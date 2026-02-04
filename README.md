@@ -22,7 +22,9 @@ This repository hosts .NET-specific plugins for [GitHub Copilot CLI](https://doc
 
    For subdirectories, use the `owner/repo:path` format.
 
-3. The plugin's skills will now be available to Copilot in your sessions.
+3. Restart Copilot CLI to load the new skills.
+
+4. The plugin's skills will now be available to Copilot in your sessions.
 
 ## Adding New Plugins
 
