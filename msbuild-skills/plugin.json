@@ -2,5 +2,5 @@
   "name": "msbuild-skills",
   "version": "1.0.0",
   "description": "GitHub Copilot CLI skills for MSBuild development.",
-  "skills": ["skills/multithreaded-task-migration/SKILL.md"]
+  "skills": ["skills/multithreaded-task-migration"]
 }
