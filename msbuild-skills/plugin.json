@@ -1,13 +1,13 @@
 {
   "name": "msbuild-skills",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "GitHub Copilot CLI skills for MSBuild development.",
   "skills": "./skills/",
   "mcpServers": {
     "binlog-mcp": {
       "type": "stdio",
       "command": "dnx",
-      "args": ["-y", "baronfel.binlog.mcp"],
+      "args": ["-y", "baronfel.binlog.mcp@0.0.13"],
       "tools": ["*"]
     }
   }
