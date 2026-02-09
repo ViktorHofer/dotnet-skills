@@ -19,6 +19,14 @@ Clashes can occur between:
 - **Different projects** sharing the same output directory
 - **Multi-targeting builds** (e.g., `TargetFrameworks=net8.0;net9.0`) where the path doesn't include the target framework
 
+## Samples
+
+The [samples](./samples/) folder contains a test solution demonstrating both types of clashes:
+- **LibraryA & LibraryB** - Cross-project clash with shared `BaseIntermediateOutputPath`
+- **MultiTargetLib** - Multi-targeting clash with `AppendTargetFrameworkToOutputPath=false`
+
+See [samples/README.md](./samples/README.md) for details.
+
 ## When to Use This Skill
 
 **Invoke this skill immediately when you see:**
