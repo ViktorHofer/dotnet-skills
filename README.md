@@ -31,10 +31,16 @@ _The following instructions are written for GitHub Copilot CLI but work with Cla
    ```
    /plugin install msbuild-skills@dotnet-skills
    ```
+5. Browse the available plugins:
+   ```
+   /skills
+   ```
 
-5. Restart Copilot CLI (type `/exit` and relaunch) to load the new skills.
+   You can find more information on those skills via `/skills list` and `/skills info`.
 
-6. The plugin's skills will now be available to Copilot in your sessions.
+6. Restart Copilot CLI (type `/exit` and relaunch) to load the new skills.
+
+7. The plugin's skills will now be available to Copilot in your sessions.
 
 ## Updating Plugins
 
