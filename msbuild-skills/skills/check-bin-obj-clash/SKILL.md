@@ -211,3 +211,7 @@ Or simply use the SDK defaults which place `obj` inside each project's directory
   - `Cannot create a file when that file already exists` (NuGet restore)
   - `The process cannot access the file because it is being used by another process`
   - Intermittent build failures that succeed on retry
+
+## Testing Fixes
+
+After making changes to fix path clashes, clean and rebuild to verify. See the [binlog-generation skill](../binlog-generation/SKILL.md#cleaning-the-repository) for how to clean the repository while preserving binlog files.

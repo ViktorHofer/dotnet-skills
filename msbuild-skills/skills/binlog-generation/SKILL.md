@@ -76,3 +76,17 @@ dotnet build /bl:1.binlog  # if 7.binlog already exists
 - Start at the highest existing number + 1 (or 1 if none exist)
 - Increment the counter for EVERY MSBuild invocation
 - The binlog file will be created in the current working directory
+
+## Cleaning the Repository
+
+When cleaning the repository with `git clean`, **always exclude binlog files** to preserve your build history:
+
+```bash
+# ✅ CORRECT - Exclude binlog files from cleaning
+git clean -fdx -e "*.binlog"
+
+# ❌ WRONG - This deletes binlog files (they're usually in .gitignore)
+git clean -fdx
+```
+
+This is especially important when iterating on build fixes - you need the binlogs to analyze what changed between builds.
