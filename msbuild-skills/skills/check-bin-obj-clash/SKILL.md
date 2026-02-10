@@ -18,6 +18,9 @@ This skill helps identify when multiple MSBuild project evaluations share the sa
 Clashes can occur between:
 - **Different projects** sharing the same output directory
 - **Multi-targeting builds** (e.g., `TargetFrameworks=net8.0;net9.0`) where the path doesn't include the target framework
+- **Multiple solution builds** where the same project is built from different solutions in a single build
+
+**Note:** Project instances with `BuildProjectReferences=false` should be **ignored** when analyzing clashes - these are P2P reference resolution builds that only query metadata (via `GetTargetPath`) and do not actually write to output directories.
 
 ## Samples
 
@@ -77,6 +80,16 @@ get_evaluation_global_properties with:
 
 Look for properties like `TargetFramework`, `Configuration`, `Platform`, and `RuntimeIdentifier` that should differentiate output paths.
 
+### Filter Out Non-Build Evaluations
+
+When analyzing clashes, filter evaluations based on the type of clash you're investigating:
+
+1. **For OutputPath clashes**: Exclude restore-phase evaluations (where `MSBuildRestoreSessionId` global property is set). These don't write to output directories.
+
+2. **For IntermediateOutputPath clashes**: Include restore-phase evaluations, as NuGet restore writes `project.assets.json` to the intermediate output path.
+
+3. **Always exclude `BuildProjectReferences=false`**: These are P2P metadata queries, not actual builds that write files.
+
 ## Step 6: Get Output Paths for Each Evaluation
 
 For each evaluation, retrieve the `OutputPath` and `IntermediateOutputPath`:
@@ -95,6 +108,31 @@ Compare the `OutputPath` and `IntermediateOutputPath` values across all evaluati
 1. **Normalize paths** - Convert to absolute paths and normalize separators
 2. **Group by path** - Find evaluations that share the same OutputPath or IntermediateOutputPath
 3. **Report clashes** - Any group with more than one evaluation indicates a clash
+
+## Step 8: Verify Clashes via CopyFilesToOutputDirectory (Optional)
+
+As additional evidence for OutputPath clashes, check if multiple project builds execute the `CopyFilesToOutputDirectory` target to the same path. Note that not all clashes manifest here - compilation outputs and other targets may also conflict.
+
+```
+search_binlog with:
+  - binlog_file: "<path>"
+  - query: "$target CopyFilesToOutputDirectory project(<project-name>.csproj)"
+```
+
+Then for each project ID that ran this target, examine the Copy task messages:
+
+```
+list_tasks_in_target with:
+  - binlog_file: "<path>"
+  - projectId: <project-id>
+  - targetId: <target-id-of-CopyFilesToOutputDirectory>
+```
+
+Look for evidence of clashes in the messages:
+- `Copying file from "..." to "..."` - Active file writes
+- `Did not copy from file "..." to file "..." because the "SkipUnchangedFiles" parameter was set to "true"` - Indicates a second build attempted to write to the same location
+
+The `SkipUnchangedFiles` skip message often masks clashes - the build succeeds but is vulnerable to race conditions in parallel builds.
 
 ### Expected Output Structure
 
@@ -184,6 +222,17 @@ Or simply use the SDK defaults which place `obj` inside each project's directory
 <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
 ```
 
+### Multiple solutions building the same project
+
+**Problem:** A single build invokes multiple solutions (e.g., via MSBuild task or command line) that include the same project. Each solution build evaluates and builds the project independently, potentially with different global properties that don't affect the output path.
+
+**Example:** A repo build script builds `BuildAnalyzers.sln` then `Main.slnx`, and both solutions include `SharedAnalyzers.csproj`. Both builds write to `bin\Release\netstandard2.0\`.
+
+**Fix:** Options include:
+1. **Consolidate solutions** - Ensure each project is only built from one solution in a single build
+2. **Use different configurations** - Build solutions with different `Configuration` values that result in different output paths
+3. **Exclude duplicate projects** - Use solution filters or conditional project inclusion to avoid building the same project twice
+
 ## Example Workflow
 
 ```
@@ -219,6 +268,20 @@ Or simply use the SDK defaults which place `obj` inside each project's directory
   - `Cannot create a file when that file already exists` (NuGet restore)
   - `The process cannot access the file because it is being used by another process`
   - Intermittent build failures that succeed on retry
+
+### Global Properties to Check When Comparing Evaluations
+
+When multiple evaluations share an output path, compare these global properties to understand why:
+
+| Property | Affects OutputPath? | Notes |
+|----------|---------------------|-------|
+| `TargetFramework` | Yes | Different TFMs should have different paths |
+| `RuntimeIdentifier` | Yes | Different RIDs should have different paths |
+| `Configuration` | Yes | Debug vs Release |
+| `Platform` | Yes | AnyCPU vs x64 etc. |
+| `BuildProjectReferences` | No | `false` = P2P query, not a real build - ignore these |
+| `MSBuildRestoreSessionId` | No | Present = restore phase evaluation |
+| `PublishReadyToRun` | No | Publish setting, doesn't change build output path |
 
 ## Testing Fixes
 
