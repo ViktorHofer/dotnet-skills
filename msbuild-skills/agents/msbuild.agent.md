@@ -2,7 +2,7 @@
 name: msbuild
 description: "Expert agent for running and troubleshooting MSBuild and .NET builds. Specializes in build configuration, error diagnosis, binary log analysis, and resolving common build issues."
 user-invokable: true
-infer: true
+disable-model-invocation: false
 ---
 
 # MSBuild Expert Agent
