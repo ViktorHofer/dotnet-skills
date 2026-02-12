@@ -3,13 +3,5 @@
   "version": "1.5.0",
   "description": "GitHub Copilot CLI skills for MSBuild development.",
   "skills": "./skills/",
-  "agents": "./agents/",
-  "mcpServers": {
-    "binlog-mcp": {
-      "type": "stdio",
-      "command": "dnx",
-      "args": ["-y", "baronfel.binlog.mcp@0.0.13"],
-      "tools": ["*"]
-    }
-  }
+  "agents": ["./agents/msbuild.agent.md"]
 }
