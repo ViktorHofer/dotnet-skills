@@ -54,9 +54,34 @@ function Get-TimeDelta {
 }
 
 function Get-Winner {
-    param([float]$VanillaScore, [float]$SkilledScore)
+    param(
+        [float]$VanillaScore,
+        [float]$SkilledScore,
+        [int]$VanillaTime = 0,
+        [int]$SkilledTime = 0,
+        [int]$VanillaTokens = 0,
+        [int]$SkilledTokens = 0
+    )
+    # Quality is the primary criterion
     if ($SkilledScore -gt $VanillaScore) { return "Skilled" }
     if ($VanillaScore -gt $SkilledScore) { return "Vanilla" }
+
+    # Quality tied - use efficiency (time + tokens) as tiebreaker
+    # Score: lower time/tokens = better. Count wins per metric.
+    $skilledWins = 0
+    $vanillaWins = 0
+
+    if ($VanillaTime -gt 0 -and $SkilledTime -gt 0) {
+        if ($SkilledTime -lt $VanillaTime) { $skilledWins++ }
+        elseif ($VanillaTime -lt $SkilledTime) { $vanillaWins++ }
+    }
+    if ($VanillaTokens -gt 0 -and $SkilledTokens -gt 0) {
+        if ($SkilledTokens -lt $VanillaTokens) { $skilledWins++ }
+        elseif ($VanillaTokens -lt $SkilledTokens) { $vanillaWins++ }
+    }
+
+    if ($skilledWins -gt $vanillaWins) { return "Skilled" }
+    if ($vanillaWins -gt $skilledWins) { return "Vanilla" }
     return "Tie"
 }
 
@@ -81,14 +106,6 @@ function Get-TokenDelta {
     $pct = [math]::Round($ratio - 100)
     if ($pct -le 0) { return "${pct}%" }
     return "+${pct}%"
-}
-
-function Get-RequestDelta {
-    param([int]$Vanilla, [int]$Skilled)
-    $delta = $Skilled - $Vanilla
-    if ($delta -eq 0) { return "= 0" }
-    if ($delta -gt 0) { return "+$delta" }
-    return "$delta"
 }
 
 #endregion
@@ -119,8 +136,8 @@ $summaryLines.Add("")
 # Summary table
 $summaryLines.Add("### Summary")
 $summaryLines.Add("")
-$summaryLines.Add("| Scenario | Quality | Time | Tokens (in) | Requests | Winner |")
-$summaryLines.Add("|----------|---------|------|-------------|----------|--------|")
+$summaryLines.Add("| Scenario | Quality | Time | Tokens (in) | Winner |")
+$summaryLines.Add("|----------|---------|------|-------------|--------|")
 
 $overallVanilla = 0.0
 $overallSkilled = 0.0
@@ -157,7 +174,6 @@ foreach ($scenarioDir in $scenarioDirs) {
             $delta = [float]$skilledEval.score - [float]$vanillaEval.score
             $deltaEmoji = Get-QualityDeltaEmoji -Delta $delta
             $qualityDelta = "$deltaEmoji $delta"
-            $winner = Get-Winner -VanillaScore ([float]$vanillaEval.score) -SkilledScore ([float]$skilledEval.score)
             $scenarioCount++
         }
     }
@@ -188,16 +204,31 @@ foreach ($scenarioDir in $scenarioDirs) {
 
     # Delta stats for summary table
     $tokenDelta = "N/A"
-    $requestDelta = "N/A"
 
     if ($vanillaStats -and $skilledStats -and $vanillaStats.TokensIn -and $skilledStats.TokensIn) {
         $tokenDelta = Get-TokenDelta -Vanilla ([int]$vanillaStats.TokensIn) -Skilled ([int]$skilledStats.TokensIn)
     }
-    if ($vanillaStats -and $skilledStats -and $vanillaStats.PremiumRequests -and $skilledStats.PremiumRequests) {
-        $requestDelta = Get-RequestDelta -Vanilla ([int]$vanillaStats.PremiumRequests) -Skilled ([int]$skilledStats.PremiumRequests)
+
+    # Determine winner: quality first, then time + tokens as tiebreakers
+    if ($vanillaEval -and $skilledEval -and $vanillaEval.score -and $skilledEval.score) {
+        $winnerParams = @{
+            VanillaScore = [float]$vanillaEval.score
+            SkilledScore = [float]$skilledEval.score
+        }
+        if ($vanillaStats -and $skilledStats) {
+            if ($vanillaStats.TotalTimeSeconds -and $skilledStats.TotalTimeSeconds) {
+                $winnerParams.VanillaTime = [int]$vanillaStats.TotalTimeSeconds
+                $winnerParams.SkilledTime = [int]$skilledStats.TotalTimeSeconds
+            }
+            if ($vanillaStats.TokensIn -and $skilledStats.TokensIn) {
+                $winnerParams.VanillaTokens = [int]$vanillaStats.TokensIn
+                $winnerParams.SkilledTokens = [int]$skilledStats.TokensIn
+            }
+        }
+        $winner = Get-Winner @winnerParams
     }
 
-    $summaryLines.Add("| $scenarioName | $qualityDelta | $timeDelta | $tokenDelta | $requestDelta | $winner |")
+    $summaryLines.Add("| $scenarioName | $qualityDelta | $timeDelta | $tokenDelta | $winner |")
 }
 
 $summaryLines.Add("")
@@ -292,15 +323,6 @@ foreach ($scenarioDir in $scenarioDirs) {
         $tkDelta = Get-TokenDelta -Vanilla ([int]$vanillaStats.TokensIn) -Skilled ([int]$skilledStats.TokensIn)
     }
     $summaryLines.Add("| Tokens (in/out) | $vTokens | $sTokens | $tkDelta |")
-
-    # Premium Requests row
-    $vReqs = if ($vanillaStats -and $vanillaStats.PremiumRequests) { "$($vanillaStats.PremiumRequests)" } else { "N/A" }
-    $sReqs = if ($skilledStats -and $skilledStats.PremiumRequests) { "$($skilledStats.PremiumRequests)" } else { "N/A" }
-    $rDelta = "N/A"
-    if ($vanillaStats -and $skilledStats -and $vanillaStats.PremiumRequests -and $skilledStats.PremiumRequests) {
-        $rDelta = Get-RequestDelta -Vanilla ([int]$vanillaStats.PremiumRequests) -Skilled ([int]$skilledStats.PremiumRequests)
-    }
-    $summaryLines.Add("| Premium Requests | $vReqs | $sReqs | $rDelta |")
 
     $summaryLines.Add("")
 
