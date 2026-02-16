@@ -74,12 +74,26 @@ function Clean-ScenarioFolder {
 
     Write-Host "[CLEAN] Cleaning scenario folder: $ScenarioPath"
 
+    # Restore any files modified by a previous Copilot run
+    Write-Host "[CLEAN] Restoring modified files via git checkout..."
+    Push-Location $ScenarioPath
+    try {
+        & git checkout -- . 2>&1 | Out-Null
+    } catch {
+        Write-Warning "git checkout failed (scenario may not be tracked): $_"
+    }
+    Pop-Location
+
     # Remove build artifacts
     Get-ChildItem -Path $ScenarioPath -Recurse -Directory -Include 'bin', 'obj' -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     # Remove any previous copilot outputs
     Get-ChildItem -Path $ScenarioPath -Recurse -File -Include '*.copilot.*', 'copilot-session-*' -ErrorAction SilentlyContinue |
+        Remove-Item -Force -ErrorAction SilentlyContinue
+
+    # Remove binlog files that may have been generated
+    Get-ChildItem -Path $ScenarioPath -Recurse -File -Include '*.binlog' -ErrorAction SilentlyContinue |
         Remove-Item -Force -ErrorAction SilentlyContinue
 
     # Remove SharedObj and SharedOutput contents (from bin-obj-clash scenario)
@@ -243,7 +257,14 @@ if ($RunType -eq "vanilla") {
 }
 
 # Step 3: Build the prompt
-$prompt = "Analyze the build configuration in this directory and identify any output path clashes or build configuration issues. Look at the .csproj files and solution file. Identify problems that would cause build failures, especially related to shared output paths, intermediate output paths, and multi-targeting configurations. Explain each issue you find and suggest a solution."
+$promptFile = Join-Path $scenarioDir "prompt.txt"
+if (Test-Path $promptFile) {
+    $prompt = (Get-Content $promptFile -Raw).Trim()
+    Write-Host "[PROMPT] Loaded from: $promptFile"
+} else {
+    $prompt = "Analyze the build issues in this scenario and provide required fixes and their explanations. The fixes should not alter logic of the code (e.g. by suggesting to delete code files)."
+    Write-Host "[PROMPT] Using default prompt (no prompt.txt found)"
+}
 
 # Step 4: Run Copilot CLI
 $outputFile = Join-Path $scenarioResultsDir "${RunType}-output.txt"
