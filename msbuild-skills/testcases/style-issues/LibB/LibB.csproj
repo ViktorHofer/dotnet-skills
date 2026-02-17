@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- BAD: Same properties duplicated from LibA — should be in Directory.Build.props -->
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -11,7 +10,6 @@
     <Copyright>Copyright 2024 Contoso</Copyright>
   </PropertyGroup>
 
-  <!-- BAD: Hardcoded absolute path -->
   <PropertyGroup>
     <OutputPath>C:\builds\output\LibB</OutputPath>
   </PropertyGroup>

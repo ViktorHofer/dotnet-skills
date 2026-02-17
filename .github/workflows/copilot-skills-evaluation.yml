@@ -66,14 +66,19 @@ jobs:
             $scenarios = $inputScenarios -split ',' | ForEach-Object { $_.Trim() }
           }
           else {
-            $scenarios = Get-ChildItem -Path "evaluation/scenarios" -Directory |
-              Where-Object { Test-Path (Join-Path $_.FullName "scenario") } |
+          $scenarios = Get-ChildItem -Path "msbuild-skills/testcases" -Directory |
+            Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
               Select-Object -ExpandProperty Name
           }
           $scenarioList = $scenarios -join ","
           Write-Host "Scenarios to evaluate: $scenarioList"
           echo "SCENARIOS=$scenarioList" >> $env:GITHUB_ENV
         shell: pwsh
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}

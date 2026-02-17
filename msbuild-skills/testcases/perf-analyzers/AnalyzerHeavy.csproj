@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Many analyzers to demonstrate analyzer overhead -->
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" />
     <PackageReference Include="Roslynator.Analyzers" Version="4.7.0" />

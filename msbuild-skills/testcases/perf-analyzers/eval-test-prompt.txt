@@ -1,0 +1,1 @@
+Build this project and analyze its build performance. Identify any bottlenecks.

@@ -3,17 +3,13 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
-  <!-- BAD: Custom target WITHOUT Inputs/Outputs — always runs, breaking incremental build -->
   <Target Name="GenerateTimestamp" BeforeTargets="CoreCompile">
     <PropertyGroup>
       <TimestampFile>$(IntermediateOutputPath)build-timestamp.txt</TimestampFile>
     </PropertyGroup>
     <WriteLinesToFile File="$(TimestampFile)" Lines="Built at: $([System.DateTime]::Now.ToString())" Overwrite="true" />
-    <!-- BAD: Not registered in FileWrites, so clean won't remove it -->
-    <!-- BAD: No Inputs/Outputs, so this target runs every single build -->
   </Target>
 
-  <!-- BAD: Another target that always runs because it uses volatile data -->
   <Target Name="EmbedGitHash" BeforeTargets="CoreCompile">
     <Exec Command="git rev-parse HEAD" ConsoleToMsBuild="true" IgnoreExitCode="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="GitHash" />

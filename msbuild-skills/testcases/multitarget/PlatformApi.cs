@@ -17,8 +17,6 @@ public class PlatformApi
 #endif
     }
 
-    // This will cause CS0246 on netstandard2.0 and net472 because Span<T> is not available
-    // without the System.Memory package
     public void ProcessData(ReadOnlySpan<byte> data)
     {
         Console.WriteLine($"Processing {data.Length} bytes");

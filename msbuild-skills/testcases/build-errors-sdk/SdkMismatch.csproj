@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- NETSDK1045: The current .NET SDK does not support targeting .NET 99.0 -->
     <TargetFramework>net99.0</TargetFramework>
   </PropertyGroup>
 </Project>
