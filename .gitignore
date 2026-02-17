@@ -3,6 +3,15 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Secrets file for local testing (act)
+.secrets
+
+# Local artifact server storage (act)
+.act-artifacts/
+
+# Evaluation results (generated at runtime)
+evaluation/results/
+
 # dotenv files
 .env
 

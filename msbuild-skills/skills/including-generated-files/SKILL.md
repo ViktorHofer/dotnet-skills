@@ -1,6 +1,6 @@
 ---
 name: msbuild-including-generated-files
-description: "Explains how to include files generated during the build into MSBuild's build process. Use when generated files are missing from output, not being compiled, or globs don't capture runtime-generated content."
+description: "Proper handling of files generated during the MSBuild's build process."
 ---
 
 # Including Generated Files Into Your Build
@@ -13,6 +13,19 @@ Files generated during the build are generally ignored by the build process. Thi
 - Globs not capturing files created during the build
 
 This happens because of how MSBuild's build phases work.
+
+## Quick Takeaway
+
+For code files generated during the build - we need to add those to `Compile` and `FileWrites` item groups within the target generating the file(s):
+
+```xml
+  <ItemGroup>
+    <Compile Include="$(GeneratedFilePath)" />
+    <FileWrites Include="$(GeneratedFilePath)" />
+  </ItemGroup>
+```
+
+The target generating the file(s) should be hooked before CoreCompile and BeforeCompile targets - `BeforeTargets="CoreCompile;BeforeCompile"`
 
 ## Why Generated Files Are Ignored
 
@@ -74,17 +87,17 @@ If you're generating `.cs` files that need to be compiled, use **`BeforeTargets=
 ```xml
 <Target Name="IncludeGeneratedSourceFiles" BeforeTargets="CoreCompile;BeforeCompile">
   <PropertyGroup>
-    <_GeneratedCodeDir>$(IntermediateOutputPath)Generated\</_GeneratedCodeDir>
-    <_GeneratedFilePath>$(_GeneratedCodeDir)MyGeneratedFile.cs</_GeneratedFilePath>
+    <GeneratedCodeDir>$(IntermediateOutputPath)Generated\</GeneratedCodeDir>
+    <GeneratedFilePath>$(GeneratedCodeDir)MyGeneratedFile.cs</GeneratedFilePath>
   </PropertyGroup>
 
-  <MakeDir Directories="$(_GeneratedCodeDir)" />
+  <MakeDir Directories="$(GeneratedCodeDir)" />
 
   <!-- Your logic that generates the .cs file goes here -->
 
   <ItemGroup>
-    <Compile Include="$(_GeneratedFilePath)" />
-    <FileWrites Include="$(_GeneratedFilePath)" />
+    <Compile Include="$(GeneratedFilePath)" />
+    <FileWrites Include="$(GeneratedFilePath)" />
   </ItemGroup>
 </Target>
 ```
