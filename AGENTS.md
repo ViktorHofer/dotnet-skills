@@ -17,6 +17,22 @@ This repository contains plugins under `src/plugins/`. Each plugin has a `plugin
 - Reset lower version components when bumping a higher one (e.g., `2.3.1` → `3.0.0` for major)
 - When multiple changes land in one commit, use the highest applicable bump
 
+## Skill Conventions
+
+Every skill's `description` field in its YAML frontmatter **must** include the domain gate text:
+
+```
+Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals).
+```
+
+This ensures skills are only activated when the user is working in an MSBuild/.NET context. The `skills/shared/domain-check.md` file defines the relevance signals (high/medium/low confidence).
+
+Run validation to check all skills:
+
+```bash
+node eng/validate-skills.js
+```
+
 ## Compiled Knowledge
 
 Skill content is compiled into knowledge bundles for agentic workflows and the Copilot Extension. When modifying skills, regenerate compiled knowledge:
