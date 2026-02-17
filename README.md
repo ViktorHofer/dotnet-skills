@@ -93,7 +93,7 @@ cp src/plugins/msbuild-skills/templates/AGENTS.md AGENTS.md
 ```
 This provides MSBuild awareness in Copilot, Claude Code, and other agents that support the `AGENTS.md` standard.
 
-### VS Code Prompt Files
+### VS Code Prompt Files (Zero Install)
 
 Copy the prompt templates to your repository:
 ```bash
