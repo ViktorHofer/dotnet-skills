@@ -427,22 +427,9 @@ After migration, consider enabling modern C# features:
 
 ## Central Package Management Migration
 
-Centralizes NuGet version management across a multi-project solution.
+Centralizes NuGet version management across a multi-project solution. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the full CPM setup pattern.
 
-**Step 1:** Create `Directory.Packages.props` at the repository root:
-
-```xml
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="Serilog" Version="3.1.1" />
-    <PackageVersion Include="xunit" Version="2.7.0" />
-  </ItemGroup>
-</Project>
-```
+**Step 1:** Create `Directory.Packages.props` at the repository root with `<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>` and `<PackageVersion>` items for all packages.
 
 **Step 2:** Remove `Version` from each project's `PackageReference`:
 
@@ -545,6 +532,12 @@ Directory.Build.props → SDK .props → YourProject.csproj → SDK .targets →
 **Rule of thumb:** Properties and items go in `.props`. Custom targets and late-bound logic go in `.targets`.
 
 Because `.props` is imported before the project file, the project can override any value set there. Because `.targets` is imported after everything, it gets the final say—but projects cannot override `.targets` values.
+
+### ⚠️ Critical: TargetFramework Availability in .props vs .targets
+
+**Property conditions on `$(TargetFramework)` in `.props` files silently fail for single-targeting projects** — the property is empty during `.props` evaluation. Move TFM-conditional properties to `.targets` instead. ItemGroup and Target conditions are not affected.
+
+See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-props-evaluation.md) for the full explanation, BAD/GOOD examples, and the item/target exception.
 
 ## Directory.Build.props
 
@@ -670,7 +663,7 @@ Because `.props` is imported before the project file, the project can override a
 
 ## Directory.Packages.props (Central Package Management)
 
-Central Package Management (CPM) provides a single source of truth for all NuGet package versions.
+Central Package Management (CPM) provides a single source of truth for all NuGet package versions. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the full setup pattern, including `GlobalPackageReference` and `VersionOverride`.
 
 **Enable CPM in `Directory.Packages.props` at the repo root:**
 
@@ -681,7 +674,6 @@ Central Package Management (CPM) provides a single source of truth for all NuGet
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Define all package versions centrally -->
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="xunit" Version="2.9.0" />
@@ -695,29 +687,6 @@ Central Package Management (CPM) provides a single source of truth for all NuGet
   </ItemGroup>
 </Project>
 ```
-
-**Project files reference packages without versions:**
-
-```xml
-<!-- In a .csproj file -->
-<ItemGroup>
-  <PackageReference Include="Microsoft.Extensions.Logging" />
-  <PackageReference Include="Newtonsoft.Json" />
-</ItemGroup>
-```
-
-**Override a version for a specific project when needed:**
-
-```xml
-<PackageReference Include="Newtonsoft.Json" VersionOverride="14.0.0-beta1" />
-```
-
-**Benefits:**
-
-- Single source of truth for all package versions
-- Easier bulk updates across the entire repo
-- Prevents version drift between projects
-- `GlobalPackageReference` ensures analyzers apply everywhere without per-project configuration
 
 ## Directory.Build.rsp
 
@@ -986,6 +955,7 @@ The `ArtifactsPath` property (.NET 8+) automatically sets `BaseOutputPath`, `Bas
 | Multi-level import doesn't work | Missing `GetPathOfFileAbove` import in inner file | Add the `<Import>` element at the top of the inner file (see Multi-level section) |
 | Properties using SDK values are empty in `.props` | SDK properties aren't defined yet during `.props` evaluation | Move to `.targets` which is imported after the SDK |
 | `Directory.Packages.props` not found | File not at repo root or not named exactly | Must be named `Directory.Packages.props` and at or above the project directory |
+| Property condition on `$(TargetFramework)` doesn't match in `.props` | `TargetFramework` isn't set yet for single-targeting projects during `.props` evaluation | Move property to `.targets`, or use ItemGroup/Target conditions instead (which evaluate late) |
 
 **Diagnosis:** Use the preprocessed project output to see all imports and final property values:
 

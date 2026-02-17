@@ -29,35 +29,9 @@ Because `.props` is imported before the project file, the project can override a
 
 ### ⚠️ Critical: TargetFramework Availability in .props vs .targets
 
-**`$(TargetFramework)` is NOT reliably available in `Directory.Build.props` or any `.props` file imported before the project body.** It is only set that early for multi-targeting projects, which receive `TargetFramework` as a global property from the outer build. Single-targeting projects (using singular `<TargetFramework>`) set it in the project body, which is evaluated *after* `.props`.
+**Property conditions on `$(TargetFramework)` in `.props` files silently fail for single-targeting projects** — the property is empty during `.props` evaluation. Move TFM-conditional properties to `.targets` instead. ItemGroup and Target conditions are not affected.
 
-This means **property conditions on `$(TargetFramework)` in `.props` files silently fail** for single-targeting projects — the condition never matches because the property is empty. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
-
-```xml
-<!-- BAD: In Directory.Build.props — TargetFramework may be empty here -->
-<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-
-<!-- ALSO BAD: Condition on the property itself has the same problem -->
-<PropertyGroup>
-  <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-
-<!-- GOOD: In Directory.Build.targets — TargetFramework is always available -->
-<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-```
-
-**This restriction applies only to property conditions.** Item and Target conditions in `.props` files are safe because items and targets evaluate after all properties (including those set in the project body) have been evaluated:
-
-```xml
-<!-- OK in Directory.Build.props — ItemGroup conditions evaluate late -->
-<ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-  <PackageReference Include="System.Memory" />
-</ItemGroup>
-```
+See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-props-evaluation.md) for the full explanation, BAD/GOOD examples, and the item/target exception.
 
 ## Directory.Build.props
 
@@ -183,7 +157,7 @@ This means **property conditions on `$(TargetFramework)` in `.props` files silen
 
 ## Directory.Packages.props (Central Package Management)
 
-Central Package Management (CPM) provides a single source of truth for all NuGet package versions.
+Central Package Management (CPM) provides a single source of truth for all NuGet package versions. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the full setup pattern, including `GlobalPackageReference` and `VersionOverride`.
 
 **Enable CPM in `Directory.Packages.props` at the repo root:**
 
@@ -194,7 +168,6 @@ Central Package Management (CPM) provides a single source of truth for all NuGet
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Define all package versions centrally -->
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="xunit" Version="2.9.0" />
@@ -208,29 +181,6 @@ Central Package Management (CPM) provides a single source of truth for all NuGet
   </ItemGroup>
 </Project>
 ```
-
-**Project files reference packages without versions:**
-
-```xml
-<!-- In a .csproj file -->
-<ItemGroup>
-  <PackageReference Include="Microsoft.Extensions.Logging" />
-  <PackageReference Include="Newtonsoft.Json" />
-</ItemGroup>
-```
-
-**Override a version for a specific project when needed:**
-
-```xml
-<PackageReference Include="Newtonsoft.Json" VersionOverride="14.0.0-beta1" />
-```
-
-**Benefits:**
-
-- Single source of truth for all package versions
-- Easier bulk updates across the entire repo
-- Prevents version drift between projects
-- `GlobalPackageReference` ensures analyzers apply everywhere without per-project configuration
 
 ## Directory.Build.rsp
 

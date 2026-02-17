@@ -186,24 +186,7 @@ Use this catalog when scanning project files for improvements. Cross-reference w
 
 **Why it's bad**: Without `PrivateAssets="all"`, analyzer and build-tool packages flow as transitive dependencies to consumers of your library. Consumers get unwanted analyzers or build-time tools they didn't ask for.
 
-```xml
-<!-- BAD -->
-<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
-<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-<PackageReference Include="MinVer" Version="5.0.0" />
-
-<!-- GOOD -->
-<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
-<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-<PackageReference Include="MinVer" Version="5.0.0" PrivateAssets="all" />
-```
-
-**Packages that almost always need `PrivateAssets="all"`:**
-- Roslyn analyzers (`*.Analyzers`, `*.CodeFixes`)
-- Source generators
-- SourceLink packages (`Microsoft.SourceLink.*`)
-- Versioning tools (`MinVer`, `Nerdbank.GitVersioning`)
-- Build-only tools (`Microsoft.DotNet.ApiCompat`, etc.)
+See [`shared/private-assets.md`](../shared/private-assets.md) for BAD/GOOD examples and the full list of packages that need this.
 
 ---
 
@@ -251,21 +234,9 @@ See `directory-build-organization` skill for full guidance on structuring `Direc
 <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 <!-- ProjectB.csproj -->
 <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-
-<!-- GOOD: Central Package Management -->
-<!-- Directory.Packages.props -->
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-</Project>
-
-<!-- ProjectA.csproj / ProjectB.csproj — no Version attribute -->
-<PackageReference Include="Newtonsoft.Json" />
 ```
+
+**Fix:** Use Central Package Management. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the setup pattern.
 
 ---
 
@@ -310,23 +281,7 @@ See `directory-build-organization` skill for full guidance on structuring `Direc
 
 **Why it's bad**: The target runs on every build, even when nothing changed. This defeats incremental build and slows down no-op builds.
 
-```xml
-<!-- BAD: Runs every time -->
-<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile">
-  <WriteLinesToFile File="$(IntermediateOutputPath)BuildInfo.g.cs"
-                    Lines="// Generated at $(Version)" Overwrite="true" />
-</Target>
-
-<!-- GOOD: Skipped when up-to-date -->
-<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile"
-        Inputs="$(MSBuildProjectFile)" Outputs="$(IntermediateOutputPath)BuildInfo.g.cs">
-  <WriteLinesToFile File="$(IntermediateOutputPath)BuildInfo.g.cs"
-                    Lines="// Generated at $(Version)" Overwrite="true" />
-  <ItemGroup>
-    <Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" />
-  </ItemGroup>
-</Target>
-```
+See [`shared/incremental-build-inputs-outputs.md`](../shared/incremental-build-inputs-outputs.md) for BAD/GOOD examples and the full pattern including FileWrites registration.
 
 See `incremental-build` skill for deep guidance on Inputs/Outputs, FileWrites, and up-to-date checks.
 
@@ -547,6 +502,16 @@ See `incremental-build` skill for deep guidance on Inputs/Outputs, FileWrites, a
 
 ---
 
+## AP-21: Property Conditioned on TargetFramework in .props Files
+
+**Smell**: `<PropertyGroup Condition="'$(TargetFramework)' == '...'">` or `<Property Condition="'$(TargetFramework)' == '...'">` in `Directory.Build.props` or any `.props` file imported before the project body.
+
+**Why it's bad**: `$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects. For single-targeting projects, the condition silently fails. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
+
+See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-props-evaluation.md) for the full explanation, BAD/GOOD examples, and the item/target exception.
+
+---
+
 ## Quick-Reference Checklist
 
 When reviewing an MSBuild file, scan for these in order:
@@ -555,6 +520,7 @@ When reviewing an MSBuild file, scan for these in order:
 |---|-------|----------|
 | AP-02 | Unquoted conditions | 🔴 Error-prone |
 | AP-19 | Side effects in evaluation | 🔴 Dangerous |
+| AP-21 | Property conditioned on TargetFramework in .props | 🔴 Silent failure |
 | AP-03 | Hardcoded absolute paths | 🔴 Broken on other machines |
 | AP-06 | `<Reference>` with HintPath for NuGet | 🟡 Legacy |
 | AP-07 | Missing `PrivateAssets="all"` on tools | 🟡 Leaks to consumers |
@@ -875,20 +841,9 @@ Group related properties logically. Use a consistent ordering convention.
 
 ### Central Package Management
 
-For multi-project repos, use `Directory.Packages.props` to centralize versions:
+For multi-project repos, use `Directory.Packages.props` to centralize versions. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the full setup pattern.
 
 ```xml
-<!-- Directory.Packages.props (repo root) -->
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="xunit" Version="2.9.3" />
-  </ItemGroup>
-</Project>
-
 <!-- Individual .csproj — no Version attribute needed -->
 <ItemGroup>
   <PackageReference Include="Newtonsoft.Json" />
@@ -897,11 +852,7 @@ For multi-project repos, use `Directory.Packages.props` to centralize versions:
 
 ### Analyzers and build-only packages
 
-```xml
-<!-- GOOD: Mark analyzers/build tools so they don't flow to consumers -->
-<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
-<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-```
+Mark analyzers and build tools with `PrivateAssets="all"` so they don't flow to consumers. See [`shared/private-assets.md`](../shared/private-assets.md) for the full list of packages that need this.
 
 ### Fine-grained asset control
 
@@ -1016,7 +967,7 @@ Use **Verb + Noun** format:
 
 ### Incremental build support
 
-Always specify `Inputs` and `Outputs` so the target is skipped when up-to-date:
+Always specify `Inputs` and `Outputs` so the target is skipped when up-to-date. See [`shared/incremental-build-inputs-outputs.md`](../shared/incremental-build-inputs-outputs.md) for the full pattern with FileWrites.
 
 ```xml
 <!-- GOOD: Incremental target -->
@@ -1104,6 +1055,22 @@ Use property functions for simple operations instead of shelling out.
 </Target>
 ```
 
+### Don't condition properties on TargetFramework in .props files
+
+`$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects. For single-targeting projects, property conditions on it silently fail. See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-props-evaluation.md) for the full explanation.
+
+```xml
+<!-- BAD: In Directory.Build.props — TargetFramework may be empty -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- GOOD: In Directory.Build.targets — TargetFramework is always available -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+```
+
 ---
 
 ## Paths
@@ -1178,6 +1145,6 @@ Use property functions for simple operations instead of shelling out.
 <PropertyGroup>
   <LangVersion>latest</LangVersion>
   <Nullable>enable</Nullable>
-  <Tr
+  <Trea
 
 [truncated]
