@@ -8,7 +8,7 @@ Two projects with multiple MSBuild anti-patterns for testing `msbuild-style-guid
 2. **Hardcoded absolute paths** for OutputPath
 3. **Unquoted conditions** (`$(Configuration) == Debug` should be `'$(Configuration)' == 'Debug'`)
 4. **Explicit Compile includes** (SDK handles this automatically)
-5. **`<Reference>` with HintPath** instead of `<PackageReference>`
+5. **`<Reference>` with HintPath** instead of `<PackageReference>` (note: `<Reference>` is valid for .NET Framework GAC assemblies)
 6. **`<Exec>` for simple operations** (Message task would be better)
 7. **No Directory.Build.props** to centralize shared settings
 8. **No Central Package Management**

@@ -663,12 +663,17 @@ Use property functions for simple operations instead of shelling out.
 
 ### 7. Using `<Reference>` for NuGet packages → use `<PackageReference>`
 
+`<Reference>` with HintPath to a NuGet package folder is a legacy pattern. Use `<PackageReference>` for NuGet packages and `<ProjectReference>` for local project dependencies. Note: `<Reference>` is still appropriate for .NET Framework projects referencing GAC assemblies (e.g., `WindowsBase`, `PresentationCore`).
+
 ```xml
 <!-- BAD -->
 <Reference Include="..\packages\Newtonsoft.Json.13.0.3\lib\netstandard2.0\Newtonsoft.Json.dll" />
 
-<!-- GOOD -->
+<!-- GOOD: NuGet package -->
 <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+
+<!-- ALSO OK: .NET Framework GAC assembly -->
+<Reference Include="WindowsBase" />
 ```
 
 ### 8. Defining the same property unconditionally in multiple places

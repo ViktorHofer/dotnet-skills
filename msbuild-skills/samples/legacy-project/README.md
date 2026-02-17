@@ -6,7 +6,7 @@ A deliberately legacy (non-SDK-style) project for testing the `msbuild-moderniza
 
 - Non-SDK-style project format (verbose XML with explicit Imports)
 - Explicit `<Compile Include>` for every file (SDK does this automatically)
-- `<Reference>` for framework assemblies (unnecessary in SDK-style)
+- `<Reference>` for framework assemblies (unnecessary in SDK-style unless targeting .NET Framework GAC assemblies)
 - `AssemblyInfo.cs` with properties that should be in .csproj
 - Redundant Debug/Release PropertyGroups
 - Legacy boilerplate: ProjectGuid, FileAlignment, etc.

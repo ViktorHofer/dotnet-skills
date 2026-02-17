@@ -342,7 +342,7 @@ description: "Knowledge base of common .NET and MSBuild build errors with root c
 **Common root causes:**
 - Transitive dependencies pulling in different versions of a shared library
 - Mixing package versions across projects in a solution
-- Explicit assembly references (`<Reference>`) conflicting with NuGet-managed versions
+- Explicit assembly references (`<Reference>`) conflicting with NuGet-managed versions (note: `<Reference>` is still valid for .NET Framework GAC assemblies like `WindowsBase`)
 
 **Step-by-step fix:**
 1. Build with `/bl` and inspect the binlog to see exactly which assemblies conflict.

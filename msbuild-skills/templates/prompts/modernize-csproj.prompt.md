@@ -26,6 +26,6 @@ Help me modernize and clean up the MSBuild project files in this repository.
 
 - Properties repeated in multiple .csproj files → centralize in Directory.Build.props
 - Legacy format projects → migrate to SDK-style
-- `<Reference>` tags for NuGet packages → convert to `<PackageReference>`
+- `<Reference>` tags for NuGet packages → convert to `<PackageReference>` (keep `<Reference>` only for .NET Framework GAC assemblies)
 - Custom targets without Inputs/Outputs → add for incremental build
 - Scattered package versions → centralize with Directory.Packages.props

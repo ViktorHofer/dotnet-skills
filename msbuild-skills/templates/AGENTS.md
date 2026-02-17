@@ -21,7 +21,7 @@ When a build fails:
 ## MSBuild Project File Conventions
 
 - Use SDK-style projects (`<Project Sdk="Microsoft.NET.Sdk">`)
-- Prefer `<PackageReference>` over `<Reference>` for NuGet packages
+- Use `<PackageReference>` for NuGet packages and `<ProjectReference>` for local dependencies (avoid `<Reference>` with HintPath, though `<Reference>` is still valid for .NET Framework GAC assemblies like `WindowsBase`)
 - Centralize common settings in `Directory.Build.props`
 - Centralize package versions in `Directory.Packages.props` (Central Package Management)
 - Use PascalCase for custom MSBuild properties

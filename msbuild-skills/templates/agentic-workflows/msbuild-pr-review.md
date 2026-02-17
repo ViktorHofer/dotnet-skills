@@ -43,7 +43,7 @@ You are a specialized reviewer for MSBuild project file changes. When a PR modif
 ### Check for Anti-patterns
 - Hardcoded absolute paths (should use MSBuild properties)
 - Explicit file includes that SDK handles automatically
-- `<Reference>` tags that should be `<PackageReference>`
+- `<Reference>` tags with HintPath that should be `<PackageReference>` (note: `<Reference>` is valid for .NET Framework GAC assemblies)
 - Missing `Condition` quotes: must be `'$(Prop)' == 'value'`
 - Properties that belong in Directory.Build.props (if duplicated)
 
