@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "compile-knowledge": "node scripts/compile-knowledge.js",
+    "compile-knowledge": "node ../../eng/compile-knowledge.js copilot-extension",
     "test": "node --test src/**/*.test.js"
   },
   "keywords": [

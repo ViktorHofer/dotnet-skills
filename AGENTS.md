@@ -16,3 +16,13 @@ This repository contains plugins under `src/plugins/`. Each plugin has a `plugin
 - Bump the version in the same commit as the content change
 - Reset lower version components when bumping a higher one (e.g., `2.3.1` → `3.0.0` for major)
 - When multiple changes land in one commit, use the highest applicable bump
+
+## Compiled Knowledge
+
+Skill content is compiled into knowledge bundles for agentic workflows and the Copilot Extension. When modifying skills, regenerate compiled knowledge:
+
+```bash
+node eng/compile-knowledge.js
+```
+
+The workflow compiled output (`src/msbuild-skills/templates/agentic-workflows/shared/compiled/`) and Copilot Extension compiled output (`src/copilot-extension/src/knowledge/`) are both checked in and must be committed alongside skill changes.

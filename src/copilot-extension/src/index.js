@@ -19,8 +19,8 @@ function loadKnowledge() {
     return;
   }
   for (const file of fs.readdirSync(knowledgeDir)) {
-    if (file.endsWith(".md")) {
-      const key = path.basename(file, ".md");
+    if (file.endsWith(".lock.md")) {
+      const key = path.basename(file, ".lock.md");
       knowledge[key] = fs.readFileSync(path.join(knowledgeDir, file), "utf-8");
     }
   }

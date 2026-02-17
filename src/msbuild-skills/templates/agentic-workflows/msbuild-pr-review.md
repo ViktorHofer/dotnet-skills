@@ -18,7 +18,7 @@ permissions:
   pull-requests: write
 
 imports:
-  - shared/msbuild-knowledge.md
+  - shared/compiled/pr-review-knowledge.lock.md
 
 tools:
   github:

@@ -9,7 +9,7 @@ permissions:
 
 imports:
   - shared/binlog-mcp.md
-  - shared/msbuild-knowledge.md
+  - shared/compiled/perf-audit-knowledge.lock.md
 
 tools:
   github:

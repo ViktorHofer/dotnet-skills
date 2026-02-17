@@ -12,7 +12,7 @@ permissions:
 
 imports:
   - shared/binlog-mcp.md
-  - shared/msbuild-knowledge.md
+  - shared/compiled/build-failure-knowledge.lock.md
 
 tools:
   github:

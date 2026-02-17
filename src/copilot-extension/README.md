@@ -44,13 +44,11 @@ copilot-extension/
 │   ├── index.js             # Entry point — handles Copilot webhook
 │   ├── domain-check.js      # MSBuild domain relevance detection
 │   ├── intent-classifier.js # Routes to the right knowledge area
-│   └── knowledge/           # Compiled skill content
+│   └── knowledge/           # Compiled skill content (generated, gitignored)
 │       ├── build-errors.md      # From common-build-errors + sourcegen-analyzer-failures
 │       ├── performance.md       # From build-perf-baseline + build-perf-diagnostics
 │       ├── style-guide.md       # From msbuild-style-guide + msbuild-antipatterns
 │       └── modernization.md     # From msbuild-modernization + directory-build-organization
-├── scripts/
-│   └── compile-knowledge.js # Compiles skill content into knowledge files
 └── app.yml                  # GitHub App manifest for registration
 ```
 
@@ -68,6 +66,10 @@ npm install
 Extract and compile skill content into optimized knowledge files:
 
 ```bash
+# From repo root
+node eng/compile-knowledge.js copilot-extension
+
+# Or from copilot-extension/
 npm run compile-knowledge
 ```
 
@@ -116,7 +118,7 @@ npm start
 npm test
 
 # Recompile knowledge after skill changes
-npm run compile-knowledge
+node ../../eng/compile-knowledge.js copilot-extension
 ```
 
 ## How It Works
