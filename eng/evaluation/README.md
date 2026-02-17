@@ -17,11 +17,10 @@ Both outputs are then scored by a separate Copilot invocation (acting as an eval
 
 ```
 eng/evaluation/
-├── scripts/                      # Pipeline scripts (PowerShell 7+)
-│   ├── run-scenario.ps1          # Copies testcase to temp dir, runs Copilot CLI
-│   ├── evaluate-response.ps1     # Scores vanilla & skilled outputs against expected-output.md
-│   ├── parse-copilot-stats.ps1   # Extracts token/time/model stats from Copilot output
-│   └── generate-summary.ps1      # Produces the final markdown summary table
+├── run-scenario.ps1              # Copies testcase to temp dir, runs Copilot CLI
+├── evaluate-response.ps1         # Scores vanilla & skilled outputs against expected-output.md
+├── parse-copilot-stats.ps1       # Extracts token/time/model stats from Copilot output
+├── generate-summary.ps1          # Produces the final markdown summary table
 ├── results/                      # Run outputs (git-ignored in CI, kept locally)
 │   └── <run-id>/
 │       ├── summary.md

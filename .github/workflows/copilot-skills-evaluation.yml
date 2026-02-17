@@ -132,7 +132,7 @@ jobs:
             $scenario = $_
             $runId = $using:runId
             Write-Host "`n=== Running vanilla: $scenario ==="
-            pwsh -File ./eng/evaluation/scripts/run-scenario.ps1 `
+            pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "vanilla" `
               -ResultsDir "eng/evaluation/results/$runId"
@@ -174,7 +174,7 @@ jobs:
             $scenario = $_
             $runId = $using:runId
             Write-Host "`n=== Running skilled: $scenario ==="
-            pwsh -File ./eng/evaluation/scripts/run-scenario.ps1 `
+            pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "skilled" `
               -ResultsDir "eng/evaluation/results/$runId"
@@ -207,7 +207,7 @@ jobs:
             $scenario = $_
             $runId = $using:runId
             Write-Host "`n=== Evaluating: $scenario ==="
-            pwsh -File ./eng/evaluation/scripts/evaluate-response.ps1 `
+            pwsh -File ./eng/evaluation/evaluate-response.ps1 `
               -ScenarioName $scenario `
               -ResultsDir "eng/evaluation/results/$runId"
           }
@@ -227,7 +227,7 @@ jobs:
       - name: Generate Summary
         if: always()
         run: |
-          pwsh -File ./eng/evaluation/scripts/generate-summary.ps1 `
+          pwsh -File ./eng/evaluation/generate-summary.ps1 `
             -ResultsDir "eng/evaluation/results/$env:RUN_ID" `
             -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
             -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
