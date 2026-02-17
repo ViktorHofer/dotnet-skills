@@ -545,6 +545,47 @@ See `incremental-build` skill for deep guidance on Inputs/Outputs, FileWrites, a
 
 ---
 
+## AP-21: Property Conditioned on TargetFramework in .props Files
+
+**Smell**: `<PropertyGroup Condition="'$(TargetFramework)' == '...'">` or `<Property Condition="'$(TargetFramework)' == '...'">` in `Directory.Build.props` or any `.props` file imported before the project body.
+
+**Why it's bad**: `$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects, which receive it as a global property from the outer build. For single-targeting projects (using singular `<TargetFramework>`), the property is set in the project body — which is evaluated *after* `.props` imports. The condition silently fails: it never matches, and no error is produced. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
+
+```xml
+<!-- BAD: In Directory.Build.props — silently fails for single-targeting projects -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- ALSO BAD: Condition on the property itself has the same problem -->
+<PropertyGroup>
+  <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- GOOD: Move to Directory.Build.targets where TargetFramework is always available -->
+<!-- Directory.Build.targets -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- ALSO GOOD: In the project file itself -->
+<!-- MyProject.csproj -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+```
+
+**Key distinction**: This restriction applies only to property conditions. ItemGroup and Target conditions on `$(TargetFramework)` are safe in `.props` files because items and targets evaluate after all properties:
+
+```xml
+<!-- OK in Directory.Build.props — ItemGroup conditions evaluate late -->
+<ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+  <PackageReference Include="System.Memory" />
+</ItemGroup>
+```
+
+---
+
 ## Quick-Reference Checklist
 
 When reviewing an MSBuild file, scan for these in order:
@@ -553,6 +594,7 @@ When reviewing an MSBuild file, scan for these in order:
 |---|-------|----------|
 | AP-02 | Unquoted conditions | 🔴 Error-prone |
 | AP-19 | Side effects in evaluation | 🔴 Dangerous |
+| AP-21 | Property conditioned on TargetFramework in .props | 🔴 Silent failure |
 | AP-03 | Hardcoded absolute paths | 🔴 Broken on other machines |
 | AP-06 | `<Reference>` with HintPath for NuGet | 🟡 Legacy |
 | AP-07 | Missing `PrivateAssets="all"` on tools | 🟡 Leaks to consumers |

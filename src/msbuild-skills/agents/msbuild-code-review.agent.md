@@ -45,6 +45,7 @@ You are a specialized agent that reviews MSBuild project files for quality, corr
 - Are there assembly version conflicts (MSB3277)?
 - Are there condition evaluation issues (wrong syntax, always true/false)?
 - Missing `PrivateAssets="all"` on analyzer packages?
+- Are there property conditions on `$(TargetFramework)` in `.props` files? (AP-21 — silently fails for single-targeting projects; move to `.targets`)
 
 3. **Report**: Produce a structured review organized by severity:
    - 🔴 **Errors**: Things that are likely broken or will cause build failures
