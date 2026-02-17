@@ -21,6 +21,11 @@ on:
         required: false
         type: boolean
         default: false
+      parallelism:
+        description: 'Number of scenarios to run in parallel'
+        required: false
+        type: number
+        default: 4
 
 # Note: For local testing with act, secrets are loaded from .secrets file
 # For GitHub, secrets are configured in repository settings
@@ -75,6 +80,26 @@ jobs:
           $scenarioList = $scenarios -join ","
           Write-Host "Scenarios to evaluate: $scenarioList"
           echo "SCENARIOS=$scenarioList" >> $env:GITHUB_ENV
+
+          # Set parallelism level
+          $parallelism = "${{ github.event.inputs.parallelism }}"
+          if (-not $parallelism -or $parallelism -eq '') {
+            $parallelism = 4
+          } else {
+            # Validate and convert to integer
+            try {
+              $parallelism = [int]$parallelism
+              if ($parallelism -lt 1) {
+                Write-Warning "Parallelism must be at least 1, using default of 4"
+                $parallelism = 4
+              }
+            } catch {
+              Write-Warning "Invalid parallelism value, using default of 4"
+              $parallelism = 4
+            }
+          }
+          Write-Host "Parallelism level: $parallelism"
+          echo "PARALLELISM=$parallelism" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Setup .NET SDK
@@ -97,15 +122,23 @@ jobs:
           }
           Write-Host "✅ Validated: No msbuild-skills plugin installed"
 
-          # Run each scenario
+          # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
-          foreach ($scenario in $scenarios) {
+          $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
+          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
+
+          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
+            $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Running vanilla: $scenario ==="
             pwsh -File ./evaluation/scripts/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "vanilla" `
-              -ResultsDir "evaluation/results/$env:RUN_ID"
+              -ResultsDir "evaluation/results/$runId"
           }
+
+          Write-Host "`n✅ All vanilla scenario runs completed"
         shell: pwsh
 
       - name: Install Plugin and Run Skilled Copilot
@@ -131,15 +164,23 @@ jobs:
           }
           Write-Host "✅ Validated: msbuild-skills plugin is installed"
 
-          # Run each scenario
+          # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
-          foreach ($scenario in $scenarios) {
+          $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
+          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
+
+          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
+            $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Running skilled: $scenario ==="
             pwsh -File ./evaluation/scripts/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "skilled" `
-              -ResultsDir "evaluation/results/$env:RUN_ID"
+              -ResultsDir "evaluation/results/$runId"
           }
+
+          Write-Host "`n✅ All skilled scenario runs completed"
         shell: pwsh
 
       - name: Uninstall Plugin and Run Evaluation
@@ -156,14 +197,22 @@ jobs:
           }
           Write-Host "✅ Validated: No msbuild-skills plugin installed for evaluation"
 
-          # Evaluate each scenario
+          # Evaluate scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
-          foreach ($scenario in $scenarios) {
+          $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
+          Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
+
+          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
+            $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Evaluating: $scenario ==="
             pwsh -File ./evaluation/scripts/evaluate-response.ps1 `
               -ScenarioName $scenario `
-              -ResultsDir "evaluation/results/$env:RUN_ID"
+              -ResultsDir "evaluation/results/$runId"
           }
+
+          Write-Host "`n✅ All scenario evaluations completed"
         shell: pwsh
 
       - name: Upload Artifacts
