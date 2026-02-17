@@ -58,7 +58,7 @@ Ready-to-use templates for different distribution channels:
 
 | Template | Location | Description |
 |----------|----------|-------------|
-| Copilot Custom Instructions | `templates/copilot-instructions.md` | Copy to `.github/copilot-instructions.md` for always-on MSBuild guidance |
+| Agent Instructions | `templates/AGENTS.md` | Copy to repo root as `AGENTS.md` for cross-agent MSBuild guidance |
 | Prompt Files | `templates/prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
 | Agentic Workflows | `templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
 | Copilot Extension Design | `templates/copilot-extension-design.md` | Design doc for a future Copilot Extension |
@@ -82,14 +82,13 @@ Ready-to-use templates for different distribution channels:
    /skills
    ```
 
-### Copilot Custom Instructions (Zero Install)
+### Agent Instructions (Zero Install)
 
-Copy `templates/copilot-instructions.md` to your repository:
+Copy `templates/AGENTS.md` to your repository root:
 ```bash
-mkdir -p .github
-cp templates/copilot-instructions.md .github/copilot-instructions.md
+cp templates/AGENTS.md AGENTS.md
 ```
-This provides MSBuild awareness in every Copilot interaction — on GitHub.com, VS Code, and Visual Studio.
+This provides MSBuild awareness in Copilot, Claude Code, and other agents that support the `AGENTS.md` standard.
 
 ### VS Code Prompt Files
 

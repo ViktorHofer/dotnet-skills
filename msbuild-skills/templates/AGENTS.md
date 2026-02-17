@@ -1,6 +1,6 @@
 # MSBuild & .NET Build Instructions
 
-<!-- Copy this file to your repository's .github/copilot-instructions.md for MSBuild-aware Copilot assistance -->
+<!-- Copy this file to your repository root as AGENTS.md for cross-agent support (Copilot, Claude Code, etc.) -->
 
 ## Build System
 

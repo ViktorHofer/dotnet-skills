@@ -13,7 +13,7 @@ msbuild-skills/
 ├── samples/                     # Test/demo sample projects
 │   └── DEMO.md                  # Presenter-ready demo guide
 └── templates/                   # Distribution templates for end users
-    ├── copilot-instructions.md  # Template for .github/copilot-instructions.md
+    ├── AGENTS.md                # Template for repo-root AGENTS.md
     ├── copilot-extension-design.md
     ├── prompts/                 # Reusable .prompt.md files
     └── agentic-workflows/       # GitHub Agentic Workflow templates
@@ -185,7 +185,7 @@ The correct solution (for validation)
 
 ## Updating the Custom Instructions Template
 
-The file `templates/copilot-instructions.md` is a template users copy to `.github/copilot-instructions.md`. Keep it concise — custom instructions are injected into **every** Copilot interaction, so brevity matters. Focus on the highest-impact conventions only.
+The file `templates/AGENTS.md` is a template users copy to their repo root as `AGENTS.md`. Keep it concise — these instructions are injected into **every** AI interaction, so brevity matters. Focus on the highest-impact conventions only.
 
 ## Plugin Manifest
 
