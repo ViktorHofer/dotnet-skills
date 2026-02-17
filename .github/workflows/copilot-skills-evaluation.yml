@@ -46,9 +46,7 @@ jobs:
 
       - name: Install Copilot CLI
         run: |
-          if ! command -v copilot &> /dev/null; then
-            npm install -g @github/copilot
-          fi
+          npm install -g @github/copilot
           copilot --version
 
       - name: Create results directory
@@ -109,7 +107,28 @@ jobs:
       - name: Install Plugin and Run Skilled Copilot
         run: |
           # Install the plugin from local source
-          copilot plugin install "${{ github.workspace }}/msbuild-skills"
+          $pluginDir = Join-Path "${{ github.workspace }}" "msbuild-skills"
+          Write-Host "Plugin directory: $pluginDir"
+          Write-Host "Plugin.json exists: $(Test-Path (Join-Path $pluginDir 'plugin.json'))"
+          Write-Host "Copilot CLI: $(Get-Command copilot | Select-Object -ExpandProperty Source)"
+          Get-ChildItem $pluginDir -File | Select-Object Name | Format-Table
+
+          # Install with retry (transient failures observed in CI)
+          $installed = $false
+          for ($attempt = 1; $attempt -le 3; $attempt++) {
+            Write-Host "Plugin install attempt $attempt..."
+            $installOutput = copilot plugin install $pluginDir 2>&1 | Out-String
+            Write-Host $installOutput
+            if ($installOutput -match "installed successfully") {
+              $installed = $true
+              break
+            }
+            Write-Host "Attempt $attempt failed, retrying in 5s..."
+            Start-Sleep -Seconds 5
+          }
+          if (-not $installed) {
+            throw "Plugin install failed after 3 attempts"
+          }
 
           # Validate plugin is installed
           $pluginList = copilot plugin list 2>&1 | Out-String
