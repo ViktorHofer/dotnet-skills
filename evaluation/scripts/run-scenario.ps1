@@ -3,11 +3,14 @@
     Runs a single evaluation scenario against Copilot CLI.
 
 .DESCRIPTION
-    Executes Copilot CLI in programmatic mode against a scenario folder,
-    captures output and stats, and saves results to the results directory.
+    Copies the scenario's 'scenario/' subfolder to a clean temp directory,
+    executes Copilot CLI in programmatic mode there, captures output and stats,
+    saves results to the results directory, and cleans up the temp copy.
 
 .PARAMETER ScenarioName
     Name of the scenario folder under evaluation/scenarios/.
+    Each scenario folder must contain a 'scenario/' subfolder with the test content
+    and optionally an 'expected-output.md' for evaluation.
 
 .PARAMETER RunType
     Either "vanilla" (no plugins) or "skilled" (with msbuild-skills plugin).
@@ -69,43 +72,22 @@ function Assert-PluginState {
     Write-Host "[OK] Plugin state validated: '$PluginName' installed=$isInstalled (expected=$ShouldBeInstalled)"
 }
 
-function Clean-ScenarioFolder {
-    param([string]$ScenarioPath)
+function Copy-ScenarioToTemp {
+    param(
+        [string]$ScenarioSourceDir,
+        [string]$ScenarioName,
+        [string]$RunType
+    )
 
-    Write-Host "[CLEAN] Cleaning scenario folder: $ScenarioPath"
+    $tempBase = Join-Path ([System.IO.Path]::GetTempPath()) "copilot-eval"
+    $tempDir = Join-Path $tempBase "${ScenarioName}-${RunType}-$(Get-Random)"
 
-    # Restore any files modified by a previous Copilot run
-    Write-Host "[CLEAN] Restoring modified files via git checkout..."
-    Push-Location $ScenarioPath
-    try {
-        & git checkout -- . 2>&1 | Out-Null
-    } catch {
-        Write-Warning "git checkout failed (scenario may not be tracked): $_"
-    }
-    Pop-Location
+    Write-Host "[COPY] Copying scenario to temp directory: $tempDir"
+    New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
+    Copy-Item -Path "$ScenarioSourceDir\*" -Destination $tempDir -Recurse -Force
+    Write-Host "[OK] Scenario copied to clean working directory"
 
-    # Remove build artifacts
-    Get-ChildItem -Path $ScenarioPath -Recurse -Directory -Include 'bin', 'obj' -ErrorAction SilentlyContinue |
-        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-
-    # Remove any previous copilot outputs
-    Get-ChildItem -Path $ScenarioPath -Recurse -File -Include '*.copilot.*', 'copilot-session-*' -ErrorAction SilentlyContinue |
-        Remove-Item -Force -ErrorAction SilentlyContinue
-
-    # Remove binlog files that may have been generated
-    Get-ChildItem -Path $ScenarioPath -Recurse -File -Include '*.binlog' -ErrorAction SilentlyContinue |
-        Remove-Item -Force -ErrorAction SilentlyContinue
-
-    # Remove SharedObj and SharedOutput contents (from bin-obj-clash scenario)
-    @('SharedObj', 'SharedOutput') | ForEach-Object {
-        $path = Join-Path $ScenarioPath $_
-        if (Test-Path $path) {
-            Get-ChildItem -Path $path -Recurse -ErrorAction SilentlyContinue |
-                Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-        }
-    }
-
-    Write-Host "[OK] Scenario folder cleaned"
+    return $tempDir
 }
 
 function Invoke-CopilotWithTimeout {
@@ -124,12 +106,13 @@ function Invoke-CopilotWithTimeout {
     $errorFile = "${OutputFile}.err"
 
     # Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
-    $copilotCmd = Get-Command copilot -ErrorAction SilentlyContinue |
+    # Use -All to search across all PATH entries, not just the first match
+    $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
         Where-Object { $_.CommandType -eq 'Application' } |
         Select-Object -First 1 -ExpandProperty Source
     if (-not $copilotCmd) {
         if ($env:OS -match 'Windows') {
-            # Windows: use cmd.exe to run copilot (works with .ps1 shims via PATH)
+            # Windows: use cmd.exe to run copilot (works with .cmd/.bat shims via PATH)
             $copilotCmd = "cmd.exe"
             $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user"
         } else {
@@ -223,18 +206,19 @@ Write-Host ("=" * 60)
 Write-Host "[SCENARIO] Running: $ScenarioName ($RunType)"
 Write-Host ("=" * 60)
 
-$scenarioDir = Join-Path $RepoRoot "evaluation\scenarios\$ScenarioName"
+$scenarioBaseDir = Join-Path $RepoRoot "evaluation\scenarios\$ScenarioName"
+$scenarioSourceDir = Join-Path $scenarioBaseDir "scenario"
 $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 
-if (-not (Test-Path $scenarioDir)) {
-    throw "Scenario directory not found: $scenarioDir"
+if (-not (Test-Path $scenarioSourceDir)) {
+    throw "Scenario source directory not found: $scenarioSourceDir"
 }
 
 # Create results directory
 New-Item -ItemType Directory -Force -Path $scenarioResultsDir | Out-Null
 
-# Step 1: Clean the scenario folder
-Clean-ScenarioFolder -ScenarioPath $scenarioDir
+# Step 1: Copy scenario to a clean temp directory
+$workingDir = Copy-ScenarioToTemp -ScenarioSourceDir $scenarioSourceDir -ScenarioName $ScenarioName -RunType $RunType
 
 # Step 2: Configure plugin state
 $pluginName = "msbuild-skills"
@@ -257,7 +241,7 @@ if ($RunType -eq "vanilla") {
 }
 
 # Step 3: Build the prompt
-$promptFile = Join-Path $scenarioDir "prompt.txt"
+$promptFile = Join-Path $workingDir "prompt.txt"
 if (Test-Path $promptFile) {
     $prompt = (Get-Content $promptFile -Raw).Trim()
     Write-Host "[PROMPT] Loaded from: $promptFile"
@@ -271,7 +255,7 @@ $outputFile = Join-Path $scenarioResultsDir "${RunType}-output.txt"
 
 $output = Invoke-CopilotWithTimeout `
     -Prompt $prompt `
-    -WorkingDir $scenarioDir `
+    -WorkingDir $workingDir `
     -OutputFile $outputFile `
     -TimeoutSeconds $TimeoutSeconds
 
@@ -294,6 +278,11 @@ Write-Host "   Total Time: $($stats.TotalTimeSeconds)s"
 Write-Host "   Model: $($stats.Model)"
 Write-Host "   Tokens In: $($stats.TokensIn)"
 Write-Host "   Tokens Out: $($stats.TokensOut)"
+
+# Step 6: Clean up temp directory
+Write-Host ""
+Write-Host "[CLEAN] Removing temp working directory: $workingDir"
+Remove-Item -Path $workingDir -Recurse -Force -ErrorAction SilentlyContinue
 
 Write-Host ""
 Write-Host "[OK] Scenario $ScenarioName ($RunType) completed"

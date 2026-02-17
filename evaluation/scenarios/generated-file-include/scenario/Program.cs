@@ -1,4 +1,4 @@
-using AddGeneratedCodeFile.Generated;
+using TestProject.Generated;
 
 Console.WriteLine("=== Build Information (from generated code) ===");
 Console.WriteLine($"Project Name:     {BuildInfo.ProjectName}");

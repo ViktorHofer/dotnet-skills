@@ -1,7 +1,7 @@
 # Expected Findings: generated-file-include Scenario
 
 ## Problem Summary
-This project generates a C# source file during the build (via an MSBuild inline task), but fails to include it in compilation. The build fails because `Program.cs` references `AddGeneratedCodeFile.Generated.BuildInfo` which exists in the generated file.
+This project generates a C# source file during the build (via an MSBuild inline task), but fails to include it in compilation. The build fails because `Program.cs` references `TestProject.Generated.BuildInfo` which exists in the generated file.
 
 ## Root Cause
 The `GenerateSampleCode` target writes a `.cs` file to `$(IntermediateOutputPath)Generated\GeneratedInfo.cs` using the `WriteCodeFile` inline task, but the target does **not** add the generated file to the `Compile` item group. Since the file is generated during the build (execution phase), it wasn't present during MSBuild's evaluation phase when default globs are expanded, so it is never compiled.

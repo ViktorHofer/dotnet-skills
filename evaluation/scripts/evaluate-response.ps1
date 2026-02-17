@@ -13,9 +13,6 @@
 .PARAMETER ResultsDir
     Path to the results directory for this run.
 
-.PARAMETER ExpectedOutputsDir
-    Path to the directory containing expected output files.
-
 .PARAMETER TimeoutSeconds
     Maximum time to wait for evaluation Copilot CLI to complete.
 
@@ -30,10 +27,7 @@ param(
     [Parameter(Mandatory)]
     [string]$ResultsDir,
 
-    [Parameter(Mandatory)]
-    [string]$ExpectedOutputsDir,
-
-    [int]$TimeoutSeconds = 300,
+[int]$TimeoutSeconds = 300,
 
     [string]$RepoRoot
 )
@@ -54,17 +48,18 @@ function Invoke-EvaluationCopilot {
     )
 
 # Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
-        $copilotCmd = Get-Command copilot -ErrorAction SilentlyContinue |
-            Where-Object { $_.CommandType -eq 'Application' } |
-            Select-Object -First 1 -ExpandProperty Source
-        if (-not $copilotCmd) {
-            if ($env:OS -match 'Windows') {
-                $copilotCmd = "cmd.exe"
-                $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-            } else {
-                $copilotCmd = "/usr/bin/env"
-                $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-            }
+    # Use -All to search across all PATH entries, not just the first match
+    $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandType -eq 'Application' } |
+        Select-Object -First 1 -ExpandProperty Source
+    if (-not $copilotCmd) {
+        if ($env:OS -match 'Windows') {
+            $copilotCmd = "cmd.exe"
+            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
+        } else {
+            $copilotCmd = "/usr/bin/env"
+            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
+        }
     } else {
         $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
     }
@@ -187,8 +182,9 @@ Write-Host ("=" * 60)
 
 $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 
-# Read expected output
-$expectedFile = Join-Path $ExpectedOutputsDir "$ScenarioName.md"
+# Read expected output from scenario folder
+$scenarioBaseDir = Join-Path $RepoRoot "evaluation\scenarios\$ScenarioName"
+$expectedFile = Join-Path $scenarioBaseDir "expected-output.md"
 if (-not (Test-Path $expectedFile)) {
     throw "Expected output file not found: $expectedFile"
 }

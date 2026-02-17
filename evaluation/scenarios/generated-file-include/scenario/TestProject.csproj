@@ -23,7 +23,7 @@
 var code = $@"// Auto-generated file - do not edit
 // Generated on: {BuildTime}
 
-namespace AddGeneratedCodeFile.Generated;
+namespace TestProject.Generated;
 
 public static class BuildInfo
 {{
