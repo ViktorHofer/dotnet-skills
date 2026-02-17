@@ -73,7 +73,7 @@ disable-model-invocation: false
 - Define a clear **workflow** (Step 1 → Step 2 → ...) in the body
 - Reference related skills with relative paths (e.g., `../skills/my-skill/SKILL.md`)
 - Agents should orchestrate, not duplicate skill content — link to skills for deep knowledge
-- Register new agents in `plugin.json` under the `agents` array
+- Agents are auto-discovered from the `agents` directory (no manifest change needed)
 
 ## Adding a Prompt File
 
@@ -188,9 +188,10 @@ The file `templates/AGENTS.md` is a template users copy to their repo root as `A
 
 ## Plugin Manifest
 
-When adding new agents, update `src/msbuild-skills/plugin.json`:
+When adding new agents or skills, no `plugin.json` change is needed — both are auto-discovered from their directories.
 - Add new agents to the `agents` array
 - Skills are auto-discovered from the `skills` directory (no manifest change needed)
+- Agents are auto-discovered from the `agents` directory (no manifest change needed)
 - Bump `version` following [semver](https://semver.org/) on releases:
   - Patch: fix content in existing skills
   - Minor: add new skills, agents, or templates
@@ -202,7 +203,7 @@ Before submitting a PR:
 
 - [ ] Skill `description` includes when to trigger AND when NOT to trigger
 - [ ] Skill `name` matches its directory name
-- [ ] New agents are registered in `plugin.json`
+- [ ] Agent file is placed in the `agents/` directory (auto-discovered)
 - [ ] Content is actionable (commands, XML snippets, step-by-step fixes — not vague advice)
 - [ ] Related skills are cross-referenced by name
 - [ ] A sample project exists for the new skill (in `samples/`)
