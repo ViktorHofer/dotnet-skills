@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- NU1605: Package downgrade detected -->
+    <!-- Microsoft.Extensions.Logging 8.0.0 depends on Microsoft.Extensions.DependencyInjection.Abstractions >= 8.0.0 -->
+    <!-- But we explicitly request an older version -->
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+</Project>

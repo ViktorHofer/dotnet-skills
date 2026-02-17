@@ -1,69 +1,143 @@
-# .NET Skills for GitHub Copilot CLI / Claude Code
+# MSBuild Skills for AI Assistants
 
-This repository hosts .NET-specific plugins for [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli) or [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview). Each plugin provides specialized skills to assist with .NET development tasks.
+This repository provides comprehensive MSBuild and .NET build expertise for AI assistants including [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli), [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), and [GitHub Agentic Workflows](https://github.com/github/gh-aw).
 
-## Available Plugins
+## What's Included
 
-| Plugin | Description |
-|--------|-------------|
-| [msbuild-skills](./msbuild-skills) | Skills for MSBuild development, including multithreaded task migration and binlog analysis |
+### 🔧 Skills (Knowledge Base)
+
+Skills are AI-readable reference documents that provide deep expertise on specific topics.
+
+#### Build Failure Troubleshooting
+| Skill | Description |
+|-------|-------------|
+| `common-build-errors` | Catalog of CS, MSB, NU, NETSDK errors with root causes and step-by-step fixes |
+| `nuget-restore-failures` | NuGet restore diagnosis: feed auth, version conflicts, source mapping, lock files |
+| `sdk-workload-resolution` | SDK and workload resolution: global.json, roll-forward policies, workload management |
+| `multitarget-tfm-issues` | TFM compatibility, multi-targeting setup, conditional compilation, RID issues |
+| `binlog-failure-analysis` | Binary log analysis for deep build failure diagnosis |
+| `binlog-generation` | Binary log generation conventions |
+
+#### Build Performance Optimization
+| Skill | Description |
+|-------|-------------|
+| `build-perf-diagnostics` | Performance bottleneck identification using binlog analysis |
+| `incremental-build` | Incremental build optimization: Inputs/Outputs, FileWrites, up-to-date checks |
+| `build-parallelism` | Parallelism tuning: /maxcpucount, graph build, project dependency optimization |
+| `build-caching` | Build caching: NuGet cache, VBCSCompiler, deterministic builds, CI/CD strategies |
+| `eval-performance` | Evaluation performance: glob optimization, import chain analysis |
+
+#### Code Quality & Modernization
+| Skill | Description |
+|-------|-------------|
+| `msbuild-style-guide` | Best practices for idiomatic MSBuild: naming, conditions, targets, property functions |
+| `msbuild-modernization` | Legacy to SDK-style project migration with before/after examples |
+| `directory-build-organization` | Directory.Build.props/targets/rsp organization and central package management |
+| `check-bin-obj-clash` | Output path conflict detection for multi-targeting and multi-project builds |
+| `including-generated-files` | Including build-generated files in MSBuild's build process |
+
+#### Other
+| Skill | Description |
+|-------|-------------|
+| `msbuild-domain-check` | Domain relevance gating — ensures MSBuild skills only activate in .NET contexts |
+| `multithreaded-task-migration` | Thread-safe MSBuild task migration guide |
+
+### 🤖 Custom Agents
+
+Agents are autonomous AI personas that orchestrate multi-step workflows.
+
+| Agent | Description |
+|-------|-------------|
+| `msbuild` | General MSBuild expert — triages problems and routes to specialized skills/agents |
+| `build-perf` | Build performance analyst — runs builds, analyzes binlogs, suggests optimizations |
+| `msbuild-code-review` | Project file reviewer — scans .csproj/.props/.targets for anti-patterns and improvements |
+
+### 📦 Distribution Templates
+
+Ready-to-use templates for different distribution channels:
+
+| Template | Location | Description |
+|----------|----------|-------------|
+| Copilot Custom Instructions | `templates/copilot-instructions.md` | Copy to `.github/copilot-instructions.md` for always-on MSBuild guidance |
+| Prompt Files | `templates/prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
+| Agentic Workflows | `templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
+| Copilot Extension Design | `templates/copilot-extension-design.md` | Design doc for a future Copilot Extension |
 
 ## Installation
 
-_The following instructions are written for GitHub Copilot CLI but work with Claude Code as well._
+### Copilot CLI / Claude Code
 
-1. Launch GitHub Copilot CLI:
-   ```bash
-   copilot
-   ```
-
+1. Launch Copilot CLI or Claude Code
 2. Add the marketplace:
    ```
    /plugin marketplace add ViktorHofer/dotnet-skills
    ```
-
-3. Browse available plugins in the marketplace:
-   ```
-   /plugin marketplace browse dotnet-skills
-   ```
-
-4. Install a plugin from the marketplace:
+3. Install the plugin:
    ```
    /plugin install msbuild-skills@dotnet-skills
    ```
-5. Browse the available plugins:
+4. Restart to load the new skills
+5. View available skills:
    ```
    /skills
    ```
 
-   You can find more information on those skills via `/skills list` and `/skills info`.
+### Copilot Custom Instructions (Zero Install)
 
-6. Restart Copilot CLI (type `/exit` and relaunch) to load the new skills.
+Copy `templates/copilot-instructions.md` to your repository:
+```bash
+mkdir -p .github
+cp templates/copilot-instructions.md .github/copilot-instructions.md
+```
+This provides MSBuild awareness in every Copilot interaction — on GitHub.com, VS Code, and Visual Studio.
 
-7. The plugin's skills will now be available to Copilot in your sessions.
+### VS Code Prompt Files
 
-## Updating Plugins
+Copy the prompt templates to your repository:
+```bash
+mkdir -p .github/prompts
+cp templates/prompts/*.prompt.md .github/prompts/
+```
+Use them in Copilot Chat with `#prompt` references.
 
-To update plugins from the marketplace and get the latest version:
+### Agentic Workflows
+
+Copy the workflow templates and compile with `gh aw`:
+```bash
+cp -r templates/agentic-workflows/ .github/workflows/
+gh aw compile
+git add .github/workflows/
+```
+
+## Updating
 
 ```
 /plugin update msbuild-skills@dotnet-skills
 ```
 
-## Adding New Plugins
+## Contributing
 
-To add a new plugin to this repository:
+We welcome contributions! To add or improve content:
 
-1. Create a new subdirectory for your plugin
-2. Add a `plugin.json` manifest:
-   ```json
-   {
-     "name": "my-plugin",
-     "version": "1.0.0",
-     "description": "Description of what the plugin does.",
-     "skills": ["./skills/"]
-   }
-   ```
-3. Add skills in a `skills/` subdirectory, each with a `SKILL.md` file
-4. Add an `mcpServers` entry if the plugin uses mcp server.
-5. Update this README to include your plugin in the table
+1. **Skills**: Add a new directory under `msbuild-skills/skills/` with a `SKILL.md` file
+2. **Agents**: Add a new `.agent.md` file under `msbuild-skills/agents/`
+3. **Templates**: Add to `msbuild-skills/templates/`
+
+### Skill Format
+
+```yaml
+---
+name: my-skill-name
+description: "Clear description of when to use this skill. Include DO NOT trigger conditions."
+---
+```
+
+Follow the existing skills as examples. Key principles:
+- Be actionable — provide exact commands and fixes
+- Be specific — include error codes, MSBuild XML snippets, and step-by-step instructions
+- Cross-reference related skills
+- Include "DO NOT use for" exclusions in the description
+
+## License
+
+See [LICENSE](LICENSE) for details.
