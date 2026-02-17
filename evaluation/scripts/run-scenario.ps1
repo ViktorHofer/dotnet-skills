@@ -3,14 +3,14 @@
     Runs a single evaluation scenario against Copilot CLI.
 
 .DESCRIPTION
-    Copies the scenario's 'scenario/' subfolder to a clean temp directory,
+    Copies the testcase's project files to a clean temp directory,
     executes Copilot CLI in programmatic mode there, captures output and stats,
     saves results to the results directory, and cleans up the temp copy.
 
 .PARAMETER ScenarioName
-    Name of the scenario folder under evaluation/scenarios/.
-    Each scenario folder must contain a 'scenario/' subfolder with the test content
-    and optionally an 'expected-output.md' for evaluation.
+    Name of the testcase folder under msbuild-skills/testcases/.
+    Each testcase folder must contain project files and optionally
+    an 'expected-output.md' for evaluation and 'eval-test-prompt.txt' for custom prompts.
 
 .PARAMETER RunType
     Either "vanilla" (no plugins) or "skilled" (with msbuild-skills plugin).
@@ -85,6 +85,17 @@ function Copy-ScenarioToTemp {
     Write-Host "[COPY] Copying scenario to temp directory: $tempDir"
     New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
     Copy-Item -Path "$ScenarioSourceDir\*" -Destination $tempDir -Recurse -Force
+
+    # Remove evaluation and documentation files from temp copy
+    $excludeFiles = @("expected-output.md", "eval-test-prompt.txt", "README.md", "DEMO.md", ".gitignore")
+    foreach ($file in $excludeFiles) {
+        $filePath = Join-Path $tempDir $file
+        if (Test-Path $filePath) {
+            Remove-Item $filePath -Force
+            Write-Host "[CLEAN] Excluded $file from working directory"
+        }
+    }
+
     Write-Host "[OK] Scenario copied to clean working directory"
 
     return $tempDir
@@ -206,8 +217,8 @@ Write-Host ("=" * 60)
 Write-Host "[SCENARIO] Running: $ScenarioName ($RunType)"
 Write-Host ("=" * 60)
 
-$scenarioBaseDir = Join-Path $RepoRoot "evaluation\scenarios\$ScenarioName"
-$scenarioSourceDir = Join-Path $scenarioBaseDir "scenario"
+$scenarioBaseDir = Join-Path $RepoRoot "msbuild-skills\testcases\$ScenarioName"
+$scenarioSourceDir = $scenarioBaseDir
 $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 
 if (-not (Test-Path $scenarioSourceDir)) {
@@ -222,7 +233,7 @@ $workingDir = Copy-ScenarioToTemp -ScenarioSourceDir $scenarioSourceDir -Scenari
 
 # Step 2: Configure plugin state
 $pluginName = "msbuild-skills"
-$pluginPath = Join-Path $RepoRoot "msbuild-skills"
+$marketplaceName = "dotnet-skills"
 
 if ($RunType -eq "vanilla") {
     Write-Host ""
@@ -236,18 +247,25 @@ if ($RunType -eq "vanilla") {
 } elseif ($RunType -eq "skilled") {
     Write-Host ""
     Write-Host "[PLUGIN] Installing plugin for skilled run..."
-    & copilot plugin install $pluginPath 2>&1 | Write-Host
+    # Register the repo as a local marketplace (idempotent - ignore if already added)
+    $prevPref = $ErrorActionPreference
+    $ErrorActionPreference = "SilentlyContinue"
+    & copilot plugin marketplace add $RepoRoot 2>&1 | Write-Host
+    $ErrorActionPreference = $prevPref
+    # Install plugin from the marketplace
+    & copilot plugin install "${pluginName}@${marketplaceName}" 2>&1 | Write-Host
     Assert-PluginState -PluginName $pluginName -ShouldBeInstalled $true
 }
 
 # Step 3: Build the prompt
-$promptFile = Join-Path $workingDir "prompt.txt"
+# Read eval-test-prompt.txt from the ORIGINAL testcase dir (before exclusion)
+$promptFile = Join-Path $scenarioBaseDir "eval-test-prompt.txt"
 if (Test-Path $promptFile) {
     $prompt = (Get-Content $promptFile -Raw).Trim()
     Write-Host "[PROMPT] Loaded from: $promptFile"
 } else {
     $prompt = "Analyze the build issues in this scenario and provide required fixes and their explanations. The fixes should not alter logic of the code (e.g. by suggesting to delete code files)."
-    Write-Host "[PROMPT] Using default prompt (no prompt.txt found)"
+    Write-Host "[PROMPT] Using default prompt (no eval-test-prompt.txt found)"
 }
 
 # Step 4: Run Copilot CLI

@@ -17,13 +17,8 @@ Both outputs are then scored by a separate Copilot invocation (acting as an eval
 
 ```
 evaluation/
-├── scenarios/                    # One folder per test scenario
-│   └── <scenario-name>/
-│       ├── expected-output.md    # Rubric the evaluator scores against
-│       └── scenario/             # Test project files (copied to temp dir at runtime)
-│           └── <scenario files>
 ├── scripts/                      # Pipeline scripts (PowerShell 7+)
-│   ├── run-scenario.ps1          # Copies scenario to temp dir, runs Copilot CLI
+│   ├── run-scenario.ps1          # Copies testcase to temp dir, runs Copilot CLI
 │   ├── evaluate-response.ps1     # Scores vanilla & skilled outputs against expected-output.md
 │   ├── parse-copilot-stats.ps1   # Extracts token/time/model stats from Copilot output
 │   └── generate-summary.ps1      # Produces the final markdown summary table
@@ -33,19 +28,40 @@ evaluation/
 │       └── <scenario-name>/
 │           └── <scenario outputs>
 └── README.md                     # This file
+
+msbuild-skills/testcases/         # Authoritative test suite (shared by demos + eval)
+├── <testcase-name>/
+│   ├── expected-output.md        # Grading rubric (required for automated eval)
+│   ├── eval-test-prompt.txt      # Custom prompt override (optional)
+│   ├── README.md                 # Human documentation (excluded from eval)
+│   └── <project files>           # Test project files (copied to temp dir)
+└── ...
 ```
+
+### File Conventions
+
+| File | Purpose | Copied to eval temp dir? |
+|------|---------|--------------------------|
+| `expected-output.md` | Grading rubric for evaluator | ❌ No — read directly |
+| `eval-test-prompt.txt` | Custom prompt (overrides default) | ❌ No — read from source dir |
+| `README.md` | Human documentation | ❌ No — excluded from eval copy |
+| `DEMO.md` | Demo guide | ❌ No — excluded from eval copy |
+| `.gitignore` | Git ignore rules | ❌ No — excluded from eval copy |
+| Everything else | Test project files | ✅ Yes — copied to temp dir |
 
 ### Adding a New Scenario
 
-1. Create `evaluation/scenarios/<name>/scenario/` with the project files that exhibit the build problem.
-2. Create `evaluation/scenarios/<name>/expected-output.md` describing the expected diagnosis, key concepts, and fixes.
-3. The pipeline will auto-discover any folder under `scenarios/` that contains a `scenario/` subfolder.
+1. Create a testcase in `msbuild-skills/testcases/<name>/` with project files that exhibit the build problem.
+2. Add `expected-output.md` describing the expected diagnosis, key concepts, and fixes.
+3. Optionally add `eval-test-prompt.txt` if the default prompt ("Analyze the build issues...") doesn't fit.
+4. Ensure no hint-comments (e.g., `<!-- BAD: ... -->`, `// CS0246: ...`) remain in project files.
+5. The pipeline will auto-discover any testcase folder containing `expected-output.md`.
 
-> **Note:** Only the `scenario/` subfolder is copied to a temp directory for each run, keeping the repository checkout clean. The `expected-output.md` stays in place and is read directly during evaluation.
+> **Note:** Only project files are copied to a temp directory for each run. `README.md`, `expected-output.md`, `eval-test-prompt.txt`, `DEMO.md`, and `.gitignore` are excluded from the temp copy to avoid leaking answers to the AI.
 
 ## Pipeline Steps
 
-1. **Discover scenarios** — finds all `evaluation/scenarios/*/scenario/` directories.
+1. **Discover scenarios** — finds all `msbuild-skills/testcases/*/expected-output.md` directories.
 2. **Vanilla run** — uninstalls the skills plugin, runs each scenario through Copilot CLI.
 3. **Skilled run** — installs `msbuild-skills` plugin, runs each scenario again.
 4. **Evaluate** — uninstalls the plugin, then uses Copilot CLI (as a neutral evaluator) to score both outputs against `expected-output.md`.

@@ -1,0 +1,1 @@
+Review the MSBuild project files in this solution for best practices and anti-patterns. What should be improved?
