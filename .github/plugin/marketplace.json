@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "msbuild-skills",
-      "source": "./src/plugins/msbuild-skills",
+      "source": "./src/msbuild-skills",
       "description": "Skills for MSBuild development."
     }
   ]

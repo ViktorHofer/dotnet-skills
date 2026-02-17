@@ -61,9 +61,9 @@ Ready-to-use templates for different distribution channels:
 
 | Template | Location | Description |
 |----------|----------|-------------|
-| Agent Instructions | `src/plugins/msbuild-skills/templates/AGENTS.md` | Copy to repo root as `AGENTS.md` for cross-agent MSBuild guidance |
-| Prompt Files | `src/plugins/msbuild-skills/templates/prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
-| Agentic Workflows | `src/plugins/msbuild-skills/templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
+| Agent Instructions | `src/msbuild-skills/templates/AGENTS.md` | Copy to repo root as `AGENTS.md` for cross-agent MSBuild guidance |
+| Prompt Files | `src/msbuild-skills/templates/prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
+| Agentic Workflows | `src/msbuild-skills/templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
 | Copilot Extension | `src/copilot-extension/` | Deployable `@msbuild` Copilot Extension for GitHub.com, VS Code, and Visual Studio |
 
 ## Installation
@@ -87,9 +87,9 @@ Ready-to-use templates for different distribution channels:
 
 ### Agent Instructions (Zero Install)
 
-Copy `src/plugins/msbuild-skills/templates/AGENTS.md` to your repository root:
+Copy `src/msbuild-skills/templates/AGENTS.md` to your repository root:
 ```bash
-cp src/plugins/msbuild-skills/templates/AGENTS.md AGENTS.md
+cp src/msbuild-skills/templates/AGENTS.md AGENTS.md
 ```
 This provides MSBuild awareness in Copilot, Claude Code, and other agents that support the `AGENTS.md` standard.
 
@@ -98,7 +98,7 @@ This provides MSBuild awareness in Copilot, Claude Code, and other agents that s
 Copy the prompt templates to your repository:
 ```bash
 mkdir -p .github/prompts
-cp src/plugins/msbuild-skills/templates/prompts/*.prompt.md .github/prompts/
+cp src/msbuild-skills/templates/prompts/*.prompt.md .github/prompts/
 ```
 Use them in Copilot Chat with `#prompt` references.
 
@@ -106,7 +106,7 @@ Use them in Copilot Chat with `#prompt` references.
 
 Copy the workflow templates and compile with `gh aw`:
 ```bash
-cp -r src/plugins/msbuild-skills/templates/agentic-workflows/ .github/workflows/
+cp -r src/msbuild-skills/templates/agentic-workflows/ .github/workflows/
 gh aw compile
 git add .github/workflows/
 ```

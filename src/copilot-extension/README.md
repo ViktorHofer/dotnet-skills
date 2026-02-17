@@ -132,12 +132,12 @@ npm run compile-knowledge
 
 ## Extending
 
-- **Add knowledge**: Update skills in `src/plugins/msbuild-skills/skills/`, then run `npm run compile-knowledge`
+- **Add knowledge**: Update skills in `src/msbuild-skills/skills/`, then run `npm run compile-knowledge`
 - **Add intents**: Edit `src/intent-classifier.js` to recognize new categories
 - **Add tools**: For v2, add MCP server integration for binlog analysis
 
 ## Related
 
 - [Design Document](../docs/copilot-extension-design.md) — Full design rationale
-- [Skills Repository](../plugins/msbuild-skills/) — Source knowledge base
+- [Skills Repository](../msbuild-skills/) — Source knowledge base
 - [GitHub Copilot Extensions Docs](https://docs.github.com/copilot/building-copilot-extensions)

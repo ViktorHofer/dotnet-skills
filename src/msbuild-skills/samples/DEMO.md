@@ -31,7 +31,7 @@ Verify skills are loaded: `/skills` should list all MSBuild skills.
 
 ### Setup
 ```bash
-cd src/plugins/msbuild-skills/samples/build-errors-cs
+cd src/msbuild-skills/samples/build-errors-cs
 ```
 
 ### Demo Script
@@ -68,7 +68,7 @@ The AI should discover the generated file isn't included in compilation and add 
 
 ### Setup
 ```bash
-cd src/plugins/msbuild-skills/samples/legacy-project
+cd src/msbuild-skills/samples/legacy-project
 ```
 
 ### Demo Script
@@ -112,7 +112,7 @@ Build the project to make sure the migration worked
 
 ### Setup
 ```bash
-cd src/plugins/msbuild-skills/samples/perf-analyzers
+cd src/msbuild-skills/samples/perf-analyzers
 ```
 
 ### Demo Script
@@ -147,7 +147,7 @@ Disable analyzers and rebuild. How much faster is it?
 
 ### Setup
 ```bash
-cd src/plugins/msbuild-skills/samples/style-issues
+cd src/msbuild-skills/samples/style-issues
 ```
 
 ### Demo Script
