@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'src/msbuild-skills/**'
-      - 'evaluation/**'
+      - 'eng/evaluation/**'
       - '.github/workflows/copilot-skills-evaluation.yml'
 
   schedule:
@@ -61,7 +61,7 @@ jobs:
       - name: Create results directory
         run: |
           $runId = "${{ github.run_id }}-${{ github.run_attempt }}"
-          New-Item -ItemType Directory -Force -Path "evaluation/results/$runId"
+          New-Item -ItemType Directory -Force -Path "eng/evaluation/results/$runId"
           echo "RUN_ID=$runId" >> $env:GITHUB_ENV
         shell: pwsh
 
@@ -132,10 +132,10 @@ jobs:
             $scenario = $_
             $runId = $using:runId
             Write-Host "`n=== Running vanilla: $scenario ==="
-            pwsh -File ./evaluation/scripts/run-scenario.ps1 `
+            pwsh -File ./eng/evaluation/scripts/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "vanilla" `
-              -ResultsDir "evaluation/results/$runId"
+              -ResultsDir "eng/evaluation/results/$runId"
           }
 
           Write-Host "`n✅ All vanilla scenario runs completed"
@@ -174,10 +174,10 @@ jobs:
             $scenario = $_
             $runId = $using:runId
             Write-Host "`n=== Running skilled: $scenario ==="
-            pwsh -File ./evaluation/scripts/run-scenario.ps1 `
+            pwsh -File ./eng/evaluation/scripts/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "skilled" `
-              -ResultsDir "evaluation/results/$runId"
+              -ResultsDir "eng/evaluation/results/$runId"
           }
 
           Write-Host "`n✅ All skilled scenario runs completed"
@@ -207,9 +207,9 @@ jobs:
             $scenario = $_
             $runId = $using:runId
             Write-Host "`n=== Evaluating: $scenario ==="
-            pwsh -File ./evaluation/scripts/evaluate-response.ps1 `
+            pwsh -File ./eng/evaluation/scripts/evaluate-response.ps1 `
               -ScenarioName $scenario `
-              -ResultsDir "evaluation/results/$runId"
+              -ResultsDir "eng/evaluation/results/$runId"
           }
 
           Write-Host "`n✅ All scenario evaluations completed"
@@ -221,19 +221,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: evaluation-results-${{ env.RUN_ID }}
-          path: evaluation/results/${{ env.RUN_ID }}/
+          path: eng/evaluation/results/${{ env.RUN_ID }}/
           retention-days: 30
 
       - name: Generate Summary
         if: always()
         run: |
-          pwsh -File ./evaluation/scripts/generate-summary.ps1 `
-            -ResultsDir "evaluation/results/$env:RUN_ID" `
+          pwsh -File ./eng/evaluation/scripts/generate-summary.ps1 `
+            -ResultsDir "eng/evaluation/results/$env:RUN_ID" `
             -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
             -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
 
           # Add to job summary
-          Get-Content "evaluation/results/$env:RUN_ID/summary.md" >> $env:GITHUB_STEP_SUMMARY
+          Get-Content "eng/evaluation/results/$env:RUN_ID/summary.md" >> $env:GITHUB_STEP_SUMMARY
         shell: pwsh
 
       - name: Comment on PR
@@ -242,4 +242,4 @@ jobs:
         continue-on-error: true  # May fail in local act runs (no GitHub API)
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-path: evaluation/results/${{ env.RUN_ID }}/summary.md
+          body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md

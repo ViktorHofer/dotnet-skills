@@ -1,6 +1,6 @@
 # Copilot Skills Evaluation
 
-Automated pipeline for measuring whether [msbuild-skills](../src/msbuild-skills/) improve Copilot's responses to MSBuild-related problems.
+Automated pipeline for measuring whether [msbuild-skills](../../src/msbuild-skills/) improve Copilot's responses to MSBuild-related problems.
 
 ## How It Works
 
@@ -16,7 +16,7 @@ Both outputs are then scored by a separate Copilot invocation (acting as an eval
 ## Folder Structure
 
 ```
-evaluation/
+eng/evaluation/
 ├── scripts/                      # Pipeline scripts (PowerShell 7+)
 │   ├── run-scenario.ps1          # Copies testcase to temp dir, runs Copilot CLI
 │   ├── evaluate-response.ps1     # Scores vanilla & skilled outputs against expected-output.md
@@ -126,7 +126,7 @@ $ErrorActionPreference = "Continue"
     2>&1 | Tee-Object -FilePath act-eval.log
 ```
 
-Results will appear in `evaluation/results/local-run-1/summary.md`.
+Results will appear in `eng/evaluation/results/local-run-1/summary.md`.
 Uploaded artifacts are stored in `.act-artifacts/` (git-ignored).
 
 > **⚠️ Windows + act caveat:** You must invoke `act` directly from PowerShell with `2>&1 | Tee-Object` (or `2>&1 | Out-Host`). Using `cmd /c act ... > file 2>&1` causes `context canceled` errors that kill long-running Docker exec steps. This is a known issue with act v0.2.x on Windows.
