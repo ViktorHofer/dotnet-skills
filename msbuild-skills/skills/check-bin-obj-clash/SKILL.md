@@ -24,11 +24,11 @@ Clashes can occur between:
 
 ## Samples
 
-The [samples](./samples/) folder contains a test solution demonstrating both types of clashes:
+The [bin-obj-clash sample](../../samples/bin-obj-clash/) contains a test solution demonstrating both types of clashes:
 - **LibraryA & LibraryB** - Cross-project clash with shared `BaseIntermediateOutputPath`
 - **MultiTargetLib** - Multi-targeting clash with `AppendTargetFrameworkToOutputPath=false`
 
-See [samples/README.md](./samples/README.md) for details.
+See [samples/bin-obj-clash/README.md](../../samples/bin-obj-clash/README.md) for details.
 
 ## When to Use This Skill
 
