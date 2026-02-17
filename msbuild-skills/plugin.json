@@ -1,7 +1,11 @@
 {
   "name": "msbuild-skills",
-  "version": "1.5.0",
-  "description": "GitHub Copilot CLI skills for MSBuild development.",
+  "version": "2.0.0",
+  "description": "Comprehensive MSBuild and .NET build skills: failure diagnosis, performance optimization, code quality, and modernization.",
   "skills": "./skills/",
-  "agents": ["./agents/msbuild.agent.md"]
+  "agents": [
+    "./agents/msbuild.agent.md",
+    "./agents/msbuild-code-review.agent.md",
+    "./agents/build-perf.agent.md"
+  ]
 }
