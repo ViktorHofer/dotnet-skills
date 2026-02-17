@@ -54,6 +54,7 @@ For detailed MSBuild documentation, concepts, and best practices, refer to the o
 **GitHub Repository**: https://github.com/MicrosoftDocs/visualstudio-docs/blob/main/docs/msbuild
 
 Key documentation areas:
+- [Build Process Overview](https://learn.microsoft.com/en-us/visualstudio/msbuild/build-process-overview) — evaluation phases, execution model, property/item ordering
 - [MSBuild Concepts](https://github.com/MicrosoftDocs/visualstudio-docs/blob/main/docs/msbuild/msbuild-concepts.md)
 - [MSBuild Reference](https://github.com/MicrosoftDocs/visualstudio-docs/blob/main/docs/msbuild/msbuild-reference.md)
 - [Common MSBuild Project Properties](https://github.com/MicrosoftDocs/visualstudio-docs/blob/main/docs/msbuild/common-msbuild-project-properties.md)
