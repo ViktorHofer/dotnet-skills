@@ -233,7 +233,7 @@ $workingDir = Copy-ScenarioToTemp -ScenarioSourceDir $scenarioSourceDir -Scenari
 
 # Step 2: Configure plugin state
 $pluginName = "msbuild-skills"
-$pluginPath = Join-Path $RepoRoot "msbuild-skills"
+$marketplaceName = "dotnet-skills"
 
 if ($RunType -eq "vanilla") {
     Write-Host ""
@@ -247,7 +247,13 @@ if ($RunType -eq "vanilla") {
 } elseif ($RunType -eq "skilled") {
     Write-Host ""
     Write-Host "[PLUGIN] Installing plugin for skilled run..."
-    & copilot plugin install $pluginPath 2>&1 | Write-Host
+    # Register the repo as a local marketplace (idempotent - ignore if already added)
+    $prevPref = $ErrorActionPreference
+    $ErrorActionPreference = "SilentlyContinue"
+    & copilot plugin marketplace add $RepoRoot 2>&1 | Write-Host
+    $ErrorActionPreference = $prevPref
+    # Install plugin from the marketplace
+    & copilot plugin install "${pluginName}@${marketplaceName}" 2>&1 | Write-Host
     Assert-PluginState -PluginName $pluginName -ShouldBeInstalled $true
 }
 
