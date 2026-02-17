@@ -10,7 +10,7 @@
 .act-artifacts/
 
 # Evaluation results (generated at runtime)
-evaluation/results/
+eng/evaluation/results/
 
 # dotenv files
 .env

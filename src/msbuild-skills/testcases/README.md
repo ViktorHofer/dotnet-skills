@@ -77,7 +77,7 @@ cd ../perf-analyzers && dotnet build /bl:perf.binlog
 ## Evaluation Integration
 
 Testcases with an `expected-output.md` file are automatically included in the
-evaluation pipeline. See [evaluation/README.md](../../evaluation/README.md) for details.
+evaluation pipeline. See [eng/evaluation/README.md](../../../eng/evaluation/README.md) for details.
 
 ### Special Files
 - `expected-output.md` — Grading rubric (required for evaluation)
