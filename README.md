@@ -116,7 +116,7 @@ git add .github/workflows/
 
 ## Contributing
 
-See [CONTRIBUTING](docs/CONTRIBUTING) for guidelines on adding skills, agents, prompt files, agentic workflows, samples, and more.
+See [CONTRIBUTING](docs/CONTRIBUTING.md) for guidelines on adding skills, agents, prompt files, agentic workflows, samples, and more.
 
 ## License
 
