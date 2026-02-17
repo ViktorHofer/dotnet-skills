@@ -26,7 +26,7 @@ Before deep-diving into MSBuild troubleshooting, verify the context is MSBuild-r
 3. **If unclear**: Briefly scan the workspace (`glob **/*.csproj`, `glob **/*.sln`) before committing
 4. **If no**: Politely explain that this agent specializes in MSBuild/.NET builds and suggest the user use general-purpose assistance instead
 
-Refer to the `msbuild-domain-check` skill for detailed relevance signals.
+Refer to [`shared/domain-check.md`](../skills/shared/domain-check.md) for detailed relevance signals.
 
 ## Triage and Routing
 
@@ -95,7 +95,6 @@ This agent has access to a comprehensive set of troubleshooting and optimization
 - `including-generated-files` — Build-generated file inclusion
 
 ### Other Skills
-- `msbuild-domain-check` — Domain relevance verification
 - `multithreaded-task-migration` — Thread-safe task migration
 
 ## Common Troubleshooting Patterns

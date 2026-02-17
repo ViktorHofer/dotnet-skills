@@ -1,6 +1,6 @@
 ---
 name: multitarget-tfm-issues
-description: "Diagnose and fix target framework (TFM) and multi-targeting build failures in .NET projects. Use when builds fail due to TFM incompatibility, conditional compilation issues, platform-specific API usage, or RID-specific errors. Covers TFM compatibility matrix, multi-targeting patterns, #if directives, and platform abstractions. DO NOT use for non-.NET framework issues."
+description: "Diagnose and fix target framework (TFM) and multi-targeting build failures in .NET projects. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds fail due to TFM incompatibility, conditional compilation issues, platform-specific API usage, or RID-specific errors. Covers TFM compatibility matrix, multi-targeting patterns, #if directives, and platform abstractions. DO NOT use for non-.NET framework issues."
 ---
 
 # Diagnosing and Fixing TFM and Multi-targeting Build Failures

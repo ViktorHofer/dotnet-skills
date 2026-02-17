@@ -1,6 +1,6 @@
 ---
 name: binlog-failure-analysis
-description: "MANDATORY skill for .NET/MSBuild build failures. BLOCKING REQUIREMENT: When you see 'Build failed', 'error CS', 'error MSB', or non-zero exit code from dotnet build/msbuild/dotnet test commands, you MUST invoke this skill IMMEDIATELY as your first action - before reporting errors to the user or attempting fixes. Do NOT analyze console output directly. Uses binary logs for comprehensive build failure analysis."
+description: "MANDATORY skill for .NET/MSBuild build failures. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). BLOCKING REQUIREMENT: When you see 'Build failed', 'error CS', 'error MSB', or non-zero exit code from dotnet build/msbuild/dotnet test commands, you MUST invoke this skill IMMEDIATELY as your first action - before reporting errors to the user or attempting fixes. Do NOT analyze console output directly. Uses binary logs for comprehensive build failure analysis."
 ---
 
 # Analyzing MSBuild Failures with Binary Logs

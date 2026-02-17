@@ -2,7 +2,7 @@
 
 ---
 name: build-perf-baseline
-description: "Establish build performance baselines and apply systematic optimization techniques. Use when diagnosing slow builds, establishing before/after measurements, or applying advanced optimization strategies like MSBuild Server, static graph builds, artifacts output, and dependency graph trimming. Start here before diving into specific optimizations from build-perf-diagnostics, incremental-build, or build-parallelism skills. DO NOT use for non-MSBuild build systems."
+description: "Establish build performance baselines and apply systematic optimization techniques. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when diagnosing slow builds, establishing before/after measurements, or applying advanced optimization strategies like MSBuild Server, static graph builds, artifacts output, and dependency graph trimming. Start here before diving into specific optimizations from build-perf-diagnostics, incremental-build, or build-parallelism skills. DO NOT use for non-MSBuild build systems."
 ---
 
 # Build Performance Baseline & Optimization
@@ -420,7 +420,7 @@ Is your no-op build slow (> 10s per project)?
 
 ---
 name: build-perf-diagnostics
-description: "Reference knowledge for diagnosing MSBuild build performance issues. Use when builds are slow, to identify bottlenecks using binary log analysis. Covers timeline analysis, node utilization, expensive targets/tasks, Roslyn analyzer impact, RAR performance, and critical path identification. Works with the binlog MCP tools for data-driven analysis."
+description: "Reference knowledge for diagnosing MSBuild build performance issues. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds are slow, to identify bottlenecks using binary log analysis. Covers timeline analysis, node utilization, expensive targets/tasks, Roslyn analyzer impact, RAR performance, and critical path identification. Works with the binlog MCP tools for data-driven analysis."
 ---
 
 ## Performance Analysis Methodology
@@ -510,7 +510,7 @@ Step-by-step workflow with the actual MCP tool calls:
 
 ---
 name: incremental-build
-description: "Guide for optimizing MSBuild incremental builds. Use when builds are slower than expected on subsequent runs, when 'nothing changed but it rebuilds anyway', or when diagnosing why incremental builds are broken. Covers Inputs/Outputs on targets, FileWrites tracking, up-to-date checks, and diagnosing unnecessary rebuilds via binlog analysis."
+description: "Guide for optimizing MSBuild incremental builds. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds are slower than expected on subsequent runs, when 'nothing changed but it rebuilds anyway', or when diagnosing why incremental builds are broken. Covers Inputs/Outputs on targets, FileWrites tracking, up-to-date checks, and diagnosing unnecessary rebuilds via binlog analysis."
 ---
 
 ## How MSBuild Incremental Build Works
@@ -724,7 +724,7 @@ MSBuild provides built-in tools to understand what's running and why.
 
 ---
 name: build-parallelism
-description: "Guide for optimizing MSBuild build parallelism and multi-project scheduling. Use when builds are not utilizing all CPU cores, when looking to speed up multi-project builds, or when evaluating graph build mode. Covers /maxcpucount, project dependency graphs, graph build (/graph), BuildInParallel, and reducing unnecessary project references."
+description: "Guide for optimizing MSBuild build parallelism and multi-project scheduling. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds are not utilizing all CPU cores, when looking to speed up multi-project builds, or when evaluating graph build mode. Covers /maxcpucount, project dependency graphs, graph build (/graph), BuildInParallel, and reducing unnecessary project references."
 ---
 
 ## MSBuild Parallelism Model
@@ -795,7 +795,7 @@ Step-by-step:
 
 ---
 name: build-caching
-description: "Guide for MSBuild build caching and avoiding redundant work across builds. Use when optimizing CI/CD build times, implementing NuGet restore caching, or leveraging compiler server and deterministic builds. Covers restore caching, VBCSCompiler, CI/CD cache strategies, and deterministic build configuration."
+description: "Guide for MSBuild build caching and avoiding redundant work across builds. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when optimizing CI/CD build times, implementing NuGet restore caching, or leveraging compiler server and deterministic builds. Covers restore caching, VBCSCompiler, CI/CD cache strategies, and deterministic build configuration."
 ---
 
 ## Separating Restore from Build
@@ -952,24 +952,6 @@ Enable `ContinuousIntegrationBuild` in CI to normalize file paths in PDBs (repla
 ```xml
 <PropertyGroup Condition="'$(CI)' == 'true'">
   <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-</PropertyGroup>
-```
-
-For Source Link support, also embed untracked sources:
-
-```xml
-<PropertyGroup>
-  <EmbedUntrackedSources>true</EmbedUntrackedSources>
-</PropertyGroup>
-```
-
-## CI/CD Build Caching Strategies
-
-### Cache the NuGet Packages Folder
-
-The simplest and safest caching strategy. Key the cache on a hash of dependency-related files:
-
-- `packages.lock.json` (best — exact dependency versions)
-- `Directory.Packages.props
+</PropertyGro
 
 [truncated]

@@ -1,6 +1,6 @@
 ---
 name: sdk-workload-resolution
-description: "Diagnose and fix .NET SDK and workload resolution failures. Use when builds fail with NETSDK1045, NETSDK1141, MSB4236, MSB4019, or 'SDK not found' errors. Covers global.json configuration, SDK roll-forward policies, workload installation, and multi-SDK environments. DO NOT use for non-.NET SDK issues."
+description: "Diagnose and fix .NET SDK and workload resolution failures. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds fail with NETSDK1045, NETSDK1141, MSB4236, MSB4019, or 'SDK not found' errors. Covers global.json configuration, SDK roll-forward policies, workload installation, and multi-SDK environments. DO NOT use for non-.NET SDK issues."
 ---
 
 # Diagnosing and Fixing .NET SDK and Workload Resolution Failures

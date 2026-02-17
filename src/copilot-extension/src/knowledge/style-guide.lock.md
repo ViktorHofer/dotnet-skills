@@ -2,7 +2,7 @@
 
 ---
 name: msbuild-style-guide
-description: "MSBuild best practices and style guide for writing clean, idiomatic project files. Use when reviewing, creating, or refactoring .csproj, .vbproj, .fsproj, .props, .targets, or other MSBuild files. Covers property naming, conditions, target ordering, property functions, and modern SDK-style patterns. Invoke when asked to review, clean up, or improve MSBuild project files."
+description: "MSBuild best practices and style guide for writing clean, idiomatic project files. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when reviewing, creating, or refactoring .csproj, .vbproj, .fsproj, .props, .targets, or other MSBuild files. Covers property naming, conditions, target ordering, property functions, and modern SDK-style patterns. Invoke when asked to review, clean up, or improve MSBuild project files."
 ---
 
 # MSBuild Style Guide & Best Practices
@@ -703,7 +703,7 @@ Use property functions for simple operations instead of shelling out.
 
 ---
 name: msbuild-antipatterns
-description: "Catalog of MSBuild anti-patterns with detection rules and fix recipes. Use when reviewing, auditing, or cleaning up .csproj, .vbproj, .fsproj, .props, .targets, or .proj files. Each anti-pattern has a symptom, explanation, and concrete BAD→GOOD transformation. Complements the msbuild-style-guide skill (which teaches how to write good MSBuild) with a smell-detection approach. DO NOT use for non-MSBuild build systems (npm, Maven, CMake, etc.)."
+description: "Catalog of MSBuild anti-patterns with detection rules and fix recipes. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when reviewing, auditing, or cleaning up .csproj, .vbproj, .fsproj, .props, .targets, or .proj files. Each anti-pattern has a symptom, explanation, and concrete BAD→GOOD transformation. Complements the msbuild-style-guide skill (which teaches how to write good MSBuild) with a smell-detection approach. DO NOT use for non-MSBuild build systems (npm, Maven, CMake, etc.)."
 ---
 
 # MSBuild Anti-Pattern Catalog
@@ -1247,7 +1247,7 @@ When reviewing an MSBuild file, scan for these in order:
 
 ---
 name: directory-build-organization
-description: "Guide for organizing MSBuild infrastructure with Directory.Build.props, Directory.Build.targets, Directory.Packages.props, and Directory.Build.rsp. Use when structuring multi-project repos, centralizing build settings, or implementing central package management. Invoke when asked about Directory.Build files, centralizing project properties, or organizing build infrastructure."
+description: "Guide for organizing MSBuild infrastructure with Directory.Build.props, Directory.Build.targets, Directory.Packages.props, and Directory.Build.rsp. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when structuring multi-project repos, centralizing build settings, or implementing central package management. Invoke when asked about Directory.Build files, centralizing project properties, or organizing build infrastructure."
 ---
 
 # Organizing Build Infrastructure with Directory.Build Files
@@ -1423,14 +1423,6 @@ Central Package Management (CPM) provides a single source of truth for all NuGet
 
   <ItemGroup>
     <!-- GlobalPackageReference applies to ALL projects — great for analyzers -->
-    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
-    <GlobalPackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" />
-  </ItemGroup>
-</Project>
-```
-
-## Directory.Build.rsp
-
-Contains default MSBuild 
+    <
 
 [truncated]

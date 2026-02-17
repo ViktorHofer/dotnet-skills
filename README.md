@@ -42,7 +42,6 @@ Skills are AI-readable reference documents that provide deep expertise on specif
 #### Other
 | Skill | Description |
 |-------|-------------|
-| `msbuild-domain-check` | Domain relevance gating — ensures MSBuild skills only activate in .NET contexts |
 | `multithreaded-task-migration` | Thread-safe MSBuild task migration guide |
 
 ### 🤖 Custom Agents
