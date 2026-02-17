@@ -15,12 +15,14 @@ Skills are AI-readable reference documents that provide deep expertise on specif
 | `nuget-restore-failures` | NuGet restore diagnosis: feed auth, version conflicts, source mapping, lock files |
 | `sdk-workload-resolution` | SDK and workload resolution: global.json, roll-forward policies, workload management |
 | `multitarget-tfm-issues` | TFM compatibility, multi-targeting setup, conditional compilation, RID issues |
+| `sourcegen-analyzer-failures` | Source generator crashes (CS8785), analyzer exceptions (AD0001), debugging techniques |
 | `binlog-failure-analysis` | Binary log analysis for deep build failure diagnosis |
 | `binlog-generation` | Binary log generation conventions |
 
 #### Build Performance Optimization
 | Skill | Description |
 |-------|-------------|
+| `build-perf-baseline` | Performance baseline methodology: cold/warm/no-op measurement, MSBuild Server, graph builds, artifacts output |
 | `build-perf-diagnostics` | Performance bottleneck identification using binlog analysis |
 | `incremental-build` | Incremental build optimization: Inputs/Outputs, FileWrites, up-to-date checks |
 | `build-parallelism` | Parallelism tuning: /maxcpucount, graph build, project dependency optimization |
@@ -31,6 +33,7 @@ Skills are AI-readable reference documents that provide deep expertise on specif
 | Skill | Description |
 |-------|-------------|
 | `msbuild-style-guide` | Best practices for idiomatic MSBuild: naming, conditions, targets, property functions |
+| `msbuild-antipatterns` | Anti-pattern catalog: 20 numbered smells with detection rules, severity, and BAD→GOOD fixes |
 | `msbuild-modernization` | Legacy to SDK-style project migration with before/after examples |
 | `directory-build-organization` | Directory.Build.props/targets/rsp organization and central package management |
 | `check-bin-obj-clash` | Output path conflict detection for multi-targeting and multi-project builds |
@@ -61,7 +64,8 @@ Ready-to-use templates for different distribution channels:
 | Agent Instructions | `templates/AGENTS.md` | Copy to repo root as `AGENTS.md` for cross-agent MSBuild guidance |
 | Prompt Files | `templates/prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
 | Agentic Workflows | `templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
-| Copilot Extension Design | `templates/copilot-extension-design.md` | Design doc for a future Copilot Extension |
+| Copilot Extension | `copilot-extension/` | Deployable `@msbuild` Copilot Extension for GitHub.com, VS Code, and Visual Studio |
+| Copilot Extension Design | `docs/copilot-extension-design.md` | Design doc for the Copilot Extension |
 
 ## Installation
 

@@ -57,6 +57,7 @@ You are a specialized agent that reviews MSBuild project files for quality, corr
 ## Specialized Skills Reference
 This agent draws knowledge from these companion skills — load them for detailed guidance:
 - `../skills/msbuild-style-guide/SKILL.md` — Style and best practices patterns
+- `../skills/msbuild-antipatterns/SKILL.md` — Anti-pattern catalog with detection rules and fix recipes
 - `../skills/msbuild-modernization/SKILL.md` — Legacy to modern migration
 - `../skills/directory-build-organization/SKILL.md` — Build infrastructure organization
 - `../skills/check-bin-obj-clash/SKILL.md` — Output path conflict detection

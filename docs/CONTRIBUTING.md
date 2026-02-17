@@ -14,7 +14,6 @@ msbuild-skills/
 │   └── DEMO.md                  # Presenter-ready demo guide
 └── templates/                   # Distribution templates for end users
     ├── AGENTS.md                # Template for repo-root AGENTS.md
-    ├── copilot-extension-design.md
     ├── prompts/                 # Reusable .prompt.md files
     └── agentic-workflows/       # GitHub Agentic Workflow templates
         ├── shared/              # Shared components (imported by workflows)

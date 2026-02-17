@@ -77,5 +77,5 @@ Start with Option A for broad reach, then expand to Option B for users who need 
 - How to handle repo-specific context (the extension doesn't have file access by default)?
 - Should we support custom knowledge overlays per organization?
 
-## Status: Design Phase
-This document captures the design direction. Implementation is a separate initiative pending resource allocation.
+## Status: MVP Implementation Available
+The serverless MVP implementation is available in [`/copilot-extension`](../copilot-extension/). See the [README](../copilot-extension/README.md) for setup and deployment instructions.

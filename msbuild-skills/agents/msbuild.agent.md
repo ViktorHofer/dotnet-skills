@@ -35,7 +35,8 @@ Classify the user's request and route to the appropriate specialist:
 | User Intent | Route To |
 |------------|----------|
 | Build failed, errors to diagnose | This agent + `binlog-failure-analysis` skill + `common-build-errors` skill |
-| Build is slow, optimize performance | `build-perf` agent (specialized performance analysis) |
+| Source generator / analyzer errors | This agent + `sourcegen-analyzer-failures` skill |
+| Build is slow, optimize performance | `build-perf` agent + `build-perf-baseline` skill (start with baseline) |
 | Review/clean up project files | `msbuild-code-review` agent (specialized code review) |
 | NuGet restore issues | This agent + `nuget-restore-failures` skill |
 | SDK or workload problems | This agent + `sdk-workload-resolution` skill |
@@ -73,10 +74,12 @@ This agent has access to a comprehensive set of troubleshooting and optimization
 - `nuget-restore-failures` — NuGet restore diagnosis and fixes
 - `sdk-workload-resolution` — SDK and workload resolution failures
 - `multitarget-tfm-issues` — Target framework and multi-targeting issues
+- `sourcegen-analyzer-failures` — Source generator crashes (CS8785) and analyzer exceptions (AD0001)
 - `binlog-failure-analysis` — Binary log analysis for failure diagnosis
 - `binlog-generation` — Binary log generation conventions
 
 ### Performance Skills
+- `build-perf-baseline` — Performance baseline methodology and systematic optimization
 - `build-perf-diagnostics` — Performance bottleneck identification
 - `incremental-build` — Incremental build optimization
 - `build-parallelism` — Parallelism and graph build
@@ -85,6 +88,7 @@ This agent has access to a comprehensive set of troubleshooting and optimization
 
 ### Code Quality Skills
 - `msbuild-style-guide` — MSBuild best practices and style guide
+- `msbuild-antipatterns` — Anti-pattern catalog with detection rules and fix recipes
 - `msbuild-modernization` — Legacy to modern project migration
 - `directory-build-organization` — Directory.Build infrastructure
 - `check-bin-obj-clash` — Output path conflict detection
