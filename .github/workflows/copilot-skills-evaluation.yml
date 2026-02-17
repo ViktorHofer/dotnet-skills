@@ -109,11 +109,12 @@ jobs:
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
-            $resultsDir = $using:env:RUN_ID
+            $resultsDir = $using:runId
             Write-Host "`n=== Running vanilla: $scenario ==="
             pwsh -File ./evaluation/scripts/run-scenario.ps1 `
               -ScenarioName $scenario `
@@ -150,11 +151,12 @@ jobs:
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
-            $resultsDir = $using:env:RUN_ID
+            $resultsDir = $using:runId
             Write-Host "`n=== Running skilled: $scenario ==="
             pwsh -File ./evaluation/scripts/run-scenario.ps1 `
               -ScenarioName $scenario `
@@ -182,11 +184,12 @@ jobs:
           # Evaluate scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
           Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
-            $resultsDir = $using:env:RUN_ID
+            $resultsDir = $using:runId
             Write-Host "`n=== Evaluating: $scenario ==="
             pwsh -File ./evaluation/scripts/evaluate-response.ps1 `
               -ScenarioName $scenario `
