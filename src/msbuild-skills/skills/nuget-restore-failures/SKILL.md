@@ -1,6 +1,6 @@
 ---
 name: nuget-restore-failures
-description: "Diagnose and fix NuGet package restore failures in .NET projects. Use when dotnet restore fails, packages can't be resolved, feed authentication fails, or version conflicts occur. Covers nuget.config issues, private feed auth, version conflicts, lock files, source mapping, and offline scenarios. DO NOT use for non-.NET package managers (npm, pip, Maven, etc.)."
+description: "Diagnose and fix NuGet package restore failures in .NET projects. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when dotnet restore fails, packages can't be resolved, feed authentication fails, or version conflicts occur. Covers nuget.config issues, private feed auth, version conflicts, lock files, source mapping, and offline scenarios. DO NOT use for non-.NET package managers (npm, pip, Maven, etc.)."
 ---
 
 # NuGet Restore Failures

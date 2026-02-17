@@ -1,6 +1,6 @@
 ---
 name: sourcegen-analyzer-failures
-description: "Diagnose and fix source generator and Roslyn analyzer failures in .NET builds. Use when builds fail with CS8785 (source generator errors), AD0001 (analyzer exceptions), RS-prefixed errors, or when source generators produce no output. Covers generator crashes, analyzer exceptions, debugging with /p:ReportAnalyzer=true and binlog analysis, version mismatches, and TFM incompatibilities. DO NOT use for build errors unrelated to analyzers/generators (use common-build-errors instead)."
+description: "Diagnose and fix source generator and Roslyn analyzer failures in .NET builds. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds fail with CS8785 (source generator errors), AD0001 (analyzer exceptions), RS-prefixed errors, or when source generators produce no output. Covers generator crashes, analyzer exceptions, debugging with /p:ReportAnalyzer=true and binlog analysis, version mismatches, and TFM incompatibilities. DO NOT use for build errors unrelated to analyzers/generators (use common-build-errors instead)."
 ---
 
 # Source Generator & Analyzer Failure Diagnosis

@@ -1,5 +1,5 @@
 // MSBuild domain relevance detection.
-// Mirrors the logic from src/msbuild-skills/skills/msbuild-domain-check/SKILL.md
+// Mirrors the logic from src/msbuild-skills/skills/shared/domain-check.md
 
 // High-confidence signals — any one of these means MSBuild context
 const HIGH_CONFIDENCE_PATTERNS = [

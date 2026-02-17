@@ -1,6 +1,6 @@
 ---
 name: msbuild-including-generated-files
-description: "Proper handling of files generated during the MSBuild's build process."
+description: "Proper handling of files generated during the MSBuild's build process. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals)."
 ---
 
 # Including Generated Files Into Your Build

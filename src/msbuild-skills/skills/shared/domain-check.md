@@ -1,9 +1,6 @@
----
-name: msbuild-domain-check
-description: "Domain relevance check for MSBuild skills. Use this skill to verify whether the current context involves MSBuild or .NET build before activating other MSBuild-specific skills. Checks for project files, dotnet CLI usage, error code patterns, and build artifacts. DO NOT trigger for: npm/yarn/webpack builds, Makefile/CMake builds, Gradle/Maven builds, or other non-.NET build systems."
----
-
 # MSBuild Domain Relevance Check
+
+All MSBuild skills and agents in this plugin **must** verify domain relevance before proceeding. This document defines the signals to check and the confidence thresholds.
 
 ## Purpose
 

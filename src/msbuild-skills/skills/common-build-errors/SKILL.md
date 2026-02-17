@@ -1,6 +1,6 @@
 ---
 name: common-build-errors
-description: "Knowledge base of common .NET and MSBuild build errors with root causes and solutions. Use when encountering CS, MSB, NU, NETSDK, FS, or BC error codes during dotnet build, dotnet test, msbuild, or dotnet pack. Provides step-by-step fix guidance for each error. DO NOT use for non-.NET build errors (npm, Gradle, CMake, etc.)."
+description: "Knowledge base of common .NET and MSBuild build errors with root causes and solutions. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when encountering CS, MSB, NU, NETSDK, FS, or BC error codes during dotnet build, dotnet test, msbuild, or dotnet pack. Provides step-by-step fix guidance for each error. DO NOT use for non-.NET build errors (npm, Gradle, CMake, etc.)."
 ---
 
 # Common .NET and MSBuild Build Errors

@@ -1,6 +1,6 @@
 ---
 name: msbuild-style-guide
-description: "MSBuild best practices and style guide for writing clean, idiomatic project files. Use when reviewing, creating, or refactoring .csproj, .vbproj, .fsproj, .props, .targets, or other MSBuild files. Covers property naming, conditions, target ordering, property functions, and modern SDK-style patterns. Invoke when asked to review, clean up, or improve MSBuild project files."
+description: "MSBuild best practices and style guide for writing clean, idiomatic project files. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when reviewing, creating, or refactoring .csproj, .vbproj, .fsproj, .props, .targets, or other MSBuild files. Covers property naming, conditions, target ordering, property functions, and modern SDK-style patterns. Invoke when asked to review, clean up, or improve MSBuild project files."
 ---
 
 # MSBuild Style Guide & Best Practices

@@ -1,6 +1,6 @@
 ---
 name: build-caching
-description: "Guide for MSBuild build caching and avoiding redundant work across builds. Use when optimizing CI/CD build times, implementing NuGet restore caching, or leveraging compiler server and deterministic builds. Covers restore caching, VBCSCompiler, CI/CD cache strategies, and deterministic build configuration."
+description: "Guide for MSBuild build caching and avoiding redundant work across builds. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when optimizing CI/CD build times, implementing NuGet restore caching, or leveraging compiler server and deterministic builds. Covers restore caching, VBCSCompiler, CI/CD cache strategies, and deterministic build configuration."
 ---
 
 ## Separating Restore from Build

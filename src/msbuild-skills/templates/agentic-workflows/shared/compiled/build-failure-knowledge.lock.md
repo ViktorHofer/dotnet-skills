@@ -2,7 +2,7 @@
 
 ---
 name: common-build-errors
-description: "Knowledge base of common .NET and MSBuild build errors with root causes and solutions. Use when encountering CS, MSB, NU, NETSDK, FS, or BC error codes during dotnet build, dotnet test, msbuild, or dotnet pack. Provides step-by-step fix guidance for each error. DO NOT use for non-.NET build errors (npm, Gradle, CMake, etc.)."
+description: "Knowledge base of common .NET and MSBuild build errors with root causes and solutions. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when encountering CS, MSB, NU, NETSDK, FS, or BC error codes during dotnet build, dotnet test, msbuild, or dotnet pack. Provides step-by-step fix guidance for each error. DO NOT use for non-.NET build errors (npm, Gradle, CMake, etc.)."
 ---
 
 # Common .NET and MSBuild Build Errors
@@ -891,7 +891,7 @@ Using `--no-restore` and `--no-build` ensures each step uses the exact output of
 
 ---
 name: sourcegen-analyzer-failures
-description: "Diagnose and fix source generator and Roslyn analyzer failures in .NET builds. Use when builds fail with CS8785 (source generator errors), AD0001 (analyzer exceptions), RS-prefixed errors, or when source generators produce no output. Covers generator crashes, analyzer exceptions, debugging with /p:ReportAnalyzer=true and binlog analysis, version mismatches, and TFM incompatibilities. DO NOT use for build errors unrelated to analyzers/generators (use common-build-errors instead)."
+description: "Diagnose and fix source generator and Roslyn analyzer failures in .NET builds. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds fail with CS8785 (source generator errors), AD0001 (analyzer exceptions), RS-prefixed errors, or when source generators produce no output. Covers generator crashes, analyzer exceptions, debugging with /p:ReportAnalyzer=true and binlog analysis, version mismatches, and TFM incompatibilities. DO NOT use for build errors unrelated to analyzers/generators (use common-build-errors instead)."
 ---
 
 # Source Generator & Analyzer Failure Diagnosis
@@ -915,12 +915,6 @@ Source generators and Roslyn analyzers run during compilation inside the Csc tas
 
 **Diagnosis steps:**
 
-1. **Check the build output** for the full exception stack trace. MSBuild typically prints the inner exception after the CS8785 message.
-
-2. **Generate a binlog** for deeper analysis:
-   ```
-   dotnet build /bl:generator-debug.binlog
-   ```
-   In the binlog, search fo
+1. **Check the build output** for the full exception stack trace. MSBuild typically prints the inner
 
 [truncated]

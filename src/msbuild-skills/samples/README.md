@@ -18,7 +18,6 @@ This directory contains sample .NET projects designed to test and demo each MSBu
 | [`eval-heavy`](eval-heavy/) | `eval-performance` | Expensive globs, deep import chain, file I/O in eval | ✅ Builds (slow evaluation) |
 | [`generated-files`](generated-files/) | `including-generated-files` | Generated .cs file not added to Compile items | ❌ Fails (CS0103) |
 | [`bin-obj-clash`](bin-obj-clash/) | `check-bin-obj-clash` | Shared output/intermediate paths causing file conflicts | ⚠️ Builds (but has clashes) |
-| [`domain-check`](domain-check/) | `msbuild-domain-check` | Mixed .NET and non-.NET project files | ✅ .NET builds, others N/A |
 
 ## How to Use These Samples
 

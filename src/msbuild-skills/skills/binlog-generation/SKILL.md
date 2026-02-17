@@ -1,6 +1,6 @@
 ---
 name: binlog-generation
-description: "MANDATORY: Always generate binary logs when running dotnet build, dotnet test, dotnet pack, msbuild.exe, or any MSBuild-based command. Pass /bl:N.binlog with an incrementing counter (1.binlog, 2.binlog, etc.) to ensure unique filenames."
+description: "MANDATORY: Always generate binary logs when running dotnet build, dotnet test, dotnet pack, msbuild.exe, or any MSBuild-based command. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Pass /bl:N.binlog with an incrementing counter (1.binlog, 2.binlog, etc.) to ensure unique filenames."
 ---
 
 # Always Generate Binary Logs

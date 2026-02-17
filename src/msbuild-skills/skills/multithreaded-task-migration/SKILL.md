@@ -1,6 +1,6 @@
 ---
 name: multithreaded-task-migration
-description: Guide for migrating MSBuild tasks to multithreaded mode support, including compatibility red-team review. Use this when converting tasks to thread-safe versions, implementing IMultiThreadableTask, adding TaskEnvironment support, or auditing migrations for behavioral compatibility.
+description: "Guide for migrating MSBuild tasks to multithreaded mode support, including compatibility red-team review. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use this when converting tasks to thread-safe versions, implementing IMultiThreadableTask, adding TaskEnvironment support, or auditing migrations for behavioral compatibility."
 ---
 
 # Migrating MSBuild Tasks to Multithreaded API

@@ -1,6 +1,6 @@
 ---
 name: build-perf-baseline
-description: "Establish build performance baselines and apply systematic optimization techniques. Use when diagnosing slow builds, establishing before/after measurements, or applying advanced optimization strategies like MSBuild Server, static graph builds, artifacts output, and dependency graph trimming. Start here before diving into specific optimizations from build-perf-diagnostics, incremental-build, or build-parallelism skills. DO NOT use for non-MSBuild build systems."
+description: "Establish build performance baselines and apply systematic optimization techniques. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when diagnosing slow builds, establishing before/after measurements, or applying advanced optimization strategies like MSBuild Server, static graph builds, artifacts output, and dependency graph trimming. Start here before diving into specific optimizations from build-perf-diagnostics, incremental-build, or build-parallelism skills. DO NOT use for non-MSBuild build systems."
 ---
 
 # Build Performance Baseline & Optimization

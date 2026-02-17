@@ -2,7 +2,7 @@
 
 ---
 name: common-build-errors
-description: "Knowledge base of common .NET and MSBuild build errors with root causes and solutions. Use when encountering CS, MSB, NU, NETSDK, FS, or BC error codes during dotnet build, dotnet test, msbuild, or dotnet pack. Provides step-by-step fix guidance for each error. DO NOT use for non-.NET build errors (npm, Gradle, CMake, etc.)."
+description: "Knowledge base of common .NET and MSBuild build errors with root causes and solutions. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when encountering CS, MSB, NU, NETSDK, FS, or BC error codes during dotnet build, dotnet test, msbuild, or dotnet pack. Provides step-by-step fix guidance for each error. DO NOT use for non-.NET build errors (npm, Gradle, CMake, etc.)."
 ---
 
 # Common .NET and MSBuild Build Errors
@@ -889,7 +889,7 @@ Using `--no-restore` and `--no-build` ensures each step uses the exact output of
 
 ---
 name: sourcegen-analyzer-failures
-description: "Diagnose and fix source generator and Roslyn analyzer failures in .NET builds. Use when builds fail with CS8785 (source generator errors), AD0001 (analyzer exceptions), RS-prefixed errors, or when source generators produce no output. Covers generator crashes, analyzer exceptions, debugging with /p:ReportAnalyzer=true and binlog analysis, version mismatches, and TFM incompatibilities. DO NOT use for build errors unrelated to analyzers/generators (use common-build-errors instead)."
+description: "Diagnose and fix source generator and Roslyn analyzer failures in .NET builds. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds fail with CS8785 (source generator errors), AD0001 (analyzer exceptions), RS-prefixed errors, or when source generators produce no output. Covers generator crashes, analyzer exceptions, debugging with /p:ReportAnalyzer=true and binlog analysis, version mismatches, and TFM incompatibilities. DO NOT use for build errors unrelated to analyzers/generators (use common-build-errors instead)."
 ---
 
 # Source Generator & Analyzer Failure Diagnosis
@@ -1174,7 +1174,7 @@ dotnet build /p:CscVerbosity=detailed /bl:verbose.binlog
 
 ---
 name: nuget-restore-failures
-description: "Diagnose and fix NuGet package restore failures in .NET projects. Use when dotnet restore fails, packages can't be resolved, feed authentication fails, or version conflicts occur. Covers nuget.config issues, private feed auth, version conflicts, lock files, source mapping, and offline scenarios. DO NOT use for non-.NET package managers (npm, pip, Maven, etc.)."
+description: "Diagnose and fix NuGet package restore failures in .NET projects. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when dotnet restore fails, packages can't be resolved, feed authentication fails, or version conflicts occur. Covers nuget.config issues, private feed auth, version conflicts, lock files, source mapping, and offline scenarios. DO NOT use for non-.NET package managers (npm, pip, Maven, etc.)."
 ---
 
 # NuGet Restore Failures
@@ -1203,13 +1203,6 @@ sh -c "$(curl -fsSL https://aka.ms/install-artifacts-credprovider.sh)"
 Add the feed with credentials:
 
 ```shell
-dotnet nuget add source "https://pkgs.dev.azure.com/{org}/{project}/_packaging/{feed}/nuget/v3/index.json" \
-  --name "AzureArtifacts" \
-  --username "az" \
-  --password "<PAT>" \
-  --store-password-in-clear-text
-```
-
-For CI (Azure Pipelines), use the `NuGetA
+dotne
 
 [truncated]
