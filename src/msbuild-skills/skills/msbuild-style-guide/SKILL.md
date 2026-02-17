@@ -524,6 +524,29 @@ Use property functions for simple operations instead of shelling out.
 </Target>
 ```
 
+### Don't condition properties on TargetFramework in .props files
+
+`$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects (which receive it as a global property from the outer build). For single-targeting projects, it is set in the project body — after `.props` imports. Property conditions on `$(TargetFramework)` in `.props` files silently fail for these projects. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
+
+```xml
+<!-- BAD: In Directory.Build.props — TargetFramework may be empty -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- ALSO BAD: Condition on the property itself has the same problem -->
+<PropertyGroup>
+  <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- GOOD: In Directory.Build.targets — TargetFramework is always available -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+```
+
+Note: ItemGroup and Target conditions on `$(TargetFramework)` are safe in `.props` files — items and targets evaluate after all properties regardless of declaration location.
+
 ---
 
 ## Paths

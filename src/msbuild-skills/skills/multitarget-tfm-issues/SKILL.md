@@ -130,6 +130,8 @@ Use `Condition` attributes to set properties per TFM:
 </PropertyGroup>
 ```
 
+> ⚠️ **Evaluation order caveat:** PropertyGroup conditions on `$(TargetFramework)` are **only safe in project files and `.targets` files**. In `Directory.Build.props` or other `.props` files imported before the project body, `$(TargetFramework)` is only available for multi-targeting projects (which receive it as a global property from the outer build). For single-targeting projects, the property is empty during `.props` evaluation. If you need TFM-conditional properties in shared build infrastructure, place them in `Directory.Build.targets` instead. ItemGroup and Target conditions are not affected — they evaluate after all properties regardless of where they are declared.
+
 ### Conditional ItemGroups
 
 Add TFM-specific package references and files:
@@ -237,13 +239,16 @@ public string GetData()
 
 ### Custom DefineConstants per TFM
 
-Add your own symbols in the project file:
+Add your own symbols in the project file or `Directory.Build.targets`:
 
 ```xml
+<!-- In a project file or Directory.Build.targets (NOT Directory.Build.props — see note below) -->
 <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
   <DefineConstants>$(DefineConstants);USE_NEWTONSOFT;LEGACY_SUPPORT</DefineConstants>
 </PropertyGroup>
 ```
+
+> ⚠️ **Do not place TFM-conditional DefineConstants in `.props` files.** `$(TargetFramework)` is not available during `.props` evaluation for single-targeting projects. Use `.targets` or the project file itself.
 
 **Common pitfall:** Using the wrong symbol name. Preprocessor symbols use underscores, not dots or hyphens:
 - ✅ `NET8_0_OR_GREATER`

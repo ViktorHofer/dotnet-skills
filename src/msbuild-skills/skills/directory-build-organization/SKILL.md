@@ -27,6 +27,38 @@ Directory.Build.props → SDK .props → YourProject.csproj → SDK .targets →
 
 Because `.props` is imported before the project file, the project can override any value set there. Because `.targets` is imported after everything, it gets the final say—but projects cannot override `.targets` values.
 
+### ⚠️ Critical: TargetFramework Availability in .props vs .targets
+
+**`$(TargetFramework)` is NOT reliably available in `Directory.Build.props` or any `.props` file imported before the project body.** It is only set that early for multi-targeting projects, which receive `TargetFramework` as a global property from the outer build. Single-targeting projects (using singular `<TargetFramework>`) set it in the project body, which is evaluated *after* `.props`.
+
+This means **property conditions on `$(TargetFramework)` in `.props` files silently fail** for single-targeting projects — the condition never matches because the property is empty. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
+
+```xml
+<!-- BAD: In Directory.Build.props — TargetFramework may be empty here -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- ALSO BAD: Condition on the property itself has the same problem -->
+<PropertyGroup>
+  <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+
+<!-- GOOD: In Directory.Build.targets — TargetFramework is always available -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
+</PropertyGroup>
+```
+
+**This restriction applies only to property conditions.** Item and Target conditions in `.props` files are safe because items and targets evaluate after all properties (including those set in the project body) have been evaluated:
+
+```xml
+<!-- OK in Directory.Build.props — ItemGroup conditions evaluate late -->
+<ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+  <PackageReference Include="System.Memory" />
+</ItemGroup>
+```
+
 ## Directory.Build.props
 
 ### What to Put Here
@@ -467,6 +499,7 @@ The `ArtifactsPath` property (.NET 8+) automatically sets `BaseOutputPath`, `Bas
 | Multi-level import doesn't work | Missing `GetPathOfFileAbove` import in inner file | Add the `<Import>` element at the top of the inner file (see Multi-level section) |
 | Properties using SDK values are empty in `.props` | SDK properties aren't defined yet during `.props` evaluation | Move to `.targets` which is imported after the SDK |
 | `Directory.Packages.props` not found | File not at repo root or not named exactly | Must be named `Directory.Packages.props` and at or above the project directory |
+| Property condition on `$(TargetFramework)` doesn't match in `.props` | `TargetFramework` isn't set yet for single-targeting projects during `.props` evaluation | Move property to `.targets`, or use ItemGroup/Target conditions instead (which evaluate late) |
 
 **Diagnosis:** Use the preprocessed project output to see all imports and final property values:
 
