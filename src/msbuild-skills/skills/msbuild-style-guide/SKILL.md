@@ -295,20 +295,9 @@ Group related properties logically. Use a consistent ordering convention.
 
 ### Central Package Management
 
-For multi-project repos, use `Directory.Packages.props` to centralize versions:
+For multi-project repos, use `Directory.Packages.props` to centralize versions. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the full setup pattern.
 
 ```xml
-<!-- Directory.Packages.props (repo root) -->
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="xunit" Version="2.9.3" />
-  </ItemGroup>
-</Project>
-
 <!-- Individual .csproj — no Version attribute needed -->
 <ItemGroup>
   <PackageReference Include="Newtonsoft.Json" />
@@ -317,11 +306,7 @@ For multi-project repos, use `Directory.Packages.props` to centralize versions:
 
 ### Analyzers and build-only packages
 
-```xml
-<!-- GOOD: Mark analyzers/build tools so they don't flow to consumers -->
-<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
-<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-```
+Mark analyzers and build tools with `PrivateAssets="all"` so they don't flow to consumers. See [`shared/private-assets.md`](../shared/private-assets.md) for the full list of packages that need this.
 
 ### Fine-grained asset control
 
@@ -436,7 +421,7 @@ Use **Verb + Noun** format:
 
 ### Incremental build support
 
-Always specify `Inputs` and `Outputs` so the target is skipped when up-to-date:
+Always specify `Inputs` and `Outputs` so the target is skipped when up-to-date. See [`shared/incremental-build-inputs-outputs.md`](../shared/incremental-build-inputs-outputs.md) for the full pattern with FileWrites.
 
 ```xml
 <!-- GOOD: Incremental target -->
@@ -526,7 +511,7 @@ Use property functions for simple operations instead of shelling out.
 
 ### Don't condition properties on TargetFramework in .props files
 
-`$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects (which receive it as a global property from the outer build). For single-targeting projects, it is set in the project body — after `.props` imports. Property conditions on `$(TargetFramework)` in `.props` files silently fail for these projects. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
+`$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects. For single-targeting projects, property conditions on it silently fail. See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-props-evaluation.md) for the full explanation.
 
 ```xml
 <!-- BAD: In Directory.Build.props — TargetFramework may be empty -->
@@ -534,18 +519,11 @@ Use property functions for simple operations instead of shelling out.
   <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
 </PropertyGroup>
 
-<!-- ALSO BAD: Condition on the property itself has the same problem -->
-<PropertyGroup>
-  <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-
 <!-- GOOD: In Directory.Build.targets — TargetFramework is always available -->
 <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
   <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
 </PropertyGroup>
 ```
-
-Note: ItemGroup and Target conditions on `$(TargetFramework)` are safe in `.props` files — items and targets evaluate after all properties regardless of declaration location.
 
 ---
 

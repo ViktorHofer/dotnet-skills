@@ -425,22 +425,9 @@ After migration, consider enabling modern C# features:
 
 ## Central Package Management Migration
 
-Centralizes NuGet version management across a multi-project solution.
+Centralizes NuGet version management across a multi-project solution. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the full CPM setup pattern.
 
-**Step 1:** Create `Directory.Packages.props` at the repository root:
-
-```xml
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="Serilog" Version="3.1.1" />
-    <PackageVersion Include="xunit" Version="2.7.0" />
-  </ItemGroup>
-</Project>
-```
+**Step 1:** Create `Directory.Packages.props` at the repository root with `<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>` and `<PackageVersion>` items for all packages.
 
 **Step 2:** Remove `Version` from each project's `PackageReference`:
 

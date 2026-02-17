@@ -184,24 +184,7 @@ Use this catalog when scanning project files for improvements. Cross-reference w
 
 **Why it's bad**: Without `PrivateAssets="all"`, analyzer and build-tool packages flow as transitive dependencies to consumers of your library. Consumers get unwanted analyzers or build-time tools they didn't ask for.
 
-```xml
-<!-- BAD -->
-<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
-<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-<PackageReference Include="MinVer" Version="5.0.0" />
-
-<!-- GOOD -->
-<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
-<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-<PackageReference Include="MinVer" Version="5.0.0" PrivateAssets="all" />
-```
-
-**Packages that almost always need `PrivateAssets="all"`:**
-- Roslyn analyzers (`*.Analyzers`, `*.CodeFixes`)
-- Source generators
-- SourceLink packages (`Microsoft.SourceLink.*`)
-- Versioning tools (`MinVer`, `Nerdbank.GitVersioning`)
-- Build-only tools (`Microsoft.DotNet.ApiCompat`, etc.)
+See [`shared/private-assets.md`](../shared/private-assets.md) for BAD/GOOD examples and the full list of packages that need this.
 
 ---
 
@@ -249,21 +232,9 @@ See `directory-build-organization` skill for full guidance on structuring `Direc
 <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 <!-- ProjectB.csproj -->
 <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-
-<!-- GOOD: Central Package Management -->
-<!-- Directory.Packages.props -->
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-</Project>
-
-<!-- ProjectA.csproj / ProjectB.csproj — no Version attribute -->
-<PackageReference Include="Newtonsoft.Json" />
 ```
+
+**Fix:** Use Central Package Management. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the setup pattern.
 
 ---
 
@@ -308,23 +279,7 @@ See `directory-build-organization` skill for full guidance on structuring `Direc
 
 **Why it's bad**: The target runs on every build, even when nothing changed. This defeats incremental build and slows down no-op builds.
 
-```xml
-<!-- BAD: Runs every time -->
-<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile">
-  <WriteLinesToFile File="$(IntermediateOutputPath)BuildInfo.g.cs"
-                    Lines="// Generated at $(Version)" Overwrite="true" />
-</Target>
-
-<!-- GOOD: Skipped when up-to-date -->
-<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile"
-        Inputs="$(MSBuildProjectFile)" Outputs="$(IntermediateOutputPath)BuildInfo.g.cs">
-  <WriteLinesToFile File="$(IntermediateOutputPath)BuildInfo.g.cs"
-                    Lines="// Generated at $(Version)" Overwrite="true" />
-  <ItemGroup>
-    <Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" />
-  </ItemGroup>
-</Target>
-```
+See [`shared/incremental-build-inputs-outputs.md`](../shared/incremental-build-inputs-outputs.md) for BAD/GOOD examples and the full pattern including FileWrites registration.
 
 See `incremental-build` skill for deep guidance on Inputs/Outputs, FileWrites, and up-to-date checks.
 
@@ -549,40 +504,9 @@ See `incremental-build` skill for deep guidance on Inputs/Outputs, FileWrites, a
 
 **Smell**: `<PropertyGroup Condition="'$(TargetFramework)' == '...'">` or `<Property Condition="'$(TargetFramework)' == '...'">` in `Directory.Build.props` or any `.props` file imported before the project body.
 
-**Why it's bad**: `$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects, which receive it as a global property from the outer build. For single-targeting projects (using singular `<TargetFramework>`), the property is set in the project body — which is evaluated *after* `.props` imports. The condition silently fails: it never matches, and no error is produced. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
+**Why it's bad**: `$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects. For single-targeting projects, the condition silently fails. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
 
-```xml
-<!-- BAD: In Directory.Build.props — silently fails for single-targeting projects -->
-<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-
-<!-- ALSO BAD: Condition on the property itself has the same problem -->
-<PropertyGroup>
-  <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-
-<!-- GOOD: Move to Directory.Build.targets where TargetFramework is always available -->
-<!-- Directory.Build.targets -->
-<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-
-<!-- ALSO GOOD: In the project file itself -->
-<!-- MyProject.csproj -->
-<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-  <DefineConstants>$(DefineConstants);MY_FEATURE</DefineConstants>
-</PropertyGroup>
-```
-
-**Key distinction**: This restriction applies only to property conditions. ItemGroup and Target conditions on `$(TargetFramework)` are safe in `.props` files because items and targets evaluate after all properties:
-
-```xml
-<!-- OK in Directory.Build.props — ItemGroup conditions evaluate late -->
-<ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-  <PackageReference Include="System.Memory" />
-</ItemGroup>
-```
+See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-props-evaluation.md) for the full explanation, BAD/GOOD examples, and the item/target exception.
 
 ---
 
