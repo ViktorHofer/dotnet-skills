@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- BAD: This target generates a .cs file but doesn't include it properly -->
+  <Target Name="GenerateVersionFile" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <VersionFile>$(IntermediateOutputPath)Version.g.cs</VersionFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(VersionFile)"
+                     Lines="namespace GeneratedFiles { internal static class VersionInfo { public const string Version = &quot;1.0.0&quot;%3B } }"
+                     Overwrite="true" />
+    <!-- BAD: File is generated but not added to Compile items -->
+    <!-- BAD: File is not registered in FileWrites for clean -->
+    <!-- The generated file exists on disk but won't be compiled -->
+  </Target>
+</Project>

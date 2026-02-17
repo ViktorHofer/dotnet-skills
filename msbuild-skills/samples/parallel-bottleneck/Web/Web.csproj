@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Web depends on Api which depends on Core — deep serial chain -->
+    <ProjectReference Include="..\Api\Api.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <Level3Setting>true</Level3Setting>
+    <!-- BAD: Deeply nested import chain, each level adds evaluation cost -->
+  </PropertyGroup>
+</Project>
