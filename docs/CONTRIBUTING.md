@@ -149,7 +149,7 @@ Natural language instructions for the AI agent...
 
 Samples are small .NET projects that intentionally trigger specific skill scenarios — for testing and demos.
 
-1. Create a directory: `src/msbuild-skills/samples/my-scenario/`
+1. Create a directory: `src/msbuild-skills/testcases/my-scenario/`
 2. Add minimal project files that reproduce the issue
 3. Add a `README.md` with:
 

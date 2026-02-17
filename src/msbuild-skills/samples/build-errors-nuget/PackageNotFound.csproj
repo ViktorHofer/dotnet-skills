@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <!-- NU1101: Package 'Nonexistent.Package.That.Does.Not.Exist' was not found -->
-    <PackageReference Include="Nonexistent.Package.That.Does.Not.Exist" Version="99.0.0" />
-  </ItemGroup>
-</Project>
