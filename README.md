@@ -65,7 +65,6 @@ Ready-to-use templates for different distribution channels:
 | Prompt Files | `src/plugins/msbuild-skills/templates/prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
 | Agentic Workflows | `src/plugins/msbuild-skills/templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
 | Copilot Extension | `src/copilot-extension/` | Deployable `@msbuild` Copilot Extension for GitHub.com, VS Code, and Visual Studio |
-| Copilot Extension Design | `docs/copilot-extension-design.md` | Design doc for the Copilot Extension |
 
 ## Installation
 
