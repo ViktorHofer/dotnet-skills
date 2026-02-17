@@ -1,6 +1,6 @@
 # Copilot Skills Evaluation
 
-Automated pipeline for measuring whether [msbuild-skills](../msbuild-skills/) improve Copilot's responses to MSBuild-related problems.
+Automated pipeline for measuring whether [msbuild-skills](../src/plugins/msbuild-skills/) improve Copilot's responses to MSBuild-related problems.
 
 ## How It Works
 

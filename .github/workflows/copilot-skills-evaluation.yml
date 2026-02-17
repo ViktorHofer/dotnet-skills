@@ -3,7 +3,7 @@ name: Copilot Skills Evaluation
 on:
   pull_request:
     paths:
-      - 'msbuild-skills/**'
+      - 'src/plugins/msbuild-skills/**'
       - 'evaluation/**'
       - '.github/workflows/copilot-skills-evaluation.yml'
 

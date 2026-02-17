@@ -101,7 +101,7 @@ This agent has access to a comprehensive set of troubleshooting and optimization
 ## Common Troubleshooting Patterns
 
 1. Use your MSBuild expertise to help user to troubleshoot build issues.
-2. If you are not able to resolve the issue with your expertise, check if there are any relevant skills in the `msbuild-skills/skills` directory that can help with the specific problem.
+2. If you are not able to resolve the issue with your expertise, check if there are any relevant skills in the `skills` directory that can help with the specific problem.
 3. Before generating a binlog - check if there are existing `*.binlog` files that might be relevant for analysis.
 4. When there are no usable binlogs and when you cannot troubleshoot the issue with provided logs, outputs, nor codebase project files and msbuild files - use the skills to generate and analyze binlog
 5. Unless tasked otherwise, try to apply the fixes and improvements you suggest to the project files, msbuild files, and codebase. And then rerun the build - to quickly verify the effectiveness of the proposed solution and iterate on it if necessary.

@@ -5,7 +5,7 @@ We welcome contributions! This repository ships several types of artifacts — e
 ## Repository Structure
 
 ```
-msbuild-skills/
+src/plugins/msbuild-skills/
 ├── plugin.json                  # Plugin manifest (bump version on releases)
 ├── .mcp.json                    # MCP server configuration (binlog-mcp)
 ├── agents/                      # Custom agents (*.agent.md)
@@ -24,7 +24,7 @@ msbuild-skills/
 
 Skills are AI-readable knowledge documents. The AI reads them for guidance when a matching topic comes up.
 
-1. Create a directory: `msbuild-skills/skills/my-skill-name/`
+1. Create a directory: `src/plugins/msbuild-skills/skills/my-skill-name/`
 2. Create `SKILL.md` with YAML frontmatter:
 
 ```yaml
@@ -55,7 +55,7 @@ private feed auth, version conflicts, and lock files. DO NOT use for non-.NET pa
 
 Agents are autonomous AI personas that orchestrate multi-step workflows — they take actions, run tools, and dispatch to skills.
 
-1. Create `msbuild-skills/agents/my-agent.agent.md`
+1. Create `src/plugins/msbuild-skills/agents/my-agent.agent.md`
 2. Use YAML frontmatter:
 
 ```yaml
@@ -79,7 +79,7 @@ disable-model-invocation: false
 
 Prompt files are user-triggered workflow templates for VS Code Copilot Chat (`#prompt` references).
 
-1. Create `msbuild-skills/templates/prompts/my-workflow.prompt.md`
+1. Create `src/plugins/msbuild-skills/templates/prompts/my-workflow.prompt.md`
 2. Use YAML frontmatter with a description:
 
 ```yaml
@@ -98,7 +98,7 @@ description: "Short description of what this prompt does"
 
 [GitHub Agentic Workflows](https://github.com/github/gh-aw) are event-driven AI automation that runs in GitHub Actions. They're written in markdown with YAML frontmatter.
 
-1. Create `msbuild-skills/templates/agentic-workflows/my-workflow.md`
+1. Create `src/plugins/msbuild-skills/templates/agentic-workflows/my-workflow.md`
 2. Use the `gh aw` frontmatter format:
 
 ```yaml
@@ -149,7 +149,7 @@ Natural language instructions for the AI agent...
 
 Samples are small .NET projects that intentionally trigger specific skill scenarios — for testing and demos.
 
-1. Create a directory: `msbuild-skills/samples/my-scenario/`
+1. Create a directory: `src/plugins/msbuild-skills/samples/my-scenario/`
 2. Add minimal project files that reproduce the issue
 3. Add a `README.md` with:
 
@@ -188,7 +188,7 @@ The file `templates/AGENTS.md` is a template users copy to their repo root as `A
 
 ## Plugin Manifest
 
-When adding new agents, update `msbuild-skills/plugin.json`:
+When adding new agents, update `src/plugins/msbuild-skills/plugin.json`:
 - Add new agents to the `agents` array
 - Skills are auto-discovered from the `skills` directory (no manifest change needed)
 - Bump `version` following [semver](https://semver.org/) on releases:

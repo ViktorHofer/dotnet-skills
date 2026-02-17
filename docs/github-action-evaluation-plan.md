@@ -85,7 +85,7 @@ viktor-dotnet-skills/
 │           │   ├── skilled-stats.json
 │           │   └── evaluation.json
 │           └── summary.md
-├── msbuild-skills/
+├── src/plugins/msbuild-skills/
 │   └── ... (existing skills - installed as plugin)
 └── docs/
     └── github-action-evaluation-plan.md
@@ -99,7 +99,7 @@ viktor-dotnet-skills/
 on:
   pull_request:
     paths:
-      - 'msbuild-skills/**'
+      - 'src/plugins/msbuild-skills/**'
       - 'evaluation/**'
       - '.github/workflows/copilot-skills-evaluation.yml'
   
@@ -538,7 +538,7 @@ $env:GH_TOKEN = $(gh auth token)
 copilot -p "What is 2 + 2? Answer with just the number." --no-ask-user
 
 # Test with a skill-relevant prompt (from the repo root)
-copilot -p "Analyze the build configuration in msbuild-skills/skills/check-bin-obj-clash/samples/ and identify any output path clashes" `
+copilot -p "Analyze the build configuration in src/plugins/msbuild-skills/skills/check-bin-obj-clash/samples/ and identify any output path clashes" `
   --no-ask-user --allow-all-tools --allow-all-paths
 
 # Test plugin management
@@ -583,7 +583,7 @@ name: Copilot Skills Evaluation
 on:
   pull_request:
     paths:
-      - 'msbuild-skills/**'
+      - 'src/plugins/msbuild-skills/**'
       - 'evaluation/**'
   schedule:
     - cron: '0 6 * * *'  # Daily at 6 AM UTC
@@ -711,7 +711,7 @@ jobs:
 ## 7. First Scenario: bin-obj-clash
 
 ### Source
-Copy from `msbuild-skills/skills/check-bin-obj-clash/samples/`
+Copy from `src/plugins/msbuild-skills/skills/check-bin-obj-clash/samples/`
 
 ### Expected Output
 

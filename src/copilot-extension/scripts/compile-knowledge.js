@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-// Compiles skill content from msbuild-skills/skills/ into optimized
+// Compiles skill content from src/plugins/msbuild-skills/skills/ into optimized
 // knowledge files for the Copilot Extension to embed as system prompts.
 
 const fs = require("node:fs");
 const path = require("node:path");
 
-const SKILLS_DIR = path.resolve(__dirname, "../../msbuild-skills/skills");
+const SKILLS_DIR = path.resolve(__dirname, "../../plugins/msbuild-skills/skills");
 const OUTPUT_DIR = path.resolve(__dirname, "../src/knowledge");
 
 // Mapping: knowledge file → skills to include
