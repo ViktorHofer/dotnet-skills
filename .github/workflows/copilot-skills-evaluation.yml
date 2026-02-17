@@ -73,7 +73,7 @@ jobs:
             $scenarios = $inputScenarios -split ',' | ForEach-Object { $_.Trim() }
           }
           else {
-          $scenarios = Get-ChildItem -Path "msbuild-skills/testcases" -Directory |
+          $scenarios = Get-ChildItem -Path "src/msbuild-skills/testcases" -Directory |
             Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
               Select-Object -ExpandProperty Name
           }

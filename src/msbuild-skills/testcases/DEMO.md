@@ -31,7 +31,7 @@ Verify skills are loaded: `/skills` should list all MSBuild skills.
 
 ### Setup
 ```bash
-cd msbuild-skills/samples/build-errors-cs
+cd src/msbuild-skills/testcases/build-errors-cs
 ```
 
 ### Demo Script
@@ -51,7 +51,7 @@ Build MissingReference.csproj
 **Key talking point**: _"The AI didn't just read the error message — it consulted a deep knowledge base of .NET build errors and knew exactly which NuGet packages provide the missing types."_
 
 ### Fallback
-If time is short, you can also use `samples/generated-files` which produces CS0103. Ask:
+If time is short, you can also use `testcases/generated-files` which produces CS0103. Ask:
 ```
 Build GeneratedFiles.csproj and fix any errors
 ```
@@ -68,7 +68,7 @@ The AI should discover the generated file isn't included in compilation and add 
 
 ### Setup
 ```bash
-cd msbuild-skills/samples/legacy-project
+cd src/msbuild-skills/testcases/legacy-project
 ```
 
 ### Demo Script
@@ -112,7 +112,7 @@ Build the project to make sure the migration worked
 
 ### Setup
 ```bash
-cd msbuild-skills/samples/perf-analyzers
+cd src/msbuild-skills/testcases/perf-analyzers
 ```
 
 ### Demo Script
@@ -147,7 +147,7 @@ Disable analyzers and rebuild. How much faster is it?
 
 ### Setup
 ```bash
-cd msbuild-skills/samples/style-issues
+cd src/msbuild-skills/testcases/style-issues
 ```
 
 ### Demo Script

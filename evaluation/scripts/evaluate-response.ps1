@@ -183,7 +183,7 @@ Write-Host ("=" * 60)
 $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 
 # Read expected output from scenario folder
-$scenarioBaseDir = Join-Path $RepoRoot "msbuild-skills\testcases\$ScenarioName"
+$scenarioBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases\$ScenarioName"
 $expectedFile = Join-Path $scenarioBaseDir "expected-output.md"
 if (-not (Test-Path $expectedFile)) {
     throw "Expected output file not found: $expectedFile"

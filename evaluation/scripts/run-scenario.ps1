@@ -8,7 +8,7 @@
     saves results to the results directory, and cleans up the temp copy.
 
 .PARAMETER ScenarioName
-    Name of the testcase folder under msbuild-skills/testcases/.
+    Name of the testcase folder under src/msbuild-skills/testcases/.
     Each testcase folder must contain project files and optionally
     an 'expected-output.md' for evaluation and 'eval-test-prompt.txt' for custom prompts.
 
@@ -217,7 +217,7 @@ Write-Host ("=" * 60)
 Write-Host "[SCENARIO] Running: $ScenarioName ($RunType)"
 Write-Host ("=" * 60)
 
-$scenarioBaseDir = Join-Path $RepoRoot "msbuild-skills\testcases\$ScenarioName"
+$scenarioBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases\$ScenarioName"
 $scenarioSourceDir = $scenarioBaseDir
 $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 

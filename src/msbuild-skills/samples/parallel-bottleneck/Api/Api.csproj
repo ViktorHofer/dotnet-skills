@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <!-- Api depends on Core — serial dependency -->
-    <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
-</Project>

@@ -29,7 +29,7 @@ evaluation/
 │           └── <scenario outputs>
 └── README.md                     # This file
 
-msbuild-skills/testcases/         # Authoritative test suite (shared by demos + eval)
+src/msbuild-skills/testcases/     # Authoritative test suite (shared by demos + eval)
 ├── <testcase-name>/
 │   ├── expected-output.md        # Grading rubric (required for automated eval)
 │   ├── eval-test-prompt.txt      # Custom prompt override (optional)
@@ -51,7 +51,7 @@ msbuild-skills/testcases/         # Authoritative test suite (shared by demos + 
 
 ### Adding a New Scenario
 
-1. Create a testcase in `msbuild-skills/testcases/<name>/` with project files that exhibit the build problem.
+1. Create a testcase in `src/msbuild-skills/testcases/<name>/` with project files that exhibit the build problem.
 2. Add `expected-output.md` describing the expected diagnosis, key concepts, and fixes.
 3. Optionally add `eval-test-prompt.txt` if the default prompt ("Analyze the build issues...") doesn't fit.
 4. Ensure no hint-comments (e.g., `<!-- BAD: ... -->`, `// CS0246: ...`) remain in project files.
@@ -61,7 +61,7 @@ msbuild-skills/testcases/         # Authoritative test suite (shared by demos + 
 
 ## Pipeline Steps
 
-1. **Discover scenarios** — finds all `msbuild-skills/testcases/*/expected-output.md` directories.
+1. **Discover scenarios** — finds all `src/msbuild-skills/testcases/*/expected-output.md` directories.
 2. **Vanilla run** — uninstalls the skills plugin, runs each scenario through Copilot CLI.
 3. **Skilled run** — installs `msbuild-skills` plugin, runs each scenario again.
 4. **Evaluate** — uninstalls the plugin, then uses Copilot CLI (as a neutral evaluator) to score both outputs against `expected-output.md`.
