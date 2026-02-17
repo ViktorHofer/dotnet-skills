@@ -24,7 +24,6 @@ const TARGETS = {
         "nuget-restore-failures",
         "sdk-workload-resolution",
         "multitarget-tfm-issues",
-        "ci-build-failures",
       ],
       performance: [
         "build-perf-baseline",

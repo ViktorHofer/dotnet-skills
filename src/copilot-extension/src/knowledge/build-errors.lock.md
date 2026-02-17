@@ -126,24 +126,7 @@ description: "Knowledge base of common .NET and MSBuild build errors with root c
 
 ### CS8032: An instance of analyzer could not be created
 
-**What it means:** The Roslyn analyzer or source generator failed to load.
-
-**Common root causes:**
-- Analyzer package version is incompatible with the current Roslyn/SDK version
-- Analyzer targets a newer .NET runtime than the one used by the build
-- The analyzer package is corrupt or partially restored
-- Multiple conflicting versions of the same analyzer are loaded
-
-**Step-by-step fix:**
-1. Check the analyzer package version. Upgrade to the latest version compatible with your SDK.
-2. Run `dotnet nuget locals all --clear` and `dotnet restore` to get a clean restore.
-3. Check `dotnet --version` — some analyzers require a minimum SDK version.
-4. Look for duplicate analyzer references in `Directory.Build.props`, `.csproj`, and transitive dependencies.
-5. If the analyzer is optional, suppress with `<NoWarn>CS8032</NoWarn>` temporarily while investigating.
-
-**Prevention:**
-- Keep analyzer packages updated when upgrading the SDK.
-- Test analyzer compatibility in CI before upgrading.
+> For comprehensive analyzer and source generator failure diagnosis, see the **`sourcegen-analyzer-failures`** skill. It covers CS8032, CS8785, AD0001, RS-prefixed errors, debugging with `/p:ReportAnalyzer=true`, version mismatches, and TFM incompatibilities.
 
 ---
 
@@ -444,446 +427,19 @@ description: "Knowledge base of common .NET and MSBuild build errors with root c
 
 ## NU Errors (NuGet)
 
-### NU1101: Unable to find package
-
-**What it means:** NuGet cannot locate the specified package in any configured source.
-
-**Common root causes:**
-- Typo in the package name
-- The package exists on a private feed that is not configured
-- The package was delisted or removed
-- `nuget.config` is missing or not pointing to the correct feed
-- Network/firewall blocking access to nuget.org
-
-**Step-by-step fix:**
-1. Verify the exact package name on nuget.org or your private feed.
-2. Run `dotnet nuget list source` to see configured sources.
-3. Add missing sources: `dotnet nuget add source <URL> --name <name>`.
-4. For private feeds, configure authentication in `nuget.config`:
-   ```xml
-   <packageSourceCredentials>
-     <FeedName>
-       <add key="Username" value="..." />
-       <add key="ClearTextPassword" value="..." />
-     </FeedName>
-   </packageSourceCredentials>
-   ```
-5. Check network connectivity to the feed URL.
-
-**Prevention:**
-- Commit a `nuget.config` to the repo with all required sources.
-- Use `dotnet nuget list source` to validate in CI setup steps.
-
----
-
-### NU1202: Package is not compatible with target framework
-
-**What it means:** The package exists but does not support your project's TFM.
-
-**Common root causes:**
-- Package only supports newer TFMs than your project targets
-- Package only supports .NET Framework, not .NET (Core), or vice versa
-- Using a pre-release version that dropped support for your TFM
-
-**Step-by-step fix:**
-1. Check the package's supported frameworks on nuget.org under "Frameworks".
-2. Use a version of the package that supports your TFM.
-3. If possible, upgrade your project's TFM to one the package supports.
-4. Look for an alternative package that supports your TFM.
-
-**Prevention:**
-- Check TFM compatibility before adding a PackageReference.
-
----
-
-### NU1605: Detected package downgrade
-
-**What it means:** A dependency requires a higher version of a package than what is explicitly referenced.
-
-**Common root causes:**
-- Explicit `<PackageReference>` pins a lower version than a transitive dependency requires
-- Multiple projects in the solution reference different versions
-
-**Step-by-step fix:**
-1. Upgrade the explicit PackageReference to at least the version required by the transitive dependency.
-2. Run `dotnet list package --include-transitive` to see which dependency requires the higher version.
-3. If downgrade is intentional, suppress with `<NoWarn>NU1605</NoWarn>` on the PackageReference (not recommended).
-
-**Prevention:**
-- Use Central Package Management to keep versions consistent.
-- Regularly run `dotnet list package --outdated` to find version mismatches.
-
----
-
-### NU1100: Unable to resolve dependencies
-
-**What it means:** NuGet cannot find a set of package versions that satisfies all dependency constraints.
-
-**Common root causes:**
-- Two packages require incompatible versions of a shared dependency
-- A package version does not exist for the required version range
-- Private feed is missing a required transitive package
-
-**Step-by-step fix:**
-1. Read the full error output — it shows the conflicting dependency chains.
-2. Try upgrading or downgrading one of the conflicting top-level packages.
-3. Check if a newer version of either package resolves the conflict.
-4. Use `dotnet list package --include-transitive` to map the dependency graph.
-5. As a last resort, add a direct PackageReference to the conflicting transitive package at a version that satisfies both constraints.
-
-**Prevention:**
-- Keep packages up to date to minimize version range conflicts.
-
----
-
-### NU1301: Unable to load the service index for source
-
-**What it means:** NuGet cannot connect to a package source to query available packages.
-
-**Common root causes:**
-- Network connectivity issue or firewall blocking the feed URL
-- Private feed requires authentication that is not configured
-- Feed URL is incorrect or the feed is down
-- Expired or invalid authentication token (PAT, API key)
-- Corporate proxy not configured
-
-**Step-by-step fix:**
-1. Test the feed URL in a browser or with `curl`.
-2. Check `nuget.config` for the correct feed URL.
-3. For private feeds, update credentials. For Azure DevOps, use `dotnet nuget update source <name> --username <user> --password <PAT>`.
-4. If behind a proxy, configure proxy settings in `nuget.config`.
-5. If the feed is temporarily down, retry later or configure a fallback source.
-
-**Prevention:**
-- Use credential providers for automatic token refresh.
-- Configure fallback sources for resilience.
-
----
-
-### NU1701: Package was restored using a different target framework fallback
-
-**What it means:** NuGet used a compatibility shim to restore a package that doesn't directly support your TFM. It may work but is not guaranteed.
-
-**Common root causes:**
-- Package only targets `netstandard1.x` or `net4x` but you're on `net6.0+`
-- Old package that hasn't been updated for newer TFMs
-
-**Step-by-step fix:**
-1. Check if a newer version of the package supports your TFM natively.
-2. If the package works correctly despite the warning, suppress with `<NoWarn>NU1701</NoWarn>` on the specific PackageReference.
-3. Consider finding an alternative package with better TFM support.
-
-**Prevention:**
-- Prefer packages that target `netstandard2.0` or your specific TFM.
-
----
-
-### NU1603: Dependency version does not exist
-
-**What it means:** A package declares a dependency on a specific version of another package, but that version does not exist in any configured source.
-
-**Common root causes:**
-- The dependency version was unlisted or deleted from the feed
-- Private feed is missing the required version
-- Package metadata is incorrect
-
-**Step-by-step fix:**
-1. Check the feed for available versions of the missing dependency.
-2. Try a newer version of the top-level package that depends on an available version.
-3. Add a direct PackageReference to an available version of the missing dependency.
-
-**Prevention:**
-- Use feeds that mirror/cache packages to avoid issues with removed versions.
-
----
-
-### NU1108: Circular dependency detected
-
-**What it means:** Two or more packages depend on each other, creating a circular reference.
-
-**Common root causes:**
-- ProjectReferences form a cycle (A → B → A)
-- Package A depends on Package B which depends on Package A (rare for public packages, common for in-house packages)
-
-**Step-by-step fix:**
-1. Map out the dependency chain from the error message.
-2. Break the cycle by extracting shared types into a new project/package that both can reference.
-3. Use interfaces or abstractions to decouple the dependencies.
-4. If the cycle is in ProjectReferences, restructure the solution to eliminate the circular path.
-
-**Prevention:**
-- Design packages with a clear dependency hierarchy — no cycles.
-- Use architecture tools to enforce layering rules.
+> For comprehensive NuGet error diagnosis including feed configuration, authentication, version conflicts, lock files, source mapping, and offline scenarios, see the **`nuget-restore-failures`** skill.
+>
+> Common NU errors: NU1100, NU1101, NU1108, NU1202, NU1301, NU1603, NU1605, NU1701.
 
 ---
 
 ## NETSDK Errors (.NET SDK)
 
-### NETSDK1004: Assets file not found
-
-**What it means:** The `project.assets.json` file (generated by `dotnet restore`) is missing.
-
-**Common root causes:**
-- `dotnet restore` was not run before building
-- The `obj/` folder was deleted without re-restoring
-- Restore failed silently
-- CI pipeline skips the restore step
-
-**Step-by-step fix:**
-1. Run `dotnet restore` explicitly.
-2. If restore was already run, delete the `obj/` folder and restore again.
-3. Check for restore errors in the output — a failed restore won't produce the assets file.
-4. Ensure `nuget.config` is correctly configured.
-
-**Prevention:**
-- Always run `dotnet restore` before `dotnet build` in CI.
-- Use `dotnet build` which implicitly restores unless `--no-restore` is passed.
+> For comprehensive NETSDK error diagnosis including SDK resolution, global.json configuration, workload installation, and roll-forward policies, see the **`sdk-workload-resolution`** skill. It also covers the **`multitarget-tfm-issues`** skill for TFM compatibility problems.
+>
+> Common NETSDK errors: NETSDK1004, NETSDK1005, NETSDK1013, NETSDK1045, NETSDK1047, NETSDK1064, NETSDK1073, NETSDK1082, NETSDK1141.
 
 ---
-
-### NETSDK1005: Assets file has a target for a different framework
-
-**What it means:** The `project.assets.json` was generated for a different TFM than the project is currently targeting.
-
-**Common root causes:**
-- `<TargetFramework>` was changed in the `.csproj` without re-restoring
-- Stale `obj/` folder from a previous configuration
-
-**Step-by-step fix:**
-1. Run `dotnet restore` to regenerate the assets file for the current TFM.
-2. If the issue persists, delete the `obj/` folder and restore again.
-
-**Prevention:**
-- Always restore after changing `<TargetFramework>`.
-
----
-
-### NETSDK1045: The current .NET SDK does not support targeting the specified framework
-
-**What it means:** The installed SDK version is too old to build for the specified TFM.
-
-**Common root causes:**
-- Project targets `net8.0` but only .NET 7 SDK is installed
-- `global.json` pins an older SDK version
-- CI image has an outdated SDK
-
-**Step-by-step fix:**
-1. Run `dotnet --list-sdks` to see installed versions.
-2. Install the SDK version that supports the target framework (e.g., .NET 8 SDK for `net8.0`).
-3. If `global.json` exists, update the SDK version or adjust `rollForward`.
-4. In CI, update the SDK installation step.
-
-**Prevention:**
-- Use `global.json` with `"rollForward": "latestMajor"` or `"latestFeature"` for flexibility.
-- Keep CI images updated.
-
----
-
-### NETSDK1047: Assets file missing target for specified framework
-
-**What it means:** The assets file exists but does not contain entries for the TFM being built. Similar to NETSDK1005.
-
-**Common root causes:**
-- Multi-targeted project where restore ran for a subset of TFMs
-- TFM was added to `<TargetFrameworks>` without re-restoring
-- Stale `obj/` folder
-
-**Step-by-step fix:**
-1. Run `dotnet restore` to regenerate assets for all TFMs.
-2. Delete `obj/` and restore again if the issue persists.
-
-**Prevention:**
-- Restore after any change to `<TargetFrameworks>`.
-
----
-
-### NETSDK1064: Package not compatible with target framework
-
-**What it means:** A referenced package does not support the project's TFM and has no compatible fallback.
-
-**Common root causes:**
-- Package only supports older or different TFMs
-- Multi-targeting includes a TFM the package doesn't support
-
-**Step-by-step fix:**
-1. Check the package's supported TFMs on nuget.org.
-2. Use a version of the package that supports your TFM.
-3. If multi-targeting, conditionally include the package only for supported TFMs:
-   ```xml
-   <PackageReference Include="SomePackage" Version="1.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />
-   ```
-4. Find an alternative package.
-
-**Prevention:**
-- Check TFM support before adding dependencies.
-
----
-
-### NETSDK1141: Unable to resolve the .NET SDK version as specified in global.json
-
-**What it means:** The SDK version specified in `global.json` cannot be found, and the `rollForward` policy doesn't match any installed SDK.
-
-**Common root causes:**
-- `global.json` specifies an exact version that isn't installed
-- `rollForward` is set to `"disable"` preventing any fallback
-- CI machine doesn't have the required SDK
-
-**Step-by-step fix:**
-1. Check `global.json` for the specified version and `rollForward` policy.
-2. Install the exact SDK version specified, or update `global.json`.
-3. Set a more flexible `rollForward` policy:
-   - `"latestPatch"` — allows patch-level upgrades (default)
-   - `"latestFeature"` — allows feature band upgrades
-   - `"latestMajor"` — allows any installed SDK
-4. Delete `global.json` if it's not needed.
-
-**Prevention:**
-- Use `"rollForward": "latestFeature"` or `"latestPatch"` for flexibility.
-
----
-
-### NETSDK1013: The TargetFramework value is not recognized
-
-**What it means:** The TFM string in `<TargetFramework>` is malformed or unsupported.
-
-**Common root causes:**
-- Typo in the TFM (e.g., `net60` instead of `net6.0`, `netstandard2.1.0` instead of `netstandard2.1`)
-- Using a TFM that requires a newer SDK than installed
-- Mixing old and new TFM formats (e.g., `netcoreapp3.1` vs `net3.1`)
-
-**Step-by-step fix:**
-1. Verify the TFM matches an official value: `net6.0`, `net7.0`, `net8.0`, `netstandard2.0`, `net472`, etc.
-2. Check https://learn.microsoft.com/dotnet/standard/frameworks for valid TFM strings.
-3. Ensure the SDK installed supports the TFM. For example, `net9.0` requires .NET 9 SDK.
-
-**Prevention:**
-- Copy TFM strings from official documentation, not from memory.
-
----
-
-### NETSDK1073: The FrameworkReference was not recognized
-
-**What it means:** A `<FrameworkReference>` in the project refers to a framework that is not available.
-
-**Common root causes:**
-- Required workload is not installed (e.g., `Microsoft.AspNetCore.App` needs the ASP.NET workload)
-- TFM does not support the framework reference
-- Typo in the FrameworkReference name
-
-**Step-by-step fix:**
-1. Check the FrameworkReference name in the error.
-2. Install the required workload: `dotnet workload install <workload>`.
-3. Verify the framework reference is available for your TFM.
-4. For ASP.NET references on non-web projects, use the correct SDK (`Microsoft.NET.Sdk.Web`) or add the FrameworkReference explicitly.
-
-**Prevention:**
-- Document required workloads in the repository.
-
----
-
-### NETSDK1082: There was no runtime pack available for the specified platform
-
-**What it means:** No runtime pack is available for the target runtime identifier (RID) in a self-contained deployment.
-
-**Common root causes:**
-- Invalid or unsupported RuntimeIdentifier (e.g., `linux-x64` typo)
-- The runtime pack for the RID is not available in the configured feeds
-- The TFM + RID combination is not supported
-
-**Step-by-step fix:**
-1. Check the `<RuntimeIdentifier>` in the project file for typos.
-2. Verify the RID is valid: https://learn.microsoft.com/dotnet/core/rid-catalog.
-3. Ensure the NuGet feeds contain runtime packs (nuget.org has them by default).
-4. For framework-dependent deployment, remove `<SelfContained>true</SelfContained>` if self-contained is not needed.
-
-**Prevention:**
-- Use standard RIDs from the official catalog.
-
----
-
-## Cross-Cutting Troubleshooting Guidance
-
-When you encounter a build error and the specific fix above doesn't resolve it, follow these general troubleshooting steps in order:
-
-### 1. Clean and Rebuild
-```shell
-dotnet clean
-dotnet build
-```
-Removes cached build outputs that may be stale or corrupt.
-
-### 2. Delete obj/ and bin/ Folders
-```shell
-# PowerShell
-Get-ChildItem -Directory -Recurse -Include bin,obj | Remove-Item -Recurse -Force
-dotnet restore
-dotnet build
-```
-Eliminates all cached build state, assets files, and intermediate outputs. This is more thorough than `dotnet clean`.
-
-### 3. Clear NuGet Cache
-```shell
-dotnet nuget locals all --clear
-dotnet restore
-```
-Removes all cached NuGet packages. Resolves issues with corrupt or stale package downloads.
-
-### 4. Check SDK Version
-```shell
-dotnet --list-sdks
-dotnet --version
-```
-Verify the correct SDK is installed and active. Compare against `global.json` if present.
-
-### 5. Check global.json
-Look for `global.json` in the repo root or parent directories. It may pin the SDK version or roll-forward policy:
-```json
-{
-  "sdk": {
-    "version": "8.0.100",
-    "rollForward": "latestFeature"
-  }
-}
-```
-If the pinned version isn't installed and `rollForward` is restrictive, the build will fail.
-
-### 6. Verify NuGet Sources
-```shell
-dotnet nuget list source
-```
-Ensure all required feeds (nuget.org, private feeds) are configured and reachable. Check `nuget.config` for correct URLs and credentials.
-
-### 7. Use Binary Logs for Deep Analysis
-```shell
-dotnet build /bl
-```
-This produces `msbuild.binlog` — a comprehensive record of the entire build. Use the MSBuild Structured Log Viewer or binlog analysis tools to:
-- See the exact order of target and task execution
-- Inspect property and item values at each point in the build
-- Find the root cause of errors that produce unhelpful messages
-- Trace dependency resolution and assembly conflict details
-
-Binary logs are the single most effective diagnostic tool for complex build issues.
-
-### 8. Check for Directory.Build.props / Directory.Build.targets
-These files are automatically imported by MSBuild from the project directory and all parent directories up to the repo root. Unexpected build behavior is often caused by:
-- Properties or items set in a `Directory.Build.props` you didn't know existed
-- Multiple `Directory.Build.props` files in the directory hierarchy (only the nearest one is auto-imported — parent ones require explicit import)
-
-Search for them:
-```shell
-# PowerShell — find all Directory.Build.* files
-Get-ChildItem -Recurse -Filter "Directory.Build.*"
-```
-
-### 9. Restore-Build-Test Sequence
-Always follow this order, especially in CI:
-```shell
-dotnet restore
-dotnet build --no-restore
-dotnet test --no-build
-```
-Using `--no-restore` and `--no-build` ensures each step uses the exact output of the previous step, avoiding hidden implicit restores or rebuilds.
 
 ---
 
@@ -1170,8 +726,6 @@ dotnet build /p:CscVerbosity=detailed /bl:verbose.binlog
 
 ---
 
-## nuget-restore-failures
-
 ---
 name: nuget-restore-failures
 description: "Diagnose and fix NuGet package restore failures in .NET projects. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when dotnet restore fails, packages can't be resolved, feed authentication fails, or version conflicts occur. Covers nuget.config issues, private feed auth, version conflicts, lock files, source mapping, and offline scenarios. DO NOT use for non-.NET package managers (npm, pip, Maven, etc.)."
@@ -1203,6 +757,526 @@ sh -c "$(curl -fsSL https://aka.ms/install-artifacts-credprovider.sh)"
 Add the feed with credentials:
 
 ```shell
-dotne
+dotnet nuget add source "https://pkgs.dev.azure.com/{org}/{project}/_packaging/{feed}/nuget/v3/index.json" \
+  --name "AzureArtifacts" \
+  --username "az" \
+  --password "<PAT>" \
+  --store-password-in-clear-text
+```
+
+For CI (Azure Pipelines), use the `NuGetAuthenticate@1` task before restore, or set the `VSS_NUGET_EXTERNAL_FEED_ENDPOINTS` environment variable:
+
+```json
+{"endpointCredentials": [{"endpoint":"https://pkgs.dev.azure.com/{org}/_packaging/{feed}/nuget/v3/index.json", "username":"az", "password":"<PAT>"}]}
+```
+
+### GitHub Packages
+
+Requires a PAT with `read:packages` scope (and `write:packages` for publishing).
+
+```shell
+dotnet nuget add source "https://nuget.pkg.github.com/{OWNER}/index.json" \
+  --name "GitHubPackages" \
+  --username "{GITHUB_USERNAME}" \
+  --password "{PAT}" \
+  --store-password-in-clear-text
+```
+
+Or configure in `nuget.config`:
+
+```xml
+<packageSources>
+  <add key="GitHubPackages" value="https://nuget.pkg.github.com/{OWNER}/index.json" />
+</packageSources>
+<packageSourceCredentials>
+  <GitHubPackages>
+    <add key="Username" value="{GITHUB_USERNAME}" />
+    <add key="ClearTextPassword" value="{PAT}" />
+  </GitHubPackages>
+</packageSourceCredentials>
+```
+
+### Private / Self-Hosted Feeds
+
+Configure credentials in `nuget.config` (user-level at `%APPDATA%\NuGet\NuGet.Config` or `~/.nuget/NuGet/NuGet.Config`):
+
+```xml
+<configuration>
+  <packageSources>
+    <add key="PrivateFeed" value="https://myserver/nuget/v3/index.json" />
+  </packageSources>
+  <packageSourceCredentials>
+    <PrivateFeed>
+      <add key="Username" value="user" />
+      <add key="ClearTextPassword" value="secret" />
+    </PrivateFeed>
+  </packageSourceCredentials>
+</configuration>
+```
+
+> **Important:** The key inside `<packageSourceCredentials>` must exactly match the key in `<packageSources>`. Spaces and special characters in source names must be replaced with `__x0020__` (for space) in the credential section — or just avoid spaces in source names.
+
+### CI/CD Authentication Patterns
+
+**Environment variable approach** — set `NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED=true` and provide credentials via `VSS_NUGET_EXTERNAL_FEED_ENDPOINTS`.
+
+**nuget.config transform** — use CI secrets to inject credentials at build time:
+
+```shell
+dotnet nuget update source "PrivateFeed" \
+  --username "$FEED_USER" \
+  --password "$FEED_PAT" \
+  --store-password-in-clear-text \
+  --configfile ./nuget.config
+```
+
+**GitHub Actions example:**
+
+```yaml
+- run: dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --name github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+- run: dotnet restore
+```
+
+---
+
+## nuget.config Misconfiguration
+
+### Config Hierarchy
+
+NuGet merges config files from multiple levels (closest to project wins):
+
+1. **Project-level** — `nuget.config` next to `.csproj` or `sln`
+2. **Directory ancestors** — any `nuget.config` in parent directories up to the drive root
+3. **User-level** — `%APPDATA%\NuGet\NuGet.Config` (Windows) or `~/.nuget/NuGet/NuGet.Config` (Linux/macOS)
+4. **Machine-level** — `%ProgramFiles(x86)%\NuGet\Config\` (Windows)
+
+Check effective config:
+
+```shell
+dotnet nuget list source
+```
+
+### The `<clear />` Element
+
+`<clear />` removes all previously-defined sources (from higher-level configs). This is useful for controlling exactly which feeds are used, but can break restore if you forget to re-add `nuget.org`:
+
+```xml
+<packageSources>
+  <clear />
+  <!-- Only these sources will be used -->
+  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  <add key="PrivateFeed" value="https://myfeed/nuget/v3/index.json" />
+</packageSources>
+```
+
+**Common mistake:** Adding `<clear />` in a project-level config without re-adding `nuget.org`, causing all public packages to fail resolution.
+
+### Source URL Issues
+
+- **HTTP vs HTTPS** — NuGet 6.3+ blocks HTTP sources by default (`allowInsecureConnections` must be set on the source if HTTP is required)
+- **Trailing slashes** — Some servers require them, some break with them. Match the documented URL exactly.
+- **v2 vs v3** — Use `/v3/index.json` endpoints. v2 endpoints (`/nuget`) may be deprecated or slower.
+- **Typos** — A typo in the feed URL produces `Unable to load the service index`, which looks like an auth error but is a connectivity issue.
+
+### Package Source Ordering
+
+When no source mapping is configured, NuGet queries all configured sources and picks the best (highest version) match. Sources are NOT queried in order of priority — all sources are checked. Use `<packageSourceMapping>` to control which source provides which packages.
+
+---
+
+## Version Conflicts & Resolution
+
+### NU1605: Package Downgrade Detected
+
+Occurs when a transitive dependency pulls a higher version than what's directly referenced:
+
+```
+NU1605: Detected package downgrade: Newtonsoft.Json from 13.0.3 to 12.0.1.
+```
+
+**Fixes:**
+
+1. Upgrade the direct `<PackageReference>` to the higher version:
+   ```xml
+   <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+   ```
+2. Or suppress the warning (not recommended for production):
+   ```xml
+   <PropertyGroup>
+     <NoWarn>$(NoWarn);NU1605</NoWarn>
+   </PropertyGroup>
+   ```
+
+### Diamond Dependency Conflicts
+
+Project → PackageA → SharedLib 2.0  
+Project → PackageB → SharedLib 1.0
+
+NuGet uses a **nearest-wins** rule: the version closest to the project root wins. If neither is directly referenced, the higher version typically wins. To force a specific version, add an explicit `<PackageReference>`:
+
+```xml
+<PackageReference Include="SharedLib" Version="2.0.0" />
+```
+
+### Floating Versions
+
+`*` and range syntax (`1.*`, `[1.0, 2.0)`) allow flexible version resolution:
+
+```xml
+<PackageReference Include="MyLib" Version="1.*" />    <!-- latest 1.x -->
+<PackageReference Include="MyLib" Version="*" />       <!-- latest of any version -->
+```
+
+**Risks:** Builds are non-reproducible. A new patch can break things silently. **Pin exact versions** for production projects, or use lock files.
+
+### Central Package Management (CPM)
+
+When `Directory.Packages.props` exists with `<ManagePackageVersions>true</ManagePackageVersions>`, version management changes:
+
+- **`Directory.Packages.props`** defines versions with `<PackageVersion>`:
+  ```xml
+  <Project>
+    <PropertyGroup>
+      <ManagePackageVersions>true</ManagePackageVersions>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+  </Project>
+  ```
+
+- **`.csproj` files** reference packages WITHOUT versions:
+  ```xml
+  <PackageReference Include="Newtonsoft.Json" />
+  ```
+
+**Common CPM errors:**
+
+- `NU1008`: Project has a PackageReference with a Version when CPM is enabled — remove the `Version` attribute from the `.csproj`.
+- Using `<PackageReference Update="...">` in `.csproj` to override a version — this is the correct CPM override mechanism. `Include` is for referencing; `Update` is for overriding the centrally-defined version.
+
+```xml
+<!-- In .csproj to override the central version -->
+<PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
+```
+
+---
+
+## Lock Files (`packages.lock.json`)
+
+### Enabling Lock Files
+
+Add to your project or `Directory.Build.props`:
+
+```xml
+<PropertyGroup>
+  <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+</PropertyGroup>
+```
+
+Run `dotnet restore` to generate `packages.lock.json`. **Commit this file** to source control.
+
+### CI Enforcement with `RestoreLockedMode`
+
+```xml
+<PropertyGroup>
+  <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+</PropertyGroup>
+```
+
+Or pass on the command line:
+
+```shell
+dotnet restore --locked-mode
+```
+
+In locked mode, restore fails if the lock file doesn't match the resolved dependency graph. This catches unintended dependency changes.
+
+### NU1004: Lock File Inconsistent
+
+```
+NU1004: The packages lock file is inconsistent with the project dependencies.
+```
+
+**Causes:**
+- A `<PackageReference>` was added, removed, or version-changed without regenerating the lock file
+- Target framework was changed
+- A transitive dependency published a new version (if using floating versions)
+
+**Fix:** Regenerate the lock file locally and commit:
+
+```shell
+dotnet restore --force-evaluate
+```
+
+This re-evaluates all dependencies and updates `packages.lock.json`.
+
+---
+
+## Source Mapping Issues
+
+### How `<packageSourceMapping>` Works
+
+Source mapping restricts which sources can provide which packages, using namespace patterns:
+
+```xml
+<packageSourceMapping>
+  <packageSource key="nuget.org">
+    <package pattern="*" />
+  </packageSource>
+  <packageSource key="PrivateFeed">
+    <package pattern="MyCompany.*" />
+  </packageSource>
+</packageSourceMapping>
+```
+
+With this config, `MyCompany.*` packages can come from either `nuget.org` or `PrivateFeed` (patterns are additive per package, not exclusive). But if you only map `MyCompany.*` to `PrivateFeed` and don't include a `*` wildcard on `nuget.org`, then no public packages will resolve.
+
+### Debugging NU1100 with Source Mapping
+
+```
+NU1100: Unable to resolve 'SomePackage (>= 1.0.0)' for 'net8.0'.
+```
+
+When source mapping is active, NuGet only checks sources mapped to that package's namespace. If no pattern matches, the package is unresolvable.
+
+**Diagnosis:**
+
+```shell
+dotnet restore --verbosity detailed
+```
+
+Look for `Source mapping` entries in the output to see which sources were consulted for each package.
+
+**Fix:** Add a pattern for the missing package's namespace:
+
+```xml
+<packageSource key="nuget.org">
+  <package pattern="SomePackage" />
+  <!-- or use a wildcard: <package pattern="SomeCompany.*" /> -->
+</packageSource>
+```
+
+### Pattern Guidelines
+
+- `*` — matches all packages (use on your primary public feed)
+- `MyCompany.*` — matches `MyCompany.Core`, `MyCompany.Utilities`, etc.
+- `MyCompany.Utilities` — matches only that exact package ID
+- Patterns are case-insensitive
+- A package must match at least one pattern on at least one source, or restore fails
+
+---
+
+## Offline / Air-gapped Restore
+
+### Using a Local Folder as a Source
+
+```shell
+dotnet restore --source "C:\local-packages"
+```
+
+Or configure permanently in `nuget.config`:
+
+```xml
+<packageSources>
+  <clear />
+  <add key="LocalFeed" value="C:\local-packages" />
+</packageSources>
+```
+
+### Fallback Folders
+
+Fallback folders are checked before downloading. Packages found there are used directly without copying to the global cache:
+
+```xml
+<fallbackPackageFolders>
+  <add key="SharedCache" value="\\server\nuget-cache" />
+</fallbackPackageFolders>
+```
+
+### Creating a Local Feed from Cache
+
+NuGet caches downloaded packages in the global packages folder. Copy them to create an offline feed:
+
+```shell
+# Find cache location
+dotnet nuget locals global-packages --list
+# Output: global-packages: C:\Users\{user}\.nuget\packages
+
+# Push packages to a local feed directory
+dotnet nuget push "C:\Users\{user}\.nuget\packages\newtonsoft.json\13.0.3\*.nupkg" --source "C:\local-feed"
+```
+
+Or simply copy `.nupkg` files into a flat folder — NuGet supports folder-based feeds with no server required.
+
+### NuGet Cache Locations
+
+```shell
+dotnet nuget locals all --list
+```
+
+Returns:
+
+| Cache | Purpose |
+|---|---|
+| `http-cache` | Cached HTTP responses from feeds |
+| `global-packages` | Extracted packages used during build |
+| `temp` | Temporary staging during install |
+| `plugins-cache` | Credential provider plugin cache |
+
+Clear caches when troubleshooting stale package issues:
+
+```shell
+dotnet nuget locals all --clear        # clear everything
+dotnet nuget locals http-cache --clear # clear only HTTP cache
+```
+
+---
+
+## Diagnostic Steps
+
+Follow this systematic troubleshooting flow when restore fails:
+
+### 1. Verify Configured Sources
+
+```shell
+dotnet nuget list source
+dotnet nuget list source --format detailed
+```
+
+Confirm all expected feeds are listed and enabled. Check for typos in URLs.
+
+### 2. Check Cache State
+
+```shell
+dotnet nuget locals all --list
+```
+
+If you suspect stale cached data, clear the HTTP cache:
+
+```shell
+dotnet nuget locals http-cache --clear
+```
+
+### 3. Run Restore with Detailed Verbosity
+
+```shell
+dotnet restore --verbosity detailed
+```
+
+This shows:
+- Which sources are queried for each package
+- Source mapping decisions
+- Authentication attempts and failures
+- Version resolution logic
+
+### 4. Check nuget.config Hierarchy
+
+Look for `nuget.config` files at every level:
+
+```shell
+# From the project directory, check all ancestor directories
+# Windows PowerShell:
+Get-ChildItem -Path . -Filter nuget.config -Recurse
+# Also check user-level:
+Get-Item "$env:APPDATA\NuGet\NuGet.Config" -ErrorAction SilentlyContinue
+```
+
+A config file in an unexpected directory may add or `<clear />` sources.
+
+### 5. Test Feed Connectivity
+
+```shell
+# Test if the feed is reachable
+dotnet nuget list source --format detailed
+# Try restoring a single known package
+dotnet new classlib -o /tmp/test-restore && dotnet add /tmp/test-restore package Newtonsoft.Json
+```
+
+### 6. Verify Central Package Management (if used)
+
+```shell
+# Check if CPM is active
+# Look for Directory.Packages.props in the directory hierarchy
+Get-ChildItem -Path . -Filter Directory.Packages.props -Recurse
+```
+
+Confirm:
+- `<ManagePackageVersions>true</ManagePackageVersions>` is set
+- All referenced packages have a `<PackageVersion>` entry
+- `.csproj` files don't specify `Version` on `<PackageReference>` (causes NU1008)
+
+### 7. Binary Log Analysis
+
+Generate a binary log during restore for deep analysis:
+
+```shell
+dotnet restore /bl:restore.binlog
+```
+
+Load the binlog and search for restore errors, feed interactions, and resolution decisions. Look for:
+- `RestoreTask` entries showing which sources were queried
+- Warning/error codes (NU1100, NU1605, NU1004, NU1008)
+- Authentication handshake failures in HTTP traces
+
+---
+
+## sdk-workload-resolution
+
+---
+name: sdk-workload-resolution
+description: "Diagnose and fix .NET SDK and workload resolution failures. Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals). Use when builds fail with NETSDK1045, NETSDK1141, MSB4236, MSB4019, or 'SDK not found' errors. Covers global.json configuration, SDK roll-forward policies, workload installation, and multi-SDK environments. DO NOT use for non-.NET SDK issues."
+---
+
+# Diagnosing and Fixing .NET SDK and Workload Resolution Failures
+
+## SDK Resolution Failures
+
+### How SDK Resolution Works
+
+The .NET SDK resolver follows a strict order when determining which SDK version to use:
+
+1. **global.json** — If a `global.json` file exists at or above the project directory, its `sdk.version` and `sdk.rollForward` settings control SDK selection.
+2. **PATH** — If no `global.json` is found (or the policy allows), the first `dotnet` executable on the system PATH is used.
+3. **Default install location** — If `dotnet` is not on PATH, the resolver checks the default install directory.
+
+**SDK install locations by OS:**
+
+| OS | Default Install Path |
+|---|---|
+| Windows | `C:\Program Files\dotnet` |
+| Linux | `/usr/share/dotnet` or `/usr/local/share/dotnet` |
+| macOS | `/usr/local/share/dotnet` |
+
+**Feature bands vs patch versions:**
+
+SDKs use a versioning scheme: `major.minor.featureband+patch` (e.g., `8.0.301`).
+
+- **Feature band**: The hundreds digit of the patch — `8.0.100`, `8.0.200`, `8.0.300` are different feature bands.
+- **Patch version**: Increments within a feature band — `8.0.100`, `8.0.101`, `8.0.102` are patches within the `8.0.1xx` feature band.
+- Feature band changes may introduce new features and behaviors. Patch versions are bug fixes only.
+- `rollForward: "patch"` stays within the same feature band. `rollForward: "feature"` can jump across feature bands.
+
+### global.json Configuration
+
+A `global.json` file controls which SDK version is used for a project tree. It must be located at or above the project directory. The resolver walks up from the project directory until it finds one.
+
+```json
+{
+  "sdk": {
+    "version": "8.0.300",
+    "rollForward": "latestFeature",
+    "allowPrerelease": false
+  }
+}
+```
+
+**`sdk.version`** — The base SDK version to resolve against. This is an exact pin when `rollForward` is `disable`, or a minimum version for other policies.
+
+**`sdk.rollForward`** — Controls how the resolver picks an SDK when the exact `version` is not installed:
+
+| Policy | Behavior |
+|---|---|
+| `patch` | Uses the specified 
 
 [truncated]

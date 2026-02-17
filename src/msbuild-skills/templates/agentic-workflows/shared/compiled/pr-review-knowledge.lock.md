@@ -508,6 +508,8 @@ See `incremental-build` skill for deep guidance on Inputs/Outputs, FileWrites, a
 
 **Why it's bad**: `$(TargetFramework)` is only available during `.props` evaluation for multi-targeting projects. For single-targeting projects, the condition silently fails. This applies to both `<PropertyGroup Condition="...">` and individual `<Property Condition="...">` elements.
 
+**⚠️ Item and Target conditions are NOT affected.** `<ItemGroup Condition="'$(TargetFramework)' == '...'">` and individual item conditions in `.props` files are safe — do NOT flag them. This includes `PackageVersion` items in `Directory.Packages.props`.
+
 See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-props-evaluation.md) for the full explanation, BAD/GOOD examples, and the item/target exception.
 
 ---
@@ -1129,17 +1131,6 @@ Use property functions for simple operations instead of shelling out.
 
 ### 1. Hardcoded paths → use MSBuild properties
 
-```xml
-<!-- BAD -->
-<Exec Command="C:\tools\mytool.exe" />
 
-<!-- GOOD -->
-<Exec Command="$(ToolsDir)mytool.exe" />
-```
-
-### 2. Copy-paste properties across .csproj files → use Directory.Build.props
-
-```xml
-<!-- BAD: Same properties duplicated in 
 
 [truncated]

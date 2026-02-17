@@ -49,7 +49,7 @@ Before starting any review, verify the context is MSBuild-related. Refer to [`sh
 - Are there assembly version conflicts (MSB3277)?
 - Are there condition evaluation issues (wrong syntax, always true/false)?
 - Missing `PrivateAssets="all"` on analyzer packages?
-- Are there property conditions on `$(TargetFramework)` in `.props` files? (AP-21 — silently fails for single-targeting projects; move to `.targets`)
+- Are there **property** conditions on `$(TargetFramework)` in `.props` files? (AP-21 — silently fails for single-targeting projects; move to `.targets`). See [`shared/targetframework-props-evaluation.md`](../skills/shared/targetframework-props-evaluation.md) for the full explanation — **item and target conditions are NOT affected** and must not be flagged.
 
 3. **Report**: Produce a structured review organized by severity:
    - 🔴 **Errors**: Things that are likely broken or will cause build failures

@@ -5,6 +5,8 @@ description: "Guide for diagnosing and improving MSBuild project evaluation perf
 
 ## MSBuild Evaluation Phases
 
+For a comprehensive overview of MSBuild's evaluation and execution model, see [Build process overview](https://learn.microsoft.com/en-us/visualstudio/msbuild/build-process-overview).
+
 1. **Initial properties**: environment variables, global properties, reserved properties
 2. **Imports and property evaluation**: process `<Import>`, evaluate `<PropertyGroup>` top-to-bottom
 3. **Item definition evaluation**: `<ItemDefinitionGroup>` metadata defaults
