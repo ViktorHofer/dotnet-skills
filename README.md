@@ -35,30 +35,6 @@ This repository provides comprehensive .NET development expertise for AI assista
    /agents
    ```
 
-### Agent Instructions (Zero Install)
-
-Copy an `AGENTS.md` file to your repository root to provide expertise to Copilot, Claude Code, and other agents:
-```bash
-cp src/<component>/AGENTS.md AGENTS.md
-```
-
-### VS Code Prompt Files (Zero Install)
-
-Copy prompt templates for use in Copilot Chat with `#prompt` references:
-```bash
-mkdir -p .github/prompts
-cp src/<component>/prompts/*.prompt.md .github/prompts/
-```
-
-### Agentic Workflows
-
-Copy the workflow templates (including the `shared/` directory) and compile with `gh aw`:
-```bash
-cp -r src/<component>/agentic-workflows/ .github/workflows/
-gh aw compile
-git add .github/workflows/
-```
-
 ## Updating
 
 ```
