@@ -40,7 +40,7 @@ This repository provides comprehensive .NET development expertise for AI assista
 
 Copy an `AGENTS.md` file to your repository root to provide expertise to Copilot, Claude Code, and other agents:
 ```bash
-cp src/<component>/templates/AGENTS.md AGENTS.md
+cp src/<component>/AGENTS.md AGENTS.md
 ```
 
 ### VS Code Prompt Files (Zero Install)
@@ -48,14 +48,14 @@ cp src/<component>/templates/AGENTS.md AGENTS.md
 Copy prompt templates for use in Copilot Chat with `#prompt` references:
 ```bash
 mkdir -p .github/prompts
-cp src/<component>/templates/prompts/*.prompt.md .github/prompts/
+cp src/<component>/prompts/*.prompt.md .github/prompts/
 ```
 
 ### Agentic Workflows
 
 Copy the workflow templates (including the `shared/` directory) and compile with `gh aw`:
 ```bash
-cp -r src/<component>/templates/agentic-workflows/ .github/workflows/
+cp -r src/<component>/agentic-workflows/ .github/workflows/
 gh aw compile
 git add .github/workflows/
 ```

@@ -85,7 +85,7 @@ disable-model-invocation: false
 
 Prompt files are user-triggered workflow templates for VS Code Copilot Chat (`#prompt` references).
 
-1. Create `src/msbuild-skills/templates/prompts/my-workflow.prompt.md`
+1. Create `src/msbuild-skills/prompts/my-workflow.prompt.md`
 2. Use YAML frontmatter with a description:
 
 ```yaml
@@ -104,7 +104,7 @@ description: "Short description of what this prompt does"
 
 [GitHub Agentic Workflows](https://github.com/github/gh-aw) are event-driven AI automation that runs in GitHub Actions. They're written in markdown with YAML frontmatter.
 
-1. Create `src/msbuild-skills/templates/agentic-workflows/my-workflow.md`
+1. Create `src/msbuild-skills/agentic-workflows/my-workflow.md`
 2. Use the `gh aw` frontmatter format:
 
 ```yaml

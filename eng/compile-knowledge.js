@@ -3,7 +3,7 @@
 // Shared knowledge compiler for the MSBuild skills repository.
 // Compiles skill SKILL.md files into knowledge bundles for different consumers:
 //   - Copilot Extension (src/copilot-extension/src/knowledge/)
-//   - Agentic Workflows (src/msbuild-skills/templates/agentic-workflows/shared/)
+//   - Agentic Workflows (src/msbuild-skills/agentic-workflows/shared/)
 //
 // Usage: node scripts/compile-knowledge.js
 
@@ -49,7 +49,7 @@ const TARGETS = {
   "agentic-workflows": {
     outputDir: path.resolve(
       __dirname,
-      "../src/msbuild-skills/templates/agentic-workflows/shared/compiled"
+      "../src/msbuild-skills/agentic-workflows/shared/compiled"
     ),
     maxChars: 40000, // gh aw has tighter context budgets
     knowledgeMap: {
