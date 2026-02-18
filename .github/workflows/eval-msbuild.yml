@@ -50,9 +50,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install PowerShell
-        uses: PSModule/Install-PowerShell@v1
-
       - name: Install Copilot CLI
         run: |
           npm install -g @github/copilot

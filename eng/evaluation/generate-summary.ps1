@@ -390,6 +390,11 @@ if ($ArtifactsUrl) {
 $footerParts += "*"
 $summaryLines.Add($footerParts -join "")
 
+# Ensure results directory exists before writing summary
+if (-not (Test-Path $ResultsDir)) {
+    New-Item -ItemType Directory -Force -Path $ResultsDir | Out-Null
+}
+
 # Write summary
 $summaryContent = $summaryLines -join "`n"
 $summaryFile = Join-Path $ResultsDir "summary.md"
