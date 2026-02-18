@@ -14,7 +14,7 @@ This repository provides comprehensive .NET development expertise for AI assista
 
 ## Installation
 
-### Copilot CLI / Claude Code
+### 🚀 Plugins - Copilot CLI / Claude Code
 
 1. Launch Copilot CLI or Claude Code
 2. Add the marketplace:
@@ -35,7 +35,7 @@ This repository provides comprehensive .NET development expertise for AI assista
    /agents
    ```
 
-### Distribution Templates
+### 📦 Distribution Templates
 
 Some components include ready-to-use templates (agent instructions, prompt files) that can be copied directly into your repository without installing a component:
 
@@ -43,7 +43,7 @@ Some components include ready-to-use templates (agent instructions, prompt files
 2. Copy agent instructions to your repo root as `AGENTS.md`
 3. Copy prompt files to `.github/prompts/`
 
-### Agentic Workflows
+### ⚡ Agentic Workflows
 
 Some components include [GitHub Agentic Workflow](https://github.com/github/gh-aw) templates for CI/CD automation:
 
@@ -55,7 +55,7 @@ Some components include [GitHub Agentic Workflow](https://github.com/github/gh-a
    ```
 4. Commit both the `.md` and generated `.lock.yml` files
 
-### Copilot Extension
+### 🧩 Copilot Extension
 
 Some components include a deployable [Copilot Extension](https://docs.github.com/copilot/building-copilot-extensions) for GitHub.com, VS Code, and Visual Studio:
 
