@@ -1,17 +1,23 @@
 <#
 .SYNOPSIS
-    Converts evaluation results into github-action-benchmark JSON format.
+    Converts evaluation results into benchmark dashboard data.
 
 .DESCRIPTION
-    Reads evaluation results from the results directory and produces two JSON files:
-    - benchmark-quality.json (customBiggerIsBetter): quality scores per scenario
-    - benchmark-efficiency.json (customSmallerIsBetter): time and token metrics
+    Reads evaluation results from the results directory and produces a data.js
+    file compatible with the custom benchmark dashboard. If an existing data.js
+    is provided, the new data point is appended to the existing history.
 
 .PARAMETER ResultsDir
     Path to the results directory for this run.
 
 .PARAMETER OutputDir
-    Path to write the benchmark JSON files. Defaults to ResultsDir.
+    Path to write the output files. Defaults to ResultsDir.
+
+.PARAMETER ExistingDataFile
+    Optional path to an existing data.js file from gh-pages to append to.
+
+.PARAMETER CommitJson
+    Optional JSON string with commit info (id, message, author, timestamp, url).
 #>
 [CmdletBinding()]
 param(
@@ -19,7 +25,13 @@ param(
     [string]$ResultsDir,
 
     [Parameter()]
-    [string]$OutputDir
+    [string]$OutputDir,
+
+    [Parameter()]
+    [string]$ExistingDataFile,
+
+    [Parameter()]
+    [string]$CommitJson
 )
 
 $ErrorActionPreference = "Stop"
@@ -34,8 +46,9 @@ if (-not $scenarioDirs) {
     exit 0
 }
 
-$qualityBenchmarks = [System.Collections.Generic.List[object]]::new()
-$efficiencyBenchmarks = [System.Collections.Generic.List[object]]::new()
+# Build bench arrays for this run
+$qualityBenches = [System.Collections.Generic.List[object]]::new()
+$efficiencyBenches = [System.Collections.Generic.List[object]]::new()
 
 $totalVanilla = 0.0
 $totalSkilled = 0.0
@@ -44,77 +57,108 @@ $scenarioCount = 0
 foreach ($scenarioDir in $scenarioDirs) {
     $scenarioName = $scenarioDir.Name
     $evalFile = Join-Path $scenarioDir.FullName "evaluation.json"
-    $vanillaStatsFile = Join-Path $scenarioDir.FullName "vanilla-stats.json"
     $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
 
-    # Quality scores
     if (Test-Path $evalFile) {
         $evalData = Get-Content $evalFile -Raw | ConvertFrom-Json
         $vanillaEval = $evalData.evaluations.vanilla
         $skilledEval = $evalData.evaluations.skilled
 
         if ($skilledEval -and $skilledEval.score) {
-            $qualityBenchmarks.Add(@{
-                name  = "$scenarioName - Skilled Quality"
-                unit  = "Score (1-5)"
-                value = [float]$skilledEval.score
-            })
+            $qualityBenches.Add(@{ name = "$scenarioName - Skilled Quality"; unit = "Score (1-5)"; value = [float]$skilledEval.score })
             $totalSkilled += [float]$skilledEval.score
             $scenarioCount++
         }
 
         if ($vanillaEval -and $vanillaEval.score) {
-            $qualityBenchmarks.Add(@{
-                name  = "$scenarioName - Vanilla Quality"
-                unit  = "Score (1-5)"
-                value = [float]$vanillaEval.score
-            })
+            $qualityBenches.Add(@{ name = "$scenarioName - Vanilla Quality"; unit = "Score (1-5)"; value = [float]$vanillaEval.score })
             $totalVanilla += [float]$vanillaEval.score
         }
     }
 
-    # Efficiency metrics (time)
-    $skilledStats = $null
     if (Test-Path $skilledStatsFile) {
         $skilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
         if ($skilledStats.TotalTimeSeconds) {
-            $efficiencyBenchmarks.Add(@{
-                name  = "$scenarioName - Skilled Time"
-                unit  = "seconds"
-                value = [float]$skilledStats.TotalTimeSeconds
-            })
+            $efficiencyBenches.Add(@{ name = "$scenarioName - Skilled Time"; unit = "seconds"; value = [float]$skilledStats.TotalTimeSeconds })
         }
         if ($skilledStats.TokensIn) {
-            $efficiencyBenchmarks.Add(@{
-                name  = "$scenarioName - Skilled Tokens In"
-                unit  = "tokens"
-                value = [float]$skilledStats.TokensIn
-            })
+            $efficiencyBenches.Add(@{ name = "$scenarioName - Skilled Tokens In"; unit = "tokens"; value = [float]$skilledStats.TokensIn })
         }
     }
 }
 
-# Add overall averages
 if ($scenarioCount -gt 0) {
-    $qualityBenchmarks.Add(@{
-        name  = "Overall - Skilled Avg Quality"
-        unit  = "Score (1-5)"
-        value = [math]::Round($totalSkilled / $scenarioCount, 2)
-    })
-    $qualityBenchmarks.Add(@{
-        name  = "Overall - Vanilla Avg Quality"
-        unit  = "Score (1-5)"
-        value = [math]::Round($totalVanilla / $scenarioCount, 2)
-    })
+    $qualityBenches.Add(@{ name = "Overall - Skilled Avg Quality"; unit = "Score (1-5)"; value = [math]::Round($totalSkilled / $scenarioCount, 2) })
+    $qualityBenches.Add(@{ name = "Overall - Vanilla Avg Quality"; unit = "Score (1-5)"; value = [math]::Round($totalVanilla / $scenarioCount, 2) })
 }
 
-# Write output files
-$qualityFile = Join-Path $OutputDir "benchmark-quality.json"
-$efficiencyFile = Join-Path $OutputDir "benchmark-efficiency.json"
+# Build commit info
+$commit = @{}
+if ($CommitJson) {
+    $commit = $CommitJson | ConvertFrom-Json -AsHashtable
+} else {
+    $commit = @{ id = "local"; message = "Local run"; timestamp = (Get-Date -Format "o") }
+}
 
-$qualityBenchmarks | ConvertTo-Json -Depth 5 | Out-File -FilePath $qualityFile -Encoding utf8
-$efficiencyBenchmarks | ConvertTo-Json -Depth 5 | Out-File -FilePath $efficiencyFile -Encoding utf8
+$now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 
-Write-Host "[OK] Benchmark data generated:"
-Write-Host "   Quality metrics ($($qualityBenchmarks.Count) entries): $qualityFile"
-Write-Host "   Efficiency metrics ($($efficiencyBenchmarks.Count) entries): $efficiencyFile"
+$qualityEntry = @{
+    commit = $commit
+    date   = $now
+    tool   = "customBiggerIsBetter"
+    benches = $qualityBenches.ToArray()
+}
+
+$efficiencyEntry = @{
+    commit = $commit
+    date   = $now
+    tool   = "customSmallerIsBetter"
+    benches = $efficiencyBenches.ToArray()
+}
+
+# Load existing data or create new structure
+$benchmarkData = @{
+    lastUpdate = $now
+    repoUrl    = ""
+    entries    = @{
+        "Skills Evaluation - Quality"    = @()
+        "Skills Evaluation - Efficiency" = @()
+    }
+}
+
+if ($ExistingDataFile -and (Test-Path $ExistingDataFile)) {
+    $existingContent = Get-Content $ExistingDataFile -Raw
+    # Strip the "window.BENCHMARK_DATA = " prefix and parse JSON
+    $jsonContent = $existingContent -replace '^window\.BENCHMARK_DATA\s*=\s*', ''
+    try {
+        $benchmarkData = $jsonContent | ConvertFrom-Json -AsHashtable
+        $benchmarkData['lastUpdate'] = $now
+    } catch {
+        Write-Warning "Failed to parse existing data.js, starting fresh: $_"
+    }
+}
+
+# Append new entries
+if (-not $benchmarkData['entries']) {
+    $benchmarkData['entries'] = @{}
+}
+if (-not $benchmarkData['entries']['Skills Evaluation - Quality']) {
+    $benchmarkData['entries']['Skills Evaluation - Quality'] = @()
+}
+if (-not $benchmarkData['entries']['Skills Evaluation - Efficiency']) {
+    $benchmarkData['entries']['Skills Evaluation - Efficiency'] = @()
+}
+
+$benchmarkData['entries']['Skills Evaluation - Quality'] += @($qualityEntry)
+$benchmarkData['entries']['Skills Evaluation - Efficiency'] += @($efficiencyEntry)
+
+# Write data.js
+$dataJson = $benchmarkData | ConvertTo-Json -Depth 10
+$dataJs = "window.BENCHMARK_DATA = $dataJson"
+$dataJsFile = Join-Path $OutputDir "data.js"
+$dataJs | Out-File -FilePath $dataJsFile -Encoding utf8
+
+Write-Host "[OK] Benchmark data.js generated: $dataJsFile"
+Write-Host "   Quality entries: $($qualityBenches.Count)"
+Write-Host "   Efficiency entries: $($efficiencyBenches.Count)"
+Write-Host "   Total data points: $($benchmarkData['entries']['Skills Evaluation - Quality'].Count)"
