@@ -9,6 +9,9 @@
 .PARAMETER ResultsDir
     Path to the results directory for this run.
 
+.PARAMETER PluginName
+    Name of the plugin being evaluated. Included in the summary header.
+
 .PARAMETER GitHubRunUrl
     Optional URL to the GitHub Actions workflow run for linking in the footer.
 
@@ -19,6 +22,9 @@
 param(
     [Parameter(Mandatory)]
     [string]$ResultsDir,
+
+    [Parameter()]
+    [string]$PluginName,
 
     [Parameter()]
     [string]$GitHubRunUrl,
@@ -139,7 +145,8 @@ if (-not $scenarioDirs) {
 $summaryLines = New-Object System.Collections.Generic.List[string]
 
 # Header
-$summaryLines.Add("## Copilot Skills Evaluation Results")
+$headerSuffix = if ($PluginName) { " — $PluginName" } else { "" }
+$summaryLines.Add("## Copilot Skills Evaluation Results$headerSuffix")
 $summaryLines.Add("")
 $summaryLines.Add("**Run Date**: $(Get-Date -Format 'yyyy-MM-dd HH:mm UTC')")
 $summaryLines.Add("**Scenarios Tested**: $($scenarioDirs.Count)")
@@ -382,6 +389,11 @@ if ($ArtifactsUrl) {
 }
 $footerParts += "*"
 $summaryLines.Add($footerParts -join "")
+
+# Ensure results directory exists before writing summary
+if (-not (Test-Path $ResultsDir)) {
+    New-Item -ItemType Directory -Force -Path $ResultsDir | Out-Null
+}
 
 # Write summary
 $summaryContent = $summaryLines -join "`n"

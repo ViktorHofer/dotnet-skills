@@ -1,6 +1,6 @@
-# MSBuild Skills for AI Assistants
+# .NET Skills for AI Assistants
 
-This repository provides comprehensive MSBuild and .NET build expertise for AI assistants including [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli), [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), and [GitHub Agentic Workflows](https://github.com/github/gh-aw).
+This repository provides comprehensive .NET development expertise for AI assistants including [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli), [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), and [GitHub Agentic Workflows](https://github.com/github/gh-aw).
 
 ## What's Included
 
@@ -65,6 +65,31 @@ Ready-to-use templates for different distribution channels:
 | Agentic Workflows | `src/msbuild-skills/templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
 | Copilot Extension | `src/copilot-extension/` | Deployable `@msbuild` Copilot Extension for GitHub.com, VS Code, and Visual Studio |
 
+### 🧪 Unit Test Generation
+
+| Skill | Description |
+|-------|-------------|
+| `dotnet-unittest` | Comprehensive C# unit test generation guidance for MSTest, NUnit, and xUnit — framework detection, edge-case analysis, mocking rules, best practices |
+
+### 🌐 Polyglot Test Agent
+
+An AI-powered multi-agent pipeline that generates comprehensive unit tests for any programming language.
+
+| Agent | Description |
+|-------|-------------|
+| `test-generator` | Pipeline orchestrator — coordinates the full Research→Plan→Implement workflow |
+| `researcher` | Analyzes codebase structure, testing patterns, and testability |
+| `planner` | Creates phased test implementation plans |
+| `implementer` | Writes test files and verifies they compile and pass |
+| `builder` | Runs build/compile commands and reports results |
+| `tester` | Runs test commands and reports pass/fail |
+| `fixer` | Fixes compilation errors |
+| `linter` | Runs code formatting/linting |
+
+| Skill | Description |
+|-------|-------------|
+| `polyglot-test-generation` | Generates unit tests for any language using a multi-agent pipeline (C#, TypeScript, Python, Go, Rust, Java, etc.) |
+
 ## Installation
 
 ### Copilot CLI / Claude Code
@@ -74,10 +99,19 @@ Ready-to-use templates for different distribution channels:
    ```
    /plugin marketplace add ViktorHofer/dotnet-skills
    ```
-3. Install the plugin:
-   ```
-   /plugin install msbuild-skills@dotnet-skills
-   ```
+3. Install the plugin(s) you need:
+   - **msbuild-skills** — MSBuild development skills:
+     ```
+     /plugin install msbuild-skills@dotnet-skills
+     ```
+   - **polyglot-test-agent** — Polyglot test generation agent:
+     ```
+     /plugin install polyglot-test-agent@dotnet-skills
+     ```
+   - **unittest** — .NET unit test generation guidance:
+     ```
+     /plugin install unittest@dotnet-skills
+     ```
 4. Restart to load the new skills
 5. View available skills:
    ```
@@ -114,6 +148,8 @@ git add .github/workflows/
 
 ```
 /plugin update msbuild-skills@dotnet-skills
+/plugin update polyglot-test-agent@dotnet-skills
+/plugin update unittest@dotnet-skills
 ```
 
 ## Contributing

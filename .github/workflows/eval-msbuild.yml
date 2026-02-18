@@ -1,11 +1,11 @@
-name: Copilot Skills Evaluation
+name: Eval — msbuild-skills
 
 on:
   pull_request:
     paths:
       - 'src/msbuild-skills/**'
       - 'eng/evaluation/**'
-      - '.github/workflows/copilot-skills-evaluation.yml'
+      - '.github/workflows/eval-msbuild.yml'
 
   schedule:
     - cron: '0 6 * * *'  # Daily at 6 AM UTC
@@ -26,24 +26,14 @@ on:
         required: false
         type: number
         default: 4
-      publish_benchmark:
-        description: 'Publish results to benchmark dashboard'
-        required: false
-        type: boolean
-        default: false
 
 # Note: For local testing with act, secrets are loaded from .secrets file
 # For GitHub, secrets are configured in repository settings
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-  RESULTS_BASE: artifacts/TestResults
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 jobs:
@@ -60,9 +50,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install PowerShell
-        uses: PSModule/Install-PowerShell@v1
-
       - name: Install Copilot CLI
         run: |
           npm install -g @github/copilot
@@ -70,11 +57,9 @@ jobs:
 
       - name: Create results directory
         run: |
-          $runId = Get-Date -Format 'yyyyMMdd-HHmmss'
-          $resultsDir = "$env:RESULTS_BASE/$runId"
-          New-Item -ItemType Directory -Force -Path $resultsDir
+          $runId = "${{ github.run_id }}-${{ github.run_attempt }}"
+          New-Item -ItemType Directory -Force -Path "eng/evaluation/results/$runId"
           echo "RUN_ID=$runId" >> $env:GITHUB_ENV
-          echo "RESULTS_DIR=$resultsDir" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Discover scenarios
@@ -137,16 +122,20 @@ jobs:
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Running vanilla: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "vanilla" `
-              -ResultsDir $using:resultsDir
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -PluginName "msbuild-skills" `
+              -MarketplaceName "dotnet-skills" `
+              -ScenariosBaseDir "src/msbuild-skills/testcases"
           }
 
           Write-Host "`n✅ All vanilla scenario runs completed"
@@ -178,16 +167,20 @@ jobs:
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Running skilled: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "skilled" `
-              -ResultsDir $using:resultsDir
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -PluginName "msbuild-skills" `
+              -MarketplaceName "dotnet-skills" `
+              -ScenariosBaseDir "src/msbuild-skills/testcases"
           }
 
           Write-Host "`n✅ All skilled scenario runs completed"
@@ -210,15 +203,17 @@ jobs:
           # Evaluate scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Evaluating: $scenario ==="
             pwsh -File ./eng/evaluation/evaluate-response.ps1 `
               -ScenarioName $scenario `
-              -ResultsDir $using:resultsDir
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -ScenariosBaseDir "src/msbuild-skills/testcases"
           }
 
           Write-Host "`n✅ All scenario evaluations completed"
@@ -230,19 +225,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: evaluation-results-${{ env.RUN_ID }}
-          path: ${{ env.RESULTS_DIR }}/
+          path: eng/evaluation/results/${{ env.RUN_ID }}/
           retention-days: 30
 
       - name: Generate Summary
         if: always()
         run: |
           pwsh -File ./eng/evaluation/generate-summary.ps1 `
-            -ResultsDir "$env:RESULTS_DIR" `
+            -ResultsDir "eng/evaluation/results/$env:RUN_ID" `
+            -PluginName "msbuild-skills" `
             -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
             -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
 
           # Add to job summary
-          Get-Content "$env:RESULTS_DIR/summary.md" >> $env:GITHUB_STEP_SUMMARY
+          Get-Content "eng/evaluation/results/$env:RUN_ID/summary.md" >> $env:GITHUB_STEP_SUMMARY
         shell: pwsh
 
       - name: Comment on PR
@@ -251,7 +247,7 @@ jobs:
         continue-on-error: true  # May fail in local act runs (no GitHub API)
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-path: ${{ env.RESULTS_DIR }}/summary.md
+          body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md
 
 
   publish-benchmark:

@@ -13,6 +13,10 @@
 .PARAMETER ResultsDir
     Path to the results directory for this run.
 
+.PARAMETER ScenariosBaseDir
+    Path to the testcases directory. Can be relative (resolved against RepoRoot)
+    or absolute. Defaults to src/msbuild-skills/testcases.
+
 .PARAMETER TimeoutSeconds
     Maximum time to wait for evaluation Copilot CLI to complete.
 
@@ -27,7 +31,9 @@ param(
     [Parameter(Mandatory)]
     [string]$ResultsDir,
 
-[int]$TimeoutSeconds = 300,
+    [string]$ScenariosBaseDir,
+
+    [int]$TimeoutSeconds = 300,
 
     [string]$RepoRoot
 )
@@ -183,7 +189,13 @@ Write-Host ("=" * 60)
 $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 
 # Read expected output from scenario folder
-$scenarioBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases\$ScenarioName"
+if (-not $ScenariosBaseDir) {
+    $ScenariosBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases"
+}
+if (-not [System.IO.Path]::IsPathRooted($ScenariosBaseDir)) {
+    $ScenariosBaseDir = Join-Path $RepoRoot $ScenariosBaseDir
+}
+$scenarioBaseDir = Join-Path $ScenariosBaseDir $ScenarioName
 $expectedFile = Join-Path $scenarioBaseDir "expected-output.md"
 if (-not (Test-Path $expectedFile)) {
     throw "Expected output file not found: $expectedFile"

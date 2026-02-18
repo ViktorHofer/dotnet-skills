@@ -8,7 +8,7 @@
     saves results to the results directory, and cleans up the temp copy.
 
 .PARAMETER ScenarioName
-    Name of the testcase folder under src/msbuild-skills/testcases/.
+    Name of the testcase folder under the scenarios base directory.
     Each testcase folder must contain project files and optionally
     an 'expected-output.md' for evaluation and 'eval-test-prompt.txt' for custom prompts.
 
@@ -20,6 +20,16 @@
 
 .PARAMETER TimeoutSeconds
     Maximum time to wait for Copilot CLI to complete (default: 300).
+
+.PARAMETER PluginName
+    Name of the Copilot plugin to install/uninstall (default: msbuild-skills).
+
+.PARAMETER MarketplaceName
+    Name of the local plugin marketplace (default: dotnet-skills).
+
+.PARAMETER ScenariosBaseDir
+    Path to the testcases directory. Can be relative (resolved against RepoRoot)
+    or absolute. Defaults to src/msbuild-skills/testcases.
 
 .PARAMETER RepoRoot
     Root directory of the repository. Defaults to two levels up from this script.
@@ -37,6 +47,12 @@ param(
     [string]$ResultsDir,
 
     [int]$TimeoutSeconds = 300,
+
+    [string]$PluginName = "msbuild-skills",
+
+    [string]$MarketplaceName = "dotnet-skills",
+
+    [string]$ScenariosBaseDir,
 
     [string]$RepoRoot
 )
@@ -217,7 +233,13 @@ Write-Host ("=" * 60)
 Write-Host "[SCENARIO] Running: $ScenarioName ($RunType)"
 Write-Host ("=" * 60)
 
-$scenarioBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases\$ScenarioName"
+if (-not $ScenariosBaseDir) {
+    $ScenariosBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases"
+}
+if (-not [System.IO.Path]::IsPathRooted($ScenariosBaseDir)) {
+    $ScenariosBaseDir = Join-Path $RepoRoot $ScenariosBaseDir
+}
+$scenarioBaseDir = Join-Path $ScenariosBaseDir $ScenarioName
 $scenarioSourceDir = $scenarioBaseDir
 $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 
@@ -232,8 +254,8 @@ New-Item -ItemType Directory -Force -Path $scenarioResultsDir | Out-Null
 $workingDir = Copy-ScenarioToTemp -ScenarioSourceDir $scenarioSourceDir -ScenarioName $ScenarioName -RunType $RunType
 
 # Step 2: Configure plugin state
-$pluginName = "msbuild-skills"
-$marketplaceName = "dotnet-skills"
+$pluginName = $PluginName
+$marketplaceName = $MarketplaceName
 
 if ($RunType -eq "vanilla") {
     Write-Host ""
