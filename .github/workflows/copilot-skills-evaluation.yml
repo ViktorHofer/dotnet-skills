@@ -26,6 +26,11 @@ on:
         required: false
         type: number
         default: 4
+      publish_benchmark:
+        description: 'Publish results to benchmark dashboard'
+        required: false
+        type: boolean
+        default: false
 
 # Note: For local testing with act, secrets are loaded from .secrets file
 # For GitHub, secrets are configured in repository settings
@@ -249,14 +254,14 @@ jobs:
           body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md
 
       - name: Generate Benchmark Data
-        if: always()
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
         run: |
           pwsh -File ./eng/evaluation/generate-benchmark-data.ps1 `
             -ResultsDir "eng/evaluation/results/$env:RUN_ID"
         shell: pwsh
 
       - name: Store Quality Benchmark Result
-        if: github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: 'Skills Evaluation - Quality'
@@ -268,7 +273,7 @@ jobs:
           benchmark-data-dir-path: 'dev/bench'
 
       - name: Store Efficiency Benchmark Result
-        if: github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: 'Skills Evaluation - Efficiency'
