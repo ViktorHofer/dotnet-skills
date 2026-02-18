@@ -141,6 +141,11 @@
               <div class="card-value">${qualityEntries.length}</div>
               <div class="card-delta">evaluation runs</div>
             </div>
+            <div class="card">
+              <div class="card-label">Model</div>
+              <div class="card-value" style="font-size: 18px">${latestQuality.model || 'N/A'}</div>
+              <div class="card-delta">latest run</div>
+            </div>
           `;
         }
       }
@@ -208,11 +213,13 @@
                   afterTitle: (items) => {
                     const idx = items[0].dataIndex;
                     const entry = entries[idx];
+                    const parts = [];
+                    if (entry && entry.model) parts.push(`Model: ${entry.model}`);
                     if (entry && entry.commit) {
                       const msg = entry.commit.message.split('\n')[0];
-                      return msg.length > 60 ? msg.substring(0, 60) + '...' : msg;
+                      parts.push(msg.length > 60 ? msg.substring(0, 60) + '...' : msg);
                     }
-                    return '';
+                    return parts.join('\n');
                   }
                 }
               }
