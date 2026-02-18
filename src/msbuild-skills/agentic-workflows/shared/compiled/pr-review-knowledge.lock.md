@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node eng/compile-knowledge.js -->
+<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node src/msbuild-skills/build.js -->
 
 ---
 name: msbuild-antipatterns
@@ -1130,7 +1130,5 @@ Use property functions for simple operations instead of shelling out.
 ## Anti-patterns to Avoid
 
 ### 1. Hardcoded paths → use MSBuild properties
-
-
 
 [truncated]

@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node eng/compile-knowledge.js -->
+<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node src/msbuild-skills/build.js -->
 
 ---
 name: build-perf-baseline
@@ -952,6 +952,6 @@ Enable `ContinuousIntegrationBuild` in CI to normalize file paths in PDBs (repla
 ```xml
 <PropertyGroup Condition="'$(CI)' == 'true'">
   <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-</PropertyGro
+</Property
 
 [truncated]

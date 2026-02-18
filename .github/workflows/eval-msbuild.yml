@@ -270,7 +270,8 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages 2>/dev/null || true
           mkdir -p /tmp/gh-pages
-          git show gh-pages:dev/bench/data.json > /tmp/gh-pages/data.json 2>/dev/null || true
+          git show gh-pages:data.json > /tmp/gh-pages/data.json 2>/dev/null || \
+            git show gh-pages:dev/bench/data.json > /tmp/gh-pages/data.json 2>/dev/null || true
 
       - name: Generate Benchmark Data
         run: |
@@ -287,7 +288,7 @@ jobs:
             $existingFile = $null
           }
 
-          pwsh -File ./eng/evaluation/generate-benchmark-data.ps1 `
+          pwsh -File ./eng/dashboard/generate-benchmark-data.ps1 `
             -ResultsDir "$env:RESULTS_BASE" `
             -OutputDir "/tmp/gh-pages" `
             -ExistingDataFile $existingFile `
@@ -298,10 +299,9 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: |
-          mkdir -p /tmp/deploy/dev/bench
-          cp /tmp/gh-pages/data.json /tmp/deploy/dev/bench/data.json
-          cp eng/evaluation/dashboard.html /tmp/deploy/dev/bench/index.html
-          cp eng/evaluation/dashboard.js /tmp/deploy/dev/bench/dashboard.js
+          cp /tmp/gh-pages/data.json /tmp/deploy/data.json
+          cp eng/dashboard/dashboard.html /tmp/deploy/index.html
+          cp eng/dashboard/dashboard.js /tmp/deploy/dashboard.js
 
           cd /tmp/deploy
           git init

@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node eng/compile-knowledge.js -->
+<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node src/msbuild-skills/build.js -->
 
 ---
 name: build-perf-baseline

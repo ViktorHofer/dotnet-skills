@@ -1,6 +1,6 @@
 # Copilot Skills Evaluation
 
-Automated pipeline for measuring whether [msbuild-skills](../../src/msbuild-skills/) improve Copilot's responses to MSBuild-related problems.
+Automated pipeline for measuring whether a skills plugin improves Copilot's responses to build-related problems.
 
 ## How It Works
 
@@ -9,26 +9,14 @@ Each scenario is run **twice** through Copilot CLI:
 | Run | Plugins | Purpose |
 |-----|---------|---------|
 | **Vanilla** | None | Baseline — what Copilot produces on its own |
-| **Skilled** | `msbuild-skills` installed | What Copilot produces with the skills plugin |
+| **Skilled** | Plugin installed | What Copilot produces with the skills plugin |
 
 Both outputs are then scored by a separate Copilot invocation (acting as an evaluator) against an expected-output rubric, producing per-scenario quality scores (Accuracy, Completeness, Actionability, Clarity — each 1–5) along with token and time metrics.
 
-## Folder Structure
+## Testcase Structure
 
 ```
-eng/evaluation/
-├── run-scenario.ps1              # Copies testcase to temp dir, runs Copilot CLI
-├── evaluate-response.ps1         # Scores vanilla & skilled outputs against expected-output.md
-├── parse-copilot-stats.ps1       # Extracts token/time/model stats from Copilot output
-├── generate-summary.ps1          # Produces the final markdown summary table
-├── results/                      # Run outputs (git-ignored in CI, kept locally)
-│   └── <run-id>/
-│       ├── summary.md
-│       └── <scenario-name>/
-│           └── <scenario outputs>
-└── README.md                     # This file
-
-src/msbuild-skills/testcases/     # Authoritative test suite (shared by demos + eval)
+src/<plugin>/testcases/
 ├── <testcase-name>/
 │   ├── expected-output.md        # Grading rubric (required for automated eval)
 │   ├── eval-test-prompt.txt      # Custom prompt override (optional)
@@ -37,6 +25,8 @@ src/msbuild-skills/testcases/     # Authoritative test suite (shared by demos + 
 └── ...
 ```
 
+Results are written to `artifacts/TestResults/`.
+
 ### File Conventions
 
 | File | Purpose | Copied to eval temp dir? |
@@ -44,13 +34,12 @@ src/msbuild-skills/testcases/     # Authoritative test suite (shared by demos + 
 | `expected-output.md` | Grading rubric for evaluator | ❌ No — read directly |
 | `eval-test-prompt.txt` | Custom prompt (overrides default) | ❌ No — read from source dir |
 | `README.md` | Human documentation | ❌ No — excluded from eval copy |
-| `DEMO.md` | Demo guide | ❌ No — excluded from eval copy |
 | `.gitignore` | Git ignore rules | ❌ No — excluded from eval copy |
 | Everything else | Test project files | ✅ Yes — copied to temp dir |
 
 ### Adding a New Scenario
 
-1. Create a testcase in `src/msbuild-skills/testcases/<name>/` with project files that exhibit the build problem.
+1. Create a testcase in the plugin's `testcases/<name>/` directory with project files that exhibit the build problem.
 2. Add `expected-output.md` describing the expected diagnosis, key concepts, and fixes.
 3. Optionally add `eval-test-prompt.txt` if the default prompt ("Analyze the build issues...") doesn't fit.
 4. Ensure no hint-comments (e.g., `<!-- BAD: ... -->`, `// CS0246: ...`) remain in project files.
@@ -60,9 +49,9 @@ src/msbuild-skills/testcases/     # Authoritative test suite (shared by demos + 
 
 ## Pipeline Steps
 
-1. **Discover scenarios** — finds all `src/msbuild-skills/testcases/*/expected-output.md` directories.
+1. **Discover scenarios** — finds all `src/<plugin>/testcases/*/expected-output.md` directories.
 2. **Vanilla run** — uninstalls the skills plugin, runs each scenario through Copilot CLI.
-3. **Skilled run** — installs `msbuild-skills` plugin, runs each scenario again.
+3. **Skilled run** — installs the skills plugin, runs each scenario again.
 4. **Evaluate** — uninstalls the plugin, then uses Copilot CLI (as a neutral evaluator) to score both outputs against `expected-output.md`.
 5. **Generate summary** — aggregates scores and stats into a markdown table.
 

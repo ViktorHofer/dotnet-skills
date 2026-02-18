@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node eng/compile-knowledge.js -->
+<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node src/msbuild-skills/build.js -->
 
 ---
 name: common-build-errors
@@ -954,6 +954,6 @@ When `Directory.Packages.props` exists with `<ManagePackageVersions>true</Manage
 
 **Common CPM errors:**
 
-- `NU1008`: Project has a PackageReference with a Version w
+- `NU1008`: Project has a PackageReference with a Versio
 
 [truncated]

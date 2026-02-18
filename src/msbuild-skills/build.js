@@ -1,21 +1,66 @@
 #!/usr/bin/env node
 
-// Shared knowledge compiler for the MSBuild skills repository.
-// Compiles skill SKILL.md files into knowledge bundles for different consumers:
-//   - Copilot Extension (src/msbuild-skills/copilot-extension/src/knowledge/)
-//   - Agentic Workflows (src/msbuild-skills/agentic-workflows/shared/)
-//
-// Usage: node scripts/compile-knowledge.js
+// Build entry point for the msbuild-skills component.
+// Validates skills and compiles knowledge bundles.
+// Run: node src/msbuild-skills/build.js
 
 const fs = require("node:fs");
 const path = require("node:path");
 
-const SKILLS_DIR = path.resolve(__dirname, "../src/msbuild-skills/skills");
+const SKILLS_DIR = path.resolve(__dirname, "skills");
+const DOMAIN_GATE_PATTERN = /Only activate in MSBuild\/\.NET build contexts/;
 
-// Output targets — each target gets its own set of knowledge files
-const TARGETS = {
+// ── Step 1: Validate skills ─────────────────────────────────────────
+
+console.log("=== Validating skills ===\n");
+
+let errors = 0;
+
+const skillDirs = fs.readdirSync(SKILLS_DIR, { withFileTypes: true })
+  .filter(d => d.isDirectory() && d.name !== "shared");
+
+for (const dir of skillDirs) {
+  const skillFile = path.join(SKILLS_DIR, dir.name, "SKILL.md");
+  if (!fs.existsSync(skillFile)) continue;
+
+  const content = fs.readFileSync(skillFile, "utf-8");
+
+  const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
+  if (!match) {
+    console.error(`❌ ${dir.name}: Missing YAML frontmatter`);
+    errors++;
+    continue;
+  }
+
+  const frontmatter = match[1];
+  const descMatch = frontmatter.match(/description:\s*"([^"]*)"/);
+  if (!descMatch) {
+    console.error(`❌ ${dir.name}: Missing description in frontmatter`);
+    errors++;
+    continue;
+  }
+
+  const description = descMatch[1];
+  if (!DOMAIN_GATE_PATTERN.test(description)) {
+    console.error(`❌ ${dir.name}: Description missing domain gate. Must include 'Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals).'`);
+    errors++;
+  }
+}
+
+if (errors > 0) {
+  console.error(`\n${errors} validation error(s) found.`);
+  process.exit(1);
+} else {
+  console.log(`✅ All ${skillDirs.length} skills pass validation.\n`);
+}
+
+// ── Step 2: Compile knowledge bundles ────────────────────────────────
+
+console.log("=== Compiling knowledge ===\n");
+
+const KNOWLEDGE_TARGETS = {
   "copilot-extension": {
-    outputDir: path.resolve(__dirname, "../src/msbuild-skills/copilot-extension/src/knowledge"),
+    outputDir: path.resolve(__dirname, "copilot-extension/src/knowledge"),
     maxChars: 50000,
     knowledgeMap: {
       "build-errors": [
@@ -47,11 +92,8 @@ const TARGETS = {
     },
   },
   "agentic-workflows": {
-    outputDir: path.resolve(
-      __dirname,
-      "../src/msbuild-skills/agentic-workflows/shared/compiled"
-    ),
-    maxChars: 40000, // gh aw has tighter context budgets
+    outputDir: path.resolve(__dirname, "agentic-workflows/shared/compiled"),
+    maxChars: 40000,
     knowledgeMap: {
       "build-failure-knowledge": [
         "common-build-errors",
@@ -105,7 +147,7 @@ function compileKnowledgeFile(outputName, skillNames, outputDir, maxChars) {
   const sections = [];
   let totalChars = 0;
 
-  const header = `<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node eng/compile-knowledge.js -->\n\n`;
+  const header = `<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node src/msbuild-skills/build.js -->\n\n`;
   totalChars += header.length;
 
   for (const skillName of skillNames) {
@@ -157,32 +199,10 @@ function compileTarget(targetName, config) {
   }
 }
 
-// Main
-function main() {
-  console.log("MSBuild Skills — Knowledge Compiler");
-  console.log(`Skills source: ${SKILLS_DIR}`);
+console.log(`Skills source: ${SKILLS_DIR}`);
 
-  if (!fs.existsSync(SKILLS_DIR)) {
-    console.error(`ERROR: Skills directory not found: ${SKILLS_DIR}`);
-    process.exit(1);
-  }
-
-  // Compile a specific target or all targets
-  const targetArg = process.argv[2];
-  if (targetArg) {
-    if (!TARGETS[targetArg]) {
-      console.error(`ERROR: Unknown target '${targetArg}'`);
-      console.error(`Available targets: ${Object.keys(TARGETS).join(", ")}`);
-      process.exit(1);
-    }
-    compileTarget(targetArg, TARGETS[targetArg]);
-  } else {
-    for (const [name, config] of Object.entries(TARGETS)) {
-      compileTarget(name, config);
-    }
-  }
-
-  console.log("\n✅ Knowledge compilation complete.");
+for (const [name, config] of Object.entries(KNOWLEDGE_TARGETS)) {
+  compileTarget(name, config);
 }
 
-main();
+console.log("\n✅ Build complete.");
