@@ -253,32 +253,46 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md
 
+
+  publish-benchmark:
+    needs: evaluate
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download evaluation artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: evaluation-results-*
+          path: eng/evaluation/results/
+          merge-multiple: true
+
       - name: Generate Benchmark Data
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
         run: |
           pwsh -File ./eng/evaluation/generate-benchmark-data.ps1 `
-            -ResultsDir "eng/evaluation/results/$env:RUN_ID"
+            -ResultsDir "eng/evaluation/results"
         shell: pwsh
 
       - name: Store Quality Benchmark Result
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: 'Skills Evaluation - Quality'
           tool: 'customBiggerIsBetter'
-          output-file-path: eng/evaluation/results/${{ env.RUN_ID }}/benchmark-quality.json
+          output-file-path: eng/evaluation/results/benchmark-quality.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           gh-pages-branch: 'gh-pages'
           benchmark-data-dir-path: 'dev/bench'
 
       - name: Store Efficiency Benchmark Result
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: 'Skills Evaluation - Efficiency'
           tool: 'customSmallerIsBetter'
-          output-file-path: eng/evaluation/results/${{ env.RUN_ID }}/benchmark-efficiency.json
+          output-file-path: eng/evaluation/results/benchmark-efficiency.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           gh-pages-branch: 'gh-pages'
