@@ -102,10 +102,24 @@ if ($CommitJson) {
 
 $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 
+# Detect model from skilled-stats.json files
+$model = $null
+foreach ($scenarioDir in $scenarioDirs) {
+    $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
+    if (Test-Path $skilledStatsFile) {
+        $skilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
+        if ($skilledStats.Model) {
+            $model = $skilledStats.Model
+            break
+        }
+    }
+}
+
 $qualityEntry = @{
     commit = $commit
     date   = $now
     tool   = "customBiggerIsBetter"
+    model  = $model
     benches = $qualityBenches.ToArray()
 }
 
@@ -113,6 +127,7 @@ $efficiencyEntry = @{
     commit = $commit
     date   = $now
     tool   = "customSmallerIsBetter"
+    model  = $model
     benches = $efficiencyBenches.ToArray()
 }
 
