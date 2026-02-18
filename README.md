@@ -1,6 +1,6 @@
 # .NET Skills for AI Assistants
 
-This repository provides comprehensive .NET development expertise for AI assistants including [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli), [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), and [GitHub Agentic Workflows](https://github.com/github/gh-aw). Covers MSBuild build system skills, .NET unit test generation, and polyglot test generation using a multi-agent pipeline.
+This repository provides comprehensive .NET development expertise for AI assistants including [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli), [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), and [GitHub Agentic Workflows](https://github.com/github/gh-aw).
 
 ## What's Included
 
