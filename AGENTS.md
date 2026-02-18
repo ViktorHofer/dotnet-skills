@@ -41,4 +41,4 @@ Skill content is compiled into knowledge bundles for agentic workflows and the C
 node eng/compile-knowledge.js
 ```
 
-The workflow compiled output (`src/msbuild-skills/agentic-workflows/shared/compiled/`) and Copilot Extension compiled output (`src/copilot-extension/src/knowledge/`) are both checked in and must be committed alongside skill changes.
+The workflow compiled output (`src/msbuild-skills/agentic-workflows/shared/compiled/`) and Copilot Extension compiled output (`src/msbuild-skills/copilot-extension/src/knowledge/`) are both checked in and must be committed alongside skill changes.

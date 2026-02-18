@@ -13,7 +13,7 @@ Users invoke it with `@msbuild` in any Copilot Chat:
 
 ## Architecture
 
-This is a **serverless MVP** (Option A from the [design doc](../docs/copilot-extension-design.md)):
+This is a **serverless MVP** (Option A from the [design doc](../../../docs/copilot-extension-design.md)):
 
 - **Runtime**: Node.js (deployable to Azure Functions, AWS Lambda, Vercel, or any serverless platform)
 - **Knowledge**: MSBuild skill content compiled into system prompts
@@ -118,7 +118,7 @@ npm start
 npm test
 
 # Recompile knowledge after skill changes
-node ../../eng/compile-knowledge.js copilot-extension
+node ../../../eng/compile-knowledge.js copilot-extension
 ```
 
 ## How It Works
@@ -140,6 +140,6 @@ node ../../eng/compile-knowledge.js copilot-extension
 
 ## Related
 
-- [Design Document](../docs/copilot-extension-design.md) — Full design rationale
-- [Skills Repository](../msbuild-skills/) — Source knowledge base
+- [Design Document](../../../docs/copilot-extension-design.md) — Full design rationale
+- [Skills Repository](../) — Source knowledge base
 - [GitHub Copilot Extensions Docs](https://docs.github.com/copilot/building-copilot-extensions)

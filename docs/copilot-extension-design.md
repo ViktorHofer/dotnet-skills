@@ -78,4 +78,4 @@ Start with Option A for broad reach, then expand to Option B for users who need 
 - Should we support custom knowledge overlays per organization?
 
 ## Status: MVP Implementation Available
-The serverless MVP implementation is available in [`/src/copilot-extension`](../src/copilot-extension/). See the [README](../src/copilot-extension/README.md) for setup and deployment instructions.
+The serverless MVP implementation is available in [`/src/msbuild-skills/copilot-extension`](../src/msbuild-skills/copilot-extension/). See the [README](../src/msbuild-skills/copilot-extension/README.md) for setup and deployment instructions.
