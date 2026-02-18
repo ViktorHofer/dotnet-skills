@@ -34,6 +34,10 @@ This repository provides comprehensive .NET development expertise for AI assista
    ```
    /agents
    ```
+7. Update plugin (on demand):
+   ```
+   /plugin update <plugin>@dotnet-skills
+   ```
 
 ### 📦 Distribution Templates
 
@@ -62,12 +66,6 @@ Some components include a deployable [Copilot Extension](https://docs.github.com
 1. Find the extension in the [GitHub Marketplace](https://github.com/marketplace) or your organization's Copilot Extensions
 2. Install the GitHub App on your organization or personal account
 3. Use `@<extension-name>` in any Copilot Chat surface to interact with it
-
-## Updating
-
-```
-/plugin update <plugin>@dotnet-skills
-```
 
 ## Contributing
 
