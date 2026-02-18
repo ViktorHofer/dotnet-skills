@@ -67,7 +67,7 @@ Extract and compile skill content into optimized knowledge files:
 
 ```bash
 # From repo root
-node eng/compile-knowledge.js copilot-extension
+node src/msbuild-skills/build.js
 
 # Or from copilot-extension/
 npm run compile-knowledge
@@ -118,7 +118,7 @@ npm start
 npm test
 
 # Recompile knowledge after skill changes
-node ../../../eng/compile-knowledge.js copilot-extension
+node src/msbuild-skills/build.js
 ```
 
 ## How It Works
@@ -134,7 +134,7 @@ node ../../../eng/compile-knowledge.js copilot-extension
 
 ## Extending
 
-- **Add knowledge**: Update skills in `src/msbuild-skills/skills/`, then run `npm run compile-knowledge`
+- **Add knowledge**: Update skills in `src/msbuild-skills/skills/`, then run `node src/msbuild-skills/build.js`
 - **Add intents**: Edit `src/intent-classifier.js` to recognize new categories
 - **Add tools**: For v2, add MCP server integration for binlog analysis
 

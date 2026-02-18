@@ -19,30 +19,8 @@ This repository contains plugins under `src/`. Each plugin has a `plugin.json` w
 
 ## Component Build Scripts
 
-Each component under `src/` may have a `build.js` file at its root. When making changes to a component, run its build script to validate:
+Each component under `src/` may have a `build.js` file at its root. When making changes to a component, always run its build script:
 
 ```bash
 node src/<component>/build.js
 ```
-
-This is an extension point — each component defines its own validation and build logic.
-
-## Skill Conventions
-
-Every skill's `description` field in its YAML frontmatter **must** include the domain gate text:
-
-```
-Only activate in MSBuild/.NET build contexts (see shared/domain-check.md for signals).
-```
-
-This ensures skills are only activated when the user is working in an MSBuild/.NET context. The `skills/shared/domain-check.md` file defines the relevance signals (high/medium/low confidence).
-
-## Compiled Knowledge
-
-Skill content is compiled into knowledge bundles for agentic workflows and the Copilot Extension. When modifying skills, regenerate compiled knowledge:
-
-```bash
-node eng/compile-knowledge.js
-```
-
-The workflow compiled output (`src/msbuild-skills/agentic-workflows/shared/compiled/`) and Copilot Extension compiled output (`src/msbuild-skills/copilot-extension/src/knowledge/`) are both checked in and must be committed alongside skill changes.

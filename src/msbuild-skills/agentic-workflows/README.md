@@ -7,7 +7,7 @@ These are [GitHub Agentic Workflow](https://github.com/github/gh-aw) templates f
 1. Install the `gh aw` CLI extension
 2. **Generate compiled knowledge** (from the repo root):
    ```bash
-   node eng/compile-knowledge.js agentic-workflows
+   node src/msbuild-skills/build.js
    ```
 3. Copy the desired workflow files to your repository's `.github/workflows/` directory
 4. Copy the `shared/` directory as well (workflows import from it)
@@ -19,4 +19,4 @@ These are [GitHub Agentic Workflow](https://github.com/github/gh-aw) templates f
 
 - Edit the `on:` section to match your CI workflow names
 - Adjust `safe-outputs` limits as needed
-- Rerun `node eng/compile-knowledge.js agentic-workflows` after skill changes
+- Rerun `node src/msbuild-skills/build.js` after skill changes

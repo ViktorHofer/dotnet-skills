@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node eng/compile-knowledge.js -->
+<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node src/msbuild-skills/build.js -->
 
 ---
 name: msbuild-style-guide
@@ -1418,6 +1418,6 @@ Central Package Management (CPM) provides a single source of truth for all NuGet
 
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" 
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.
 
 [truncated]

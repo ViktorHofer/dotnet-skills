@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node eng/compile-knowledge.js -->
+<!-- AUTO-GENERATED — DO NOT EDIT. Regenerate with: node src/msbuild-skills/build.js -->
 
 ---
 name: common-build-errors
@@ -1277,6 +1277,6 @@ A `global.json` file controls which SDK version is used for a project tree. It m
 
 | Policy | Behavior |
 |---|---|
-| `patch` | Uses the specified 
+| `patch` | Uses the specifi
 
 [truncated]
