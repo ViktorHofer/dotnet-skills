@@ -6,17 +6,17 @@ Generates comprehensive unit tests for any programming language using a multi-ag
 
 | Skill | Description |
 |-------|-------------|
-| `polyglot-test-generation` | Orchestrates multi-agent test generation for any language |
+| [`polyglot-test-generation`](skills/polyglot-test-generation/) | Orchestrates multi-agent test generation for any language |
 
 ## 🤖 Agents
 
 | Agent | Description |
 |-------|-------------|
-| `test-generator` | Pipeline orchestrator — coordinates the full Research→Plan→Implement workflow |
-| `researcher` | Analyzes codebase structure, testing patterns, and testability |
-| `planner` | Creates phased test implementation plans |
-| `implementer` | Writes test files and verifies they compile and pass |
-| `builder` | Runs build/compile commands and reports results |
-| `tester` | Runs test commands and reports pass/fail |
-| `fixer` | Fixes compilation errors |
-| `linter` | Runs code formatting/linting |
+| [`test-generator`](agents/test-generator.agent.md) | Pipeline orchestrator — coordinates the full Research→Plan→Implement workflow |
+| [`researcher`](agents/researcher.agent.md) | Analyzes codebase structure, testing patterns, and testability |
+| [`planner`](agents/planner.agent.md) | Creates phased test implementation plans |
+| [`implementer`](agents/implementer.agent.md) | Writes test files and verifies they compile and pass |
+| [`builder`](agents/builder.agent.md) | Runs build/compile commands and reports results |
+| [`tester`](agents/tester.agent.md) | Runs test commands and reports pass/fail |
+| [`fixer`](agents/fixer.agent.md) | Fixes compilation errors |
+| [`linter`](agents/linter.agent.md) | Runs code formatting/linting |
