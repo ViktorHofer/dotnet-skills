@@ -31,3 +31,22 @@ A .NET project with custom MSBuild targets that break incremental build — they
 - Timestamp-based up-to-date checking
 - FileWrites item group for clean support
 - Building twice to verify incrementality (second build should skip the target)
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified custom target is missing Inputs attribute
+- [ ] Identified custom target is missing Outputs attribute
+- [ ] Explained that without Inputs/Outputs, MSBuild runs target every time
+- [ ] Explained timestamp-based up-to-date checking mechanism
+- [ ] Suggested adding Inputs="@(Compile)" or appropriate input files
+- [ ] Suggested adding Outputs referencing the generated file path
+- [ ] Identified generated files not registered in FileWrites
+- [ ] Explained that FileWrites is needed for dotnet clean support
+- [ ] Provided correct XML fix with Inputs, Outputs, and FileWrites
+- [ ] Mentioned building twice to verify incrementality
+
+Total: __/10
+
+## Expected Skills
+- incremental-build

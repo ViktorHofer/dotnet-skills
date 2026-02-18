@@ -29,3 +29,22 @@ This solution demonstrates MSBuild output path and intermediate output path clas
 - Multi-targeting
 - project.assets.json
 - Parallel build conflicts
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified MultiTargetLib has AppendTargetFrameworkToOutputPath=false causing clash
+- [ ] Explained that net8.0 and net9.0 write to the same output directory
+- [ ] Suggested removing AppendTargetFrameworkToOutputPath=false or using unique output paths
+- [ ] Identified LibraryA & LibraryB share ../SharedOutput/ as OutputPath
+- [ ] Explained build artifacts overwrite each other during parallel builds
+- [ ] Suggested giving each project a unique output path
+- [ ] Identified LibraryA & LibraryB share ../SharedObj/ as IntermediateOutputPath
+- [ ] Mentioned project.assets.json conflict from shared intermediate path
+- [ ] Suggested giving each project a unique intermediate output path
+- [ ] Referenced BaseIntermediateOutputPath vs IntermediateOutputPath concepts
+
+Total: __/10
+
+## Expected Skills
+- check-bin-obj-clash

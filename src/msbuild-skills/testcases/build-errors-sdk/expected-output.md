@@ -20,3 +20,22 @@ A .NET project fails to build due to SDK resolution errors caused by global.json
 - NETSDK1141 vs NETSDK1045 error distinction
 - SDK feature bands and version matching
 - Two-layer failure: global.json blocks SDK resolution, then TFM is invalid even after fixing
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified global.json pins SDK version 99.0.100
+- [ ] Identified rollForward: "disable" prevents any SDK roll-forward
+- [ ] Mentioned NETSDK1141 error code
+- [ ] Suggested fixing global.json (remove, update SDK version, or change rollForward)
+- [ ] Identified net99.0 as an invalid target framework
+- [ ] Mentioned NETSDK1045 error code
+- [ ] Suggested changing TargetFramework to a valid TFM
+- [ ] Explained the two-layer failure (global.json blocks SDK, then TFM invalid)
+- [ ] Mentioned rollForward policy options (latestFeature, latestMajor, etc.)
+- [ ] Explained SDK feature bands and version matching
+
+Total: __/10
+
+## Expected Skills
+- sdk-workload-resolution

@@ -24,3 +24,24 @@ The fix should add an `<ItemGroup>` inside the `GenerateSampleCode` target (afte
 - `$(IntermediateOutputPath)` as the correct base directory for generated files
 - `BeforeTargets="CoreCompile;BeforeCompile"` as the correct target timing for generated source files
 - The generated file must be added to `Compile` **inside the target** (not at the project level) because it doesn't exist at evaluation time
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified that the generated file is not included in compilation
+- [ ] Explained evaluation phase vs execution phase timing
+- [ ] Explained that default globs don't capture files generated during build
+- [ ] Suggested adding generated file to Compile item group inside the target
+- [ ] Suggested adding generated file to FileWrites item group
+- [ ] Provided correct XML for the fix (Compile Include inside target)
+- [ ] Mentioned IntermediateOutputPath as correct base directory
+- [ ] Mentioned correct target timing (BeforeTargets="CoreCompile")
+- [ ] Explained that the include must be inside the target, not at project level
+- [ ] Solution would actually fix the build error
+
+Total: __/10
+
+## Expected Skills
+- including-generated-files
+- binlog-generation
+- binlog-failure-analysis

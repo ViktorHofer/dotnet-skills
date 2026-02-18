@@ -29,3 +29,23 @@ Or simpler:
 - Polyfill packages (System.Memory for Span<T>)
 - Conditional PackageReference based on TargetFramework
 - MSBuild condition syntax for TFM-specific logic
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified project multi-targets net8.0, netstandard2.0, and net472
+- [ ] Identified Span<T> usage as the source of build failure
+- [ ] Explained Span<T> is built-in on net8.0 but not on older TFMs
+- [ ] Identified CS0246 error on netstandard2.0 and net472
+- [ ] Suggested System.Memory NuGet package as polyfill
+- [ ] Provided conditional PackageReference XML
+- [ ] Used correct MSBuild condition syntax for TFM-specific logic
+- [ ] Condition correctly targets only non-net8.0 TFMs
+- [ ] Mentioned alternative approach (#if preprocessor directives)
+- [ ] Solution would actually fix the multi-target build
+
+Total: __/10
+
+## Expected Skills
+- multitarget-tfm-issues
+- binlog-generation

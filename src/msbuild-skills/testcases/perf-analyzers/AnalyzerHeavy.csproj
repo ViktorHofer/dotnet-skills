@@ -2,12 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
+  <!-- Additional project-specific analyzers (on top of 2 global analyzers from Directory.Build.props) -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" />
     <PackageReference Include="Roslynator.Analyzers" Version="4.7.0" />
     <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469" />
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.127" />

@@ -46,3 +46,22 @@ The modernized .csproj should be approximately 6 lines:
 - MSBuild `Sdk` attribute replacing explicit imports
 - Auto-generated AssemblyInfo
 - Default Debug/Release configurations in SDK projects
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified project as non-SDK-style (legacy format)
+- [ ] Suggested migration to SDK-style Project Sdk="Microsoft.NET.Sdk"
+- [ ] Identified explicit Compile Include items as unnecessary
+- [ ] Explained SDK-style implicit globbing replaces explicit includes
+- [ ] Identified framework Reference elements as removable
+- [ ] Identified AssemblyInfo.cs as replaceable by SDK auto-generation
+- [ ] Identified redundant Debug/Release PropertyGroups
+- [ ] Identified explicit MSBuild Import statements as unnecessary
+- [ ] Provided a modernized .csproj example (roughly correct structure)
+- [ ] Mentioned that modernized project should be ~6 lines vs ~48
+
+Total: __/10
+
+## Expected Skills
+- msbuild-modernization

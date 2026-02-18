@@ -451,10 +451,17 @@ description: "Reference knowledge for diagnosing MSBuild build performance issue
 
 ### 2. Roslyn Analyzers and Source Generators
 
-- **Symptoms**: Csc task takes much longer than expected for file count
-- **Diagnosis**: `get_expensive_analyzers` → identify top offenders
-- **Fixes**: remove expensive analyzers from inner loop builds, use `<RunAnalyzers>false</RunAnalyzers>` for dev builds, severity config in .editorconfig
-- `<EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>` for local builds
+- **Symptoms**: Csc task takes much longer than expected for file count (>2× clean compile time)
+- **Diagnosis**: `get_expensive_analyzers` → identify top offenders, compare Csc duration with and without analyzers
+- **Fixes**:
+  - Conditionally disable in dev: `<RunAnalyzers Condition="'$(ContinuousIntegrationBuild)' != 'true'">false</RunAnalyzers>`
+  - Per-configuration: `<RunAnalyzers Condition="'$(Configuration)' == 'Debug'">false</RunAnalyzers>`
+  - Code-style only: `<EnforceCodeStyleInBuild Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</EnforceCodeStyleInBuild>`
+  - Remove genuinely redundant analyzers from inner loop
+  - Severity config in .editorconfig for less critical rules
+- **Key principle**: Preserve analyzer enforcement in CI. Never just "remove" analyzers — configure them conditionally.
+- **GlobalPackageReference**: Analyzers added via `GlobalPackageReference` in `Directory.Packages.props` apply to ALL projects. Consider if test projects need the same analyzer set as production code.
+- **EnforceCodeStyleInBuild**: When set to `true` in `Directory.Build.props`, forces code-style analysis on every build. Should be conditional on CI environment (`ContinuousIntegrationBuild`) to avoid slowing dev inner loop.
 
 ### 3. Serialization Bottlenecks (Single-threaded targets)
 
@@ -930,28 +937,6 @@ Deterministic builds ensure that the same source code compiled with the same com
 
 This is the default in SDK-style projects.
 
-### Why Determinism Matters
-
-- **Reproducible builds:** verify that a binary was produced from a specific source commit
-- **Binary caching:** identical inputs produce identical outputs, enabling cache hits
-- **Source Link:** requires deterministic builds for reliable source mapping
-
-### What Affects Determinism
-
-Without deterministic mode, several things introduce non-determinism:
-- Timestamps embedded in PE headers
-- Random GUIDs (MVID) generated per compilation
-- Absolute file paths embedded in PDBs
-
-Deterministic mode removes timestamps, uses content-based GUIDs, and normalizes paths.
-
-### CI Configuration
-
-Enable `ContinuousIntegrationBuild` in CI to normalize file paths in PDBs (replacing local paths with source control paths):
-
-```xml
-<PropertyGroup Condition="'$(CI)' == 'true'">
-  <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-</Property
+### Why
 
 [truncated]

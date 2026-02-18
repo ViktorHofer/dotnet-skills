@@ -246,40 +246,85 @@ Read the two files in this directory:
 1. **expected-output.md** - The ground truth / expected findings
 2. **actual-response.txt** - The AI assistant's actual response
 
-Rate the actual response from 1-5 based on:
-1. **Accuracy** - Did it correctly identify the problems?
+## Step 1: Checklist Scoring (Primary Metric)
+If expected-output.md contains an "## Evaluation Checklist" section, score each checklist item:
+- Read each checklist item carefully
+- Check if the actual response correctly identifies and addresses that item
+- Award 1 point for each item that is correctly identified AND addressed with a reasonable solution
+- Award 0.5 points for items partially addressed (identified but wrong/vague fix, or fix without identification)
+- Award 0 points for items not mentioned or completely wrong
+- Calculate: checklist_score = points_earned, checklist_max = total_items
+
+If there is no Evaluation Checklist section, set checklist_score and checklist_max to null.
+
+## Step 2: Subjective Quality Rating (Secondary Metric)
+Rate the actual response on a scale of 0-10 where:
+- 0-2: Major errors, misidentification of problems, harmful suggestions
+- 3-4: Partially correct, misses major issues, vague solutions
+- 5-6: Correct identification of main issues, but missing some, generic solutions
+- 7-8: Identifies most issues correctly with specific, actionable solutions
+- 9-10: Identifies all issues, provides expert-level solutions with precise MSBuild concepts
+
+Use the full range. A response that catches 5/7 issues with correct fixes is a 7, not a 4.
+
+Rate each dimension independently on the same 0-10 scale:
+1. **Accuracy** - Did it correctly identify the problems without false positives?
 2. **Completeness** - Did it find all issues mentioned in expected output?
-3. **Actionability** - Are the suggested solutions practical and correct?
+3. **Actionability** - Are the suggested solutions practical, correct, and specific?
 4. **Clarity** - Is the explanation clear and well-organized?
 
-After reading both files, respond with ONLY a JSON object (no markdown code fences, no extra text):
-{"score": <1-5>, "accuracy": <1-5>, "completeness": <1-5>, "actionability": <1-5>, "clarity": <1-5>, "reasoning": "<brief explanation>"}
+## Response Format
+Your response must be ONLY a JSON object. Do not include any other text, markdown formatting, or code fences.
+
+{"score": <0-10>, "accuracy": <0-10>, "completeness": <0-10>, "actionability": <0-10>, "clarity": <0-10>, "checklist_score": <number|null>, "checklist_max": <number|null>, "reasoning": "<brief explanation of scoring decisions>"}
 "@
         $instructions | Out-File -FilePath (Join-Path $evalDir "INSTRUCTIONS.md") -Encoding utf8
 
         # Build a short prompt that tells Copilot to read the files
-        $evalPrompt = "Read the files in this directory: INSTRUCTIONS.md, expected-output.md, and actual-response.txt. Follow the instructions in INSTRUCTIONS.md to evaluate the actual response against the expected output. Respond with ONLY a JSON object as specified in the instructions."
+        $evalPrompt = "Read the files in this directory: INSTRUCTIONS.md, expected-output.md, and actual-response.txt. Follow the instructions in INSTRUCTIONS.md to evaluate the actual response against the expected output. Your response must be ONLY a JSON object as specified in the instructions. Do not include any markdown code fences, explanatory text, or anything other than the raw JSON object."
 
-        # Run evaluation with Copilot (vanilla - no plugins)
-        Write-Host "[EVAL] Running Copilot evaluator for $runType..."
-        $evalOutput = Invoke-EvaluationCopilot `
-            -Prompt $evalPrompt `
-            -WorkingDir $evalDir `
-            -TimeoutSeconds $TimeoutSeconds
+        # Run evaluation with Copilot (vanilla - no plugins) with retry logic
+        $maxRetries = 3
+        $evaluation = $null
 
-        # Save raw evaluation output
-        $evalRawFile = Join-Path $scenarioResultsDir "${runType}-eval-raw.txt"
-        $evalOutput | Out-File -FilePath $evalRawFile -Encoding utf8
+        for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
+            Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$maxRetries)..."
+            $evalOutput = Invoke-EvaluationCopilot `
+                -Prompt $evalPrompt `
+                -WorkingDir $evalDir `
+                -TimeoutSeconds $TimeoutSeconds
 
-        # Parse evaluation
-        $evaluation = Parse-EvaluationJson -Output $evalOutput
+            # Save raw evaluation output
+            $evalRawFile = Join-Path $scenarioResultsDir "${runType}-eval-raw.txt"
+            $evalOutput | Out-File -FilePath $evalRawFile -Encoding utf8
+
+            # Parse evaluation
+            $evaluation = Parse-EvaluationJson -Output $evalOutput
+
+            # Check if parsing succeeded (score > 0 means we got valid JSON)
+            if ($evaluation.score -gt 0) {
+                Write-Host "[EVAL] Successfully parsed evaluation on attempt $attempt"
+                break
+            }
+
+            if ($attempt -lt $maxRetries) {
+                Write-Host "[WARN] Failed to parse evaluation JSON, retrying..."
+                Start-Sleep -Seconds 2
+            } else {
+                Write-Host "[WARN] All $maxRetries evaluation attempts failed to produce valid JSON"
+            }
+        }
+
         $evaluations[$runType] = $evaluation
 
-        Write-Host "   Score: $($evaluation.score)/5"
-        Write-Host "   Accuracy: $($evaluation.accuracy)/5"
-        Write-Host "   Completeness: $($evaluation.completeness)/5"
-        Write-Host "   Actionability: $($evaluation.actionability)/5"
-        Write-Host "   Clarity: $($evaluation.clarity)/5"
+        Write-Host "   Score: $($evaluation.score)/10"
+        Write-Host "   Accuracy: $($evaluation.accuracy)/10"
+        Write-Host "   Completeness: $($evaluation.completeness)/10"
+        Write-Host "   Actionability: $($evaluation.actionability)/10"
+        Write-Host "   Clarity: $($evaluation.clarity)/10"
+        if ($null -ne $evaluation.checklist_score) {
+            Write-Host "   Checklist: $($evaluation.checklist_score)/$($evaluation.checklist_max)"
+        }
         Write-Host "   Reasoning: $($evaluation.reasoning)"
     }
     finally {
