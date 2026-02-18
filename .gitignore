@@ -9,9 +9,6 @@
 # Local artifact server storage (act)
 .act-artifacts/
 
-# Evaluation results (generated at runtime)
-eng/evaluation/results/
-
 # dotenv files
 .env
 

@@ -197,6 +197,25 @@ When adding new agents or skills, no `plugin.json` change is needed — both are
   - Minor: add new skills, agents, or templates
   - Major: breaking changes to skill names or structure
 
+## Artifacts Layout
+
+Build and test outputs are stored under the `artifacts/` directory at the repository root (git-ignored):
+
+```
+artifacts/
+└── TestResults/           # Evaluation pipeline results
+    └── <timestamp>/          # Per-run directory (e.g., 20260218-120000)
+        ├── <scenario>/    # Per-scenario results
+        │   ├── evaluation.json
+        │   ├── vanilla-output.txt
+        │   ├── skilled-output.txt
+        │   ├── vanilla-stats.json
+        │   └── skilled-stats.json
+        └── summary.md     # Aggregated markdown summary
+```
+
+This directory is created at runtime by the evaluation workflow and by local test runs.
+
 ## Quality Checklist
 
 Before submitting a PR:

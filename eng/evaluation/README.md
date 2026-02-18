@@ -120,12 +120,11 @@ $ErrorActionPreference = "Continue"
     --secret-file .secrets `
     --bind `
     --artifact-server-path "$PWD/.act-artifacts" `
-    --env "GITHUB_RUN_ID=local-run" `
-    --env "GITHUB_RUN_ATTEMPT=1" `
+    --env "GITHUB_RUN_ID=$(Get-Date -Format 'yyyyMMdd-HHmmss')" `
     2>&1 | Tee-Object -FilePath act-eval.log
 ```
 
-Results will appear in `eng/evaluation/results/local-run-1/summary.md`.
+Results will appear in `artifacts/TestResults/<timestamp>/summary.md` (e.g., `20260218-120000`).
 Uploaded artifacts are stored in `.act-artifacts/` (git-ignored).
 
 > **⚠️ Windows + act caveat:** You must invoke `act` directly from PowerShell with `2>&1 | Tee-Object` (or `2>&1 | Out-Host`). Using `cmd /c act ... > file 2>&1` causes `context canceled` errors that kill long-running Docker exec steps. This is a known issue with act v0.2.x on Windows.
