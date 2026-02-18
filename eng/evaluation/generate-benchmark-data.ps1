@@ -3,8 +3,8 @@
     Converts evaluation results into benchmark dashboard data.
 
 .DESCRIPTION
-    Reads evaluation results from the results directory and produces a data.js
-    file compatible with the custom benchmark dashboard. If an existing data.js
+    Reads evaluation results from the results directory and produces a data.json
+    file compatible with the custom benchmark dashboard. If an existing data.json
     is provided, the new data point is appended to the existing history.
 
 .PARAMETER ResultsDir
@@ -14,7 +14,7 @@
     Path to write the output files. Defaults to ResultsDir.
 
 .PARAMETER ExistingDataFile
-    Optional path to an existing data.js file from gh-pages to append to.
+    Optional path to an existing data.json file from gh-pages to append to.
 
 .PARAMETER CommitJson
     Optional JSON string with commit info (id, message, author, timestamp, url).
@@ -143,13 +143,11 @@ $benchmarkData = @{
 
 if ($ExistingDataFile -and (Test-Path $ExistingDataFile)) {
     $existingContent = Get-Content $ExistingDataFile -Raw
-    # Strip the "window.BENCHMARK_DATA = " prefix and parse JSON
-    $jsonContent = $existingContent -replace '^window\.BENCHMARK_DATA\s*=\s*', ''
     try {
-        $benchmarkData = $jsonContent | ConvertFrom-Json -AsHashtable
+        $benchmarkData = $existingContent | ConvertFrom-Json -AsHashtable
         $benchmarkData['lastUpdate'] = $now
     } catch {
-        Write-Warning "Failed to parse existing data.js, starting fresh: $_"
+        Write-Warning "Failed to parse existing data.json, starting fresh: $_"
     }
 }
 
@@ -167,13 +165,12 @@ if (-not $benchmarkData['entries']['Skills Evaluation - Efficiency']) {
 $benchmarkData['entries']['Skills Evaluation - Quality'] += @($qualityEntry)
 $benchmarkData['entries']['Skills Evaluation - Efficiency'] += @($efficiencyEntry)
 
-# Write data.js
+# Write data.json
 $dataJson = $benchmarkData | ConvertTo-Json -Depth 10
-$dataJs = "window.BENCHMARK_DATA = $dataJson"
-$dataJsFile = Join-Path $OutputDir "data.js"
-$dataJs | Out-File -FilePath $dataJsFile -Encoding utf8
+$dataJsonFile = Join-Path $OutputDir "data.json"
+$dataJson | Out-File -FilePath $dataJsonFile -Encoding utf8
 
-Write-Host "[OK] Benchmark data.js generated: $dataJsFile"
+Write-Host "[OK] Benchmark data.json generated: $dataJsonFile"
 Write-Host "   Quality entries: $($qualityBenches.Count)"
 Write-Host "   Efficiency entries: $($efficiencyBenches.Count)"
 Write-Host "   Total data points: $($benchmarkData['entries']['Skills Evaluation - Quality'].Count)"
