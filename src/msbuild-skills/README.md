@@ -2,7 +2,7 @@
 
 Comprehensive MSBuild and .NET build skills: failure diagnosis, performance optimization, code quality, and modernization.
 
-## Skills
+## 🔧 Skills
 
 ### Build Failure Troubleshooting
 
@@ -44,7 +44,7 @@ Comprehensive MSBuild and .NET build skills: failure diagnosis, performance opti
 |-------|-------------|
 | `multithreaded-task-migration` | Thread-safe MSBuild task migration guide |
 
-## Agents
+## 🤖 Agents
 
 | Agent | Description |
 |-------|-------------|
@@ -52,7 +52,7 @@ Comprehensive MSBuild and .NET build skills: failure diagnosis, performance opti
 | `build-perf` | Build performance analyst — runs builds, analyzes binlogs, suggests optimizations |
 | `msbuild-code-review` | Project file reviewer — scans .csproj/.props/.targets for anti-patterns and improvements |
 
-## Distribution Templates
+## 📦 Distribution Templates
 
 Ready-to-use templates for different distribution channels:
 
