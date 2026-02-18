@@ -696,3 +696,55 @@ Use property functions for simple operations instead of shelling out.
   <OutputPath Condition="'$(OutputPath)' == ''">bin\custom\</OutputPath>
 </PropertyGroup>
 ```
+
+### 9. DefineConstants overwrites instead of appending
+
+`<DefineConstants>` is a semicolon-delimited property. Setting it without preserving the existing value **silently kills** SDK-defined constants like `TRACE` and `DEBUG`.
+
+```xml
+<!-- BAD: This REPLACES all existing DefineConstants (TRACE, DEBUG vanish) -->
+<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  <DefineConstants>ENABLE_LOGGING</DefineConstants>
+</PropertyGroup>
+
+<!-- GOOD: Append to existing constants -->
+<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  <DefineConstants>$(DefineConstants);ENABLE_LOGGING</DefineConstants>
+</PropertyGroup>
+```
+
+### 10. Analyzer PackageReference without PrivateAssets
+
+Analyzer packages are build-time-only tools. Without `<PrivateAssets>all</PrivateAssets>`, the analyzer dependency **leaks to downstream consumers** of your library via transitive dependency resolution.
+
+```xml
+<!-- BAD: Analyzer leaks to consumers -->
+<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+
+<!-- GOOD: Analyzer stays private to this project -->
+<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+</PackageReference>
+
+<!-- BEST: Use GlobalPackageReference in Directory.Packages.props (handles PrivateAssets automatically) -->
+<GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+```
+
+### 11. Property defaults in .targets that projects can't override
+
+Properties set in `Directory.Build.targets` override any values set in project files because `.targets` is imported **after** the project. If you intend a value as an overridable default, put it in `.props`.
+
+**Evaluation order:** `Directory.Build.props → SDK .props → YourProject.csproj → SDK .targets → Directory.Build.targets`
+
+```xml
+<!-- BAD: In Directory.Build.targets — projects cannot override this -->
+<PropertyGroup>
+  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+</PropertyGroup>
+
+<!-- GOOD: In Directory.Build.props — projects can override -->
+<PropertyGroup>
+  <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+</PropertyGroup>
+```

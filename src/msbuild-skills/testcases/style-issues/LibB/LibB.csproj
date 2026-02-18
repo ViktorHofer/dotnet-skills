@@ -1,17 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Company>Contoso</Company>
-    <Authors>Build Team</Authors>
-    <Copyright>Copyright 2024 Contoso</Copyright>
   </PropertyGroup>
 
   <PropertyGroup>
     <OutputPath>C:\builds\output\LibB</OutputPath>
+  </PropertyGroup>
+
+  <!-- This attempts to disable warnings-as-errors for LibB, but it has no effect
+       because Directory.Build.targets sets TreatWarningsAsErrors=true AFTER this file. -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

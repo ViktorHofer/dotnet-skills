@@ -699,6 +699,58 @@ Use property functions for simple operations instead of shelling out.
 </PropertyGroup>
 ```
 
+### 9. DefineConstants overwrites instead of appending
+
+`<DefineConstants>` is a semicolon-delimited property. Setting it without preserving the existing value **silently kills** SDK-defined constants like `TRACE` and `DEBUG`.
+
+```xml
+<!-- BAD: This REPLACES all existing DefineConstants (TRACE, DEBUG vanish) -->
+<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  <DefineConstants>ENABLE_LOGGING</DefineConstants>
+</PropertyGroup>
+
+<!-- GOOD: Append to existing constants -->
+<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  <DefineConstants>$(DefineConstants);ENABLE_LOGGING</DefineConstants>
+</PropertyGroup>
+```
+
+### 10. Analyzer PackageReference without PrivateAssets
+
+Analyzer packages are build-time-only tools. Without `<PrivateAssets>all</PrivateAssets>`, the analyzer dependency **leaks to downstream consumers** of your library via transitive dependency resolution.
+
+```xml
+<!-- BAD: Analyzer leaks to consumers -->
+<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+
+<!-- GOOD: Analyzer stays private to this project -->
+<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+</PackageReference>
+
+<!-- BEST: Use GlobalPackageReference in Directory.Packages.props (handles PrivateAssets automatically) -->
+<GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+```
+
+### 11. Property defaults in .targets that projects can't override
+
+Properties set in `Directory.Build.targets` override any values set in project files because `.targets` is imported **after** the project. If you intend a value as an overridable default, put it in `.props`.
+
+**Evaluation order:** `Directory.Build.props → SDK .props → YourProject.csproj → SDK .targets → Directory.Build.targets`
+
+```xml
+<!-- BAD: In Directory.Build.targets — projects cannot override this -->
+<PropertyGroup>
+  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+</PropertyGroup>
+
+<!-- GOOD: In Directory.Build.props — projects can override -->
+<PropertyGroup>
+  <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+</PropertyGroup>
+```
+
 ---
 
 ---
@@ -1356,68 +1408,6 @@ See [`shared/targetframework-props-evaluation.md`](../shared/targetframework-pro
 - **Project-specific TFMs** — each project should declare its own `<TargetFramework>` or `<TargetFrameworks>`
 - **Project-specific PackageReferences** — unless truly universal (e.g., analyzers for all projects)
 - **Targets or complex build logic** — use `Directory.Build.targets` instead
-- **Properties that depend on SDK-defined values** — those won't be available yet during `.props` evaluation
-
-## Directory.Build.targets
-
-### What to Put Here
-
-**Custom build targets:**
-
-```xml
-<Target Name="ValidateProjectSettings" BeforeTargets="Build">
-  <Error Text="All libraries must target netstandard2.0 or higher"
-         Condition="'$(OutputType)' == 'Library' AND '$(TargetFramework)' == 'net472'" />
-</Target>
-```
-
-**Conditional targets based on project type:**
-
-```xml
-<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile"
-        Condition="'$(GenerateBuildInfo)' == 'true'">
-  <WriteLinesToFile File="$(IntermediateOutputPath)BuildInfo.g.cs"
-                    Lines="[assembly: System.Reflection.AssemblyMetadata(&quot;BuildDate&quot;, &quot;$(Today)&quot;)]"
-                    Overwrite="true" />
-  <ItemGroup>
-    <Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" />
-  </ItemGroup>
-</Target>
-```
-
-**Late-bound property overrides (values that depend on SDK properties):**
-
-```xml
-<PropertyGroup>
-  <!-- DocumentationFile depends on OutputPath, which is set by the SDK -->
-  <DocumentationFile Condition="'$(IsPackable)' == 'true'">$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-</PropertyGroup>
-```
-
-**Post-build validation:**
-
-```xml
-<Target Name="ValidatePackageOutput" AfterTargets="Pack"
-        Condition="'$(IsPackable)' == 'true'">
-  <Error Text="Package was not created at $(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg"
-         Condition="!Exists('$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg')" />
-</Target>
-```
-
-## Directory.Packages.props (Central Package Management)
-
-Central Package Management (CPM) provides a single source of truth for all NuGet package versions. See [`shared/central-package-management.md`](../shared/central-package-management.md) for the full setup pattern, including `GlobalPackageReference` and `VersionOverride`.
-
-**Enable CPM in `Directory.Packages.props` at the repo root:**
-
-```xml
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.
+- **Properties that dep
 
 [truncated]
