@@ -104,13 +104,13 @@ An AI-powered multi-agent pipeline that generates comprehensive unit tests for a
      ```
      /plugin install msbuild-skills@dotnet-skills
      ```
-   - **polyglot-test-agent** — Polyglot test generation agent:
+   - **polyglot-unittest-skills** — Polyglot test generation agent:
      ```
-     /plugin install polyglot-test-agent@dotnet-skills
+     /plugin install polyglot-unittest-skills@dotnet-skills
      ```
-   - **unittest** — .NET unit test generation guidance:
+   - **dotnet-unittest-skills** — .NET unit test generation guidance:
      ```
-     /plugin install unittest@dotnet-skills
+     /plugin install dotnet-unittest-skills@dotnet-skills
      ```
 4. Restart to load the new skills
 5. View available skills:
@@ -148,8 +148,8 @@ git add .github/workflows/
 
 ```
 /plugin update msbuild-skills@dotnet-skills
-/plugin update polyglot-test-agent@dotnet-skills
-/plugin update unittest@dotnet-skills
+/plugin update polyglot-unittest-skills@dotnet-skills
+/plugin update dotnet-unittest-skills@dotnet-skills
 ```
 
 ## Contributing

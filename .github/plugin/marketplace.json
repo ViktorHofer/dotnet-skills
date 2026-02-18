@@ -10,13 +10,13 @@
       "description": "Skills for MSBuild development."
     },
     {
-      "name": "polyglot-test-agent",
-      "source": "./src/polyglot-test-agent",
+      "name": "polyglot-unittest-skills",
+      "source": "./src/polyglot-unittest-skills",
       "description": "Generates comprehensive unit tests for any programming language using a multi-agent pipeline."
     },
     {
-      "name": "unittest",
-      "source": "./src/unittest",
+      "name": "dotnet-unittest-skills",
+      "source": "./src/dotnet-unittest-skills",
       "description": "Provides guidance for generating comprehensive C# unit tests in .NET projects using MSTest, NUnit, or xUnit frameworks."
     }
   ]
