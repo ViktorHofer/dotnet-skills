@@ -317,8 +317,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: eval-*
-          path: /tmp/results/
-          merge-multiple: true
+          path: /tmp/artifacts/
 
       - name: Fetch existing benchmark data
         run: |
@@ -341,22 +340,36 @@ jobs:
             $existingFile = $null
           }
 
-          # Generate benchmark data for each plugin
-          $pluginDirs = Get-ChildItem -Path "/tmp/results" -Directory -ErrorAction SilentlyContinue
-          foreach ($pluginDir in $pluginDirs) {
-            # Results are under <plugin>/<runId>/<scenarios>
-            $runDir = Get-ChildItem -Path $pluginDir.FullName -Directory | Select-Object -First 1
-            if (-not $runDir) {
-              Write-Warning "No run directory found for $($pluginDir.Name), skipping"
+          # Generate benchmark data for each plugin artifact
+          # Artifact dirs are named eval-<plugin>-<runId>
+          $artifactDirs = Get-ChildItem -Path "/tmp/artifacts" -Directory -ErrorAction SilentlyContinue
+          foreach ($artifactDir in $artifactDirs) {
+            if ($artifactDir.Name -notmatch '^eval-(.+)-(\d{8}-\d{6})$') {
+              Write-Warning "Skipping unexpected artifact directory: $($artifactDir.Name)"
               continue
             }
-            Write-Host "`n=== Generating benchmark data for: $($pluginDir.Name) ==="
-            pwsh -File ./eng/dashboard/generate-benchmark-data.ps1 `
-              -ResultsDir $runDir.FullName `
-              -PluginName $pluginDir.Name `
-              -OutputDir "/tmp/gh-pages" `
-              -ExistingDataFile $existingFile `
-              -CommitJson $commitJson
+            $plugin = $Matches[1]
+
+            # Find the run directory containing scenario results
+            $runDir = Get-ChildItem -Path $artifactDir.FullName -Directory -Recurse -Depth 1 |
+              Where-Object { Get-ChildItem -Path $_.FullName -Directory -ErrorAction SilentlyContinue } |
+              Select-Object -First 1
+            if (-not $runDir) {
+              Write-Warning "No scenario results found for $plugin, skipping"
+              continue
+            }
+
+            Write-Host "`n=== Generating benchmark data for: $plugin ==="
+            $params = @{
+              ResultsDir = $runDir.FullName
+              PluginName = $plugin
+              OutputDir  = "/tmp/gh-pages"
+              CommitJson = $commitJson
+            }
+            if ($existingFile) {
+              $params.ExistingDataFile = $existingFile
+            }
+            & ./eng/dashboard/generate-benchmark-data.ps1 @params
 
             # After first plugin, use the updated file as the existing data
             $existingFile = "/tmp/gh-pages/data.json"
