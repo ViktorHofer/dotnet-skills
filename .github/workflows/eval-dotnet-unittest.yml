@@ -1,11 +1,11 @@
-name: Eval — unittest
+name: Eval — dotnet-unittest-skills
 
 on:
   pull_request:
     paths:
-      - 'src/unittest/**'
+      - 'src/dotnet-unittest-skills/**'
       - 'eng/evaluation/**'
-      - '.github/workflows/eval-unittest.yml'
+      - '.github/workflows/eval-dotnet-unittest.yml'
 
   schedule:
     - cron: '0 7 * * *'  # Daily at 7 AM UTC (offset from msbuild eval at 6 AM)
@@ -68,7 +68,7 @@ jobs:
             $scenarios = $inputScenarios -split ',' | ForEach-Object { $_.Trim() }
           }
           else {
-            $scenarios = Get-ChildItem -Path "src/unittest/testcases" -Directory |
+            $scenarios = Get-ChildItem -Path "src/dotnet-unittest-skills/testcases" -Directory |
               Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
               Select-Object -ExpandProperty Name
           }
@@ -105,17 +105,17 @@ jobs:
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}
         run: |
-          # Ensure unittest plugin is not installed (ignore error if not installed)
+          # Ensure dotnet-unittest-skills plugin is not installed (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall unittest 2>$null
+          copilot plugin uninstall dotnet-unittest-skills 2>$null
           $ErrorActionPreference = "Stop"
 
           # Validate plugin state
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "\bunittest\b") {
-            throw "❌ VALIDATION FAILED: unittest should NOT be installed for vanilla run"
+          if ($pluginList -match "\bdotnet-unittest-skills\b") {
+            throw "❌ VALIDATION FAILED: dotnet-unittest-skills should NOT be installed for vanilla run"
           }
-          Write-Host "✅ Validated: No unittest plugin installed"
+          Write-Host "✅ Validated: No dotnet-unittest-skills plugin installed"
 
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
@@ -131,9 +131,9 @@ jobs:
               -ScenarioName $scenario `
               -RunType "vanilla" `
               -ResultsDir "eng/evaluation/results/$runId" `
-              -PluginName "unittest" `
+              -PluginName "dotnet-unittest-skills" `
               -MarketplaceName "dotnet-skills" `
-              -ScenariosBaseDir "src/unittest/testcases"
+              -ScenariosBaseDir "src/dotnet-unittest-skills/testcases"
           }
 
           Write-Host "`n✅ All vanilla scenario runs completed"
@@ -151,16 +151,16 @@ jobs:
           Write-Host "`nAvailable plugins in marketplace:"
           copilot plugin marketplace browse dotnet-skills 2>&1 | Write-Host
 
-          # Install the unittest plugin from the marketplace
-          Write-Host "`nInstalling unittest plugin..."
-          copilot plugin install unittest@dotnet-skills 2>&1 | Write-Host
+          # Install the dotnet-unittest-skills plugin from the marketplace
+          Write-Host "`nInstalling dotnet-unittest-skills plugin..."
+          copilot plugin install dotnet-unittest-skills@dotnet-skills 2>&1 | Write-Host
 
           # Validate plugin is installed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -notmatch "\bunittest\b") {
-            throw "❌ VALIDATION FAILED: unittest should be installed for skilled run"
+          if ($pluginList -notmatch "\bdotnet-unittest-skills\b") {
+            throw "❌ VALIDATION FAILED: dotnet-unittest-skills should be installed for skilled run"
           }
-          Write-Host "✅ Validated: unittest plugin is installed"
+          Write-Host "✅ Validated: dotnet-unittest-skills plugin is installed"
 
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
@@ -176,9 +176,9 @@ jobs:
               -ScenarioName $scenario `
               -RunType "skilled" `
               -ResultsDir "eng/evaluation/results/$runId" `
-              -PluginName "unittest" `
+              -PluginName "dotnet-unittest-skills" `
               -MarketplaceName "dotnet-skills" `
-              -ScenariosBaseDir "src/unittest/testcases"
+              -ScenariosBaseDir "src/dotnet-unittest-skills/testcases"
           }
 
           Write-Host "`n✅ All skilled scenario runs completed"
@@ -188,15 +188,15 @@ jobs:
         run: |
           # Uninstall plugin for clean evaluation (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall unittest 2>$null
+          copilot plugin uninstall dotnet-unittest-skills 2>$null
           $ErrorActionPreference = "Stop"
 
           # Validate plugin is removed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "\bunittest\b") {
-            throw "❌ VALIDATION FAILED: unittest should NOT be installed for evaluation"
+          if ($pluginList -match "\bdotnet-unittest-skills\b") {
+            throw "❌ VALIDATION FAILED: dotnet-unittest-skills should NOT be installed for evaluation"
           }
-          Write-Host "✅ Validated: No unittest plugin installed for evaluation"
+          Write-Host "✅ Validated: No dotnet-unittest-skills plugin installed for evaluation"
 
           # Evaluate scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
@@ -211,7 +211,7 @@ jobs:
             pwsh -File ./eng/evaluation/evaluate-response.ps1 `
               -ScenarioName $scenario `
               -ResultsDir "eng/evaluation/results/$runId" `
-              -ScenariosBaseDir "src/unittest/testcases"
+              -ScenariosBaseDir "src/dotnet-unittest-skills/testcases"
           }
 
           Write-Host "`n✅ All scenario evaluations completed"
@@ -222,7 +222,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eval-unittest-${{ env.RUN_ID }}
+          name: eval-dotnet-unittest-${{ env.RUN_ID }}
           path: eng/evaluation/results/${{ env.RUN_ID }}/
           retention-days: 30
 
@@ -231,7 +231,7 @@ jobs:
         run: |
           pwsh -File ./eng/evaluation/generate-summary.ps1 `
             -ResultsDir "eng/evaluation/results/$env:RUN_ID" `
-            -PluginName "unittest" `
+            -PluginName "dotnet-unittest-skills" `
             -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
             -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
 

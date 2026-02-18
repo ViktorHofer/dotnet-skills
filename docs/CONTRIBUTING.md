@@ -11,12 +11,12 @@ src/
 │   ├── agents/
 │   ├── skills/
 │   └── templates/
-├── unittest/                    # .NET unit test plugin
+├── dotnet-unittest-skills/          # .NET unit test plugin
 │   ├── plugin.json
 │   └── skills/dotnet-unittest/
 │       ├── SKILL.md
 │       └── references/          # Framework-specific guidance
-├── polyglot-test-agent/         # Polyglot test generation plugin
+├── polyglot-unittest-skills/       # Polyglot test generation plugin
 │   ├── plugin.json
 │   ├── agents/                  # 8 specialized agents
 │   └── skills/polyglot-test-generation/
@@ -57,7 +57,7 @@ private feed auth, version conflicts, and lock files. DO NOT use for non-.NET pa
 
 ## Adding a Custom Agent
 
-> **Multi-plugin repository**: This repo contains multiple plugins. When adding a skill or agent, place it in the correct plugin directory. MSBuild-specific content goes in `src/msbuild-skills/`. Unit testing content for .NET goes in `src/unittest/`. Polyglot test generation content goes in `src/polyglot-test-agent/`.
+> **Multi-plugin repository**: This repo contains multiple plugins. When adding a skill or agent, place it in the correct plugin directory. MSBuild-specific content goes in `src/msbuild-skills/`. Unit testing content for .NET goes in `src/dotnet-unittest-skills/`. Polyglot test generation content goes in `src/polyglot-unittest-skills/`.
 
 Agents are autonomous AI personas that orchestrate multi-step workflows — they take actions, run tools, and dispatch to skills.
 
