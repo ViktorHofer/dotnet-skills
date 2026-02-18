@@ -20,3 +20,22 @@ Two .NET projects fail during NuGet restore due to package resolution errors.
 - NU1605 package downgrade / diamond dependency resolution
 - Transitive vs direct package references
 - NuGet version resolution (nearest-wins rule)
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified NU1101 error for nonexistent package
+- [ ] Named the specific package (Nonexistent.Package.That.Does.Not.Exist)
+- [ ] Suggested removing or replacing the nonexistent package reference
+- [ ] Identified NU1605 package downgrade error
+- [ ] Explained the transitive dependency chain (Logging 8.0.0 → DI.Abstractions >= 8.0.0)
+- [ ] Identified that direct reference pins DI.Abstractions to 6.0.0
+- [ ] Suggested upgrading DI.Abstractions to 8.0.0 or higher
+- [ ] Mentioned transitive vs direct package reference concepts
+- [ ] Mentioned NuGet version resolution (nearest-wins rule)
+- [ ] Solutions are specific and actionable (exact version numbers)
+
+Total: __/10
+
+## Expected Skills
+- nuget-restore-failures

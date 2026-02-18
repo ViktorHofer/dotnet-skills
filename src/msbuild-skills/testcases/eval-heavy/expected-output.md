@@ -24,3 +24,22 @@ A .NET project with three MSBuild evaluation-phase anti-patterns causing slow pr
 - DefaultItemExcludes
 - Property functions and their cost during evaluation
 - /pp (preprocess) for analyzing evaluation output
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified deep import chain (level1→level2→level3)
+- [ ] Explained evaluation overhead from nested imports
+- [ ] Suggested flattening the import chain
+- [ ] Identified overly broad glob pattern (**/*.*)
+- [ ] Explained that broad globs scan large directories (node_modules, .git, etc.)
+- [ ] Suggested restricting globs or using DefaultItemExcludes
+- [ ] Identified property function performing file I/O during evaluation
+- [ ] Explained difference between evaluation phase and execution phase
+- [ ] Suggested moving file-reading logic to a target (execution phase)
+- [ ] Mentioned /pp (preprocess) or other diagnostic approaches
+
+Total: __/10
+
+## Expected Skills
+- eval-performance

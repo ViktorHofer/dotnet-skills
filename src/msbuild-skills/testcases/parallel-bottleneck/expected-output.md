@@ -20,3 +20,23 @@ A solution with 4 projects forming a deep serial dependency chain (Core→Api→
 - Critical path in dependency graph
 - Node timeline analysis from binlog
 - ProjectReference graph optimization
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified serial dependency chain (Core→Api→Web→Tests)
+- [ ] Explained that serial chain prevents build parallelism
+- [ ] Mentioned /maxcpucount (-m) and that it cannot help with serial dependencies
+- [ ] Explained that only one CPU core is utilized with this graph
+- [ ] Mentioned binlog node timeline for evidence
+- [ ] Identified unnecessary transitive dependencies
+- [ ] Suggested flattening the dependency graph
+- [ ] Analyzed whether Tests truly needs to depend on Web
+- [ ] Mentioned critical path concept in dependency graph
+- [ ] Provided specific restructuring suggestions for the project graph
+
+Total: __/10
+
+## Expected Skills
+- build-parallelism
+- binlog-generation

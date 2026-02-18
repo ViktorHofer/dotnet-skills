@@ -40,12 +40,12 @@
         <div class="card">
           <div class="card-label">Skilled Avg</div>
           <div class="card-value" style="color: var(--skilled)">${skilledAvg.value.toFixed(2)}</div>
-          <div class="card-delta">out of 5.0</div>
+          <div class="card-delta">out of 10.0</div>
         </div>
         <div class="card">
           <div class="card-label">Vanilla Avg</div>
           <div class="card-value" style="color: var(--vanilla)">${vanillaAvg.value.toFixed(2)}</div>
-          <div class="card-delta">out of 5.0</div>
+          <div class="card-delta">out of 10.0</div>
         </div>
         <div class="card">
           <div class="card-label">Delta</div>
@@ -145,8 +145,8 @@
           y: {
             ticks: { color: '#8b949e' },
             grid: { color: '#30363d' },
-            suggestedMin: title.includes('Quality') ? 1 : undefined,
-            suggestedMax: title.includes('Quality') ? 5 : undefined
+            suggestedMin: title.includes('Quality') ? 0 : undefined,
+            suggestedMax: title.includes('Quality') ? 10 : undefined
           }
         }
       }

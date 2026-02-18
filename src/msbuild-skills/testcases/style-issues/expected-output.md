@@ -40,3 +40,22 @@ A solution with two projects (LibA, LibB) containing multiple MSBuild anti-patte
 - PackageReference vs Reference
 - Built-in MSBuild tasks vs Exec
 - Cross-platform path handling
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified hardcoded absolute paths for OutputPath
+- [ ] Suggested using relative paths or MSBuild properties
+- [ ] Identified unquoted MSBuild condition
+- [ ] Provided correct quoted condition syntax
+- [ ] Identified duplicated properties across projects
+- [ ] Suggested creating Directory.Build.props for shared properties
+- [ ] Identified explicit Compile includes in SDK-style project
+- [ ] Identified old-style Reference with HintPath instead of PackageReference
+- [ ] Identified Exec instead of built-in MakeDir task
+- [ ] Suggested replacing Exec with MakeDir task
+
+Total: __/10
+
+## Expected Skills
+- msbuild-code-review

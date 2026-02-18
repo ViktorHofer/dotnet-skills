@@ -20,3 +20,22 @@ Two .NET projects fail to build due to C# compilation errors.
 - CS0029 implicit conversion error
 - CS8600 nullable reference type warning/error
 - How to add PackageReference to resolve missing types
+
+## Evaluation Checklist
+Award 1 point for each item correctly identified and addressed:
+
+- [ ] Identified CS0246 error in MissingReference project
+- [ ] Mentioned System.Text.Json as missing package
+- [ ] Mentioned Microsoft.Extensions.Logging.Abstractions as missing package
+- [ ] Provided correct PackageReference XML for both packages
+- [ ] Identified CS0029 in TypeMismatch (type conversion error)
+- [ ] Identified CS8600 in TypeMismatch (nullable reference)
+- [ ] Explained root cause (string-to-int assignment)
+- [ ] Provided correct code fix for type mismatch
+- [ ] Mentioned PackageReference as the mechanism to resolve missing types
+- [ ] All solutions preserve existing code logic
+
+Total: __/10
+
+## Expected Skills
+- common-build-errors

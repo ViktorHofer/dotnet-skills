@@ -88,6 +88,77 @@ function Assert-PluginState {
     Write-Host "[OK] Plugin state validated: '$PluginName' installed=$isInstalled (expected=$ShouldBeInstalled)"
 }
 
+function Get-SkillActivation {
+    param(
+        [string]$ConfigDir
+    )
+
+    $sessionStateDir = Join-Path $ConfigDir "session-state"
+    if (-not (Test-Path $sessionStateDir)) {
+        Write-Warning "[ACTIVATION] No session-state directory found at $sessionStateDir"
+        return @{
+            SessionId = $null
+            Skills    = @()
+            Agents    = @()
+            Activated = $false
+        }
+    }
+
+    $sessionDir = Get-ChildItem $sessionStateDir -Directory -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    if (-not $sessionDir) {
+        Write-Warning "[ACTIVATION] No session directories found in $sessionStateDir"
+        return @{
+            SessionId = $null
+            Skills    = @()
+            Agents    = @()
+            Activated = $false
+        }
+    }
+
+    $eventsFile = Join-Path $sessionDir.FullName "events.jsonl"
+    if (-not (Test-Path $eventsFile)) {
+        Write-Warning "[ACTIVATION] No events.jsonl found at $eventsFile"
+        return @{
+            SessionId = $sessionDir.Name
+            Skills    = @()
+            Agents    = @()
+            Activated = $false
+        }
+    }
+
+    $lines = Get-Content $eventsFile -ErrorAction SilentlyContinue
+    $skills = @()
+    $agents = @()
+
+    foreach ($line in $lines) {
+        $e = $line | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($null -eq $e) { continue }
+        # Check for skill tool calls
+        if ($e.type -eq "tool.execution_start" -and $e.data.toolName -eq "skill") {
+            $skillName = $e.data.arguments.skill
+            if ($skillName -and $skills -notcontains $skillName) {
+                $skills += $skillName
+            }
+        }
+        # Check for subagent delegation
+        if ($e.type -eq "subagent.started") {
+            $agentName = $e.data.agentName
+            if ($agentName -and $agents -notcontains $agentName) {
+                $agents += $agentName
+            }
+        }
+    }
+
+    return @{
+        SessionId = $sessionDir.Name
+        Skills    = $skills
+        Agents    = $agents
+        Activated = ($skills.Count -gt 0 -or $agents.Count -gt 0)
+    }
+}
+
 function Copy-ScenarioToTemp {
     param(
         [string]$ScenarioSourceDir,
@@ -122,7 +193,8 @@ function Invoke-CopilotWithTimeout {
         [string]$Prompt,
         [string]$WorkingDir,
         [string]$OutputFile,
-        [int]$TimeoutSeconds = 300
+        [int]$TimeoutSeconds = 300,
+        [string]$ConfigDir = ""
     )
 
     Write-Host "[RUN] Running Copilot CLI..."
@@ -137,18 +209,24 @@ function Invoke-CopilotWithTimeout {
     $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
         Where-Object { $_.CommandType -eq 'Application' } |
         Select-Object -First 1 -ExpandProperty Source
+
+    $configDirArg = ""
+    if ($ConfigDir -and $ConfigDir -ne "") {
+        $configDirArg = " --config-dir `"$ConfigDir`""
+    }
+
     if (-not $copilotCmd) {
         if ($env:OS -match 'Windows') {
             # Windows: use cmd.exe to run copilot (works with .cmd/.bat shims via PATH)
             $copilotCmd = "cmd.exe"
-            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user"
+            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
         } else {
             # Linux/macOS: use /usr/bin/env to find copilot
             $copilotCmd = "/usr/bin/env"
-            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user"
+            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
         }
     } else {
-        $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user"
+        $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
     }
 
     Write-Host "   Copilot executable: $copilotCmd"
@@ -293,11 +371,17 @@ if (Test-Path $promptFile) {
 # Step 4: Run Copilot CLI
 $outputFile = Join-Path $scenarioResultsDir "${RunType}-output.txt"
 
+# Create a per-run config directory for session isolation (must be absolute path)
+$sessionConfigDir = Join-Path (Resolve-Path $scenarioResultsDir).Path "${RunType}-config"
+New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
+Write-Host "[SESSION] Config directory: $sessionConfigDir"
+
 $output = Invoke-CopilotWithTimeout `
     -Prompt $prompt `
     -WorkingDir $workingDir `
     -OutputFile $outputFile `
-    -TimeoutSeconds $TimeoutSeconds
+    -TimeoutSeconds $TimeoutSeconds `
+    -ConfigDir $sessionConfigDir
 
 # Step 5: Parse stats
 Write-Host ""
@@ -318,6 +402,41 @@ Write-Host "   Total Time: $($stats.TotalTimeSeconds)s"
 Write-Host "   Model: $($stats.Model)"
 Write-Host "   Tokens In: $($stats.TokensIn)"
 Write-Host "   Tokens Out: $($stats.TokensOut)"
+
+# Step 5b: Extract skill activation from session logs
+Write-Host ""
+Write-Host "[ACTIVATION] Checking skill activation from session logs..."
+$activation = Get-SkillActivation -ConfigDir $sessionConfigDir
+
+$activationFile = Join-Path $scenarioResultsDir "${RunType}-activations.json"
+$activation | ConvertTo-Json -Depth 5 | Out-File -FilePath $activationFile -Encoding utf8
+
+if ($activation.Activated) {
+    Write-Host "   Skills activated: $($activation.Skills -join ', ')"
+    if ($activation.Agents.Count -gt 0) {
+        Write-Host "   Agents delegated: $($activation.Agents -join ', ')"
+    }
+} else {
+    if ($RunType -eq "skilled") {
+        Write-Host "   WARNING: No skills or agents were activated in skilled run"
+    } else {
+        Write-Host "   (vanilla run - no skills expected)"
+    }
+}
+
+# Save session ID for reproducibility
+if ($activation.SessionId) {
+    $sessionInfo = @{
+        SessionId = $activation.SessionId
+        ConfigDir = $sessionConfigDir
+        RunType   = $RunType
+        Scenario  = $ScenarioName
+        Timestamp = (Get-Date -Format "o")
+    }
+    $sessionFile = Join-Path $scenarioResultsDir "${RunType}-session.json"
+    $sessionInfo | ConvertTo-Json -Depth 5 | Out-File -FilePath $sessionFile -Encoding utf8
+    Write-Host "   Session ID: $($activation.SessionId)"
+}
 
 # Step 6: Clean up temp directory
 Write-Host ""

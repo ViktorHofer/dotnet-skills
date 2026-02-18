@@ -40,23 +40,27 @@ $ErrorActionPreference = "Stop"
 function Get-QualityDelta {
     param([float]$Vanilla, [float]$Skilled)
     $delta = $Skilled - $Vanilla
-    if ($delta -ge 2) { return "+$delta (much better)" }
-    if ($delta -ge 1) { return "+$delta (better)" }
-    if ($delta -gt 0) { return "+$delta (slightly better)" }
+    if ($delta -ge 3) { return "+$delta (much better)" }
+    if ($delta -ge 2) { return "+$delta (better)" }
+    if ($delta -ge 1) { return "+$delta (slightly better)" }
+    if ($delta -gt 0) { return "+$delta (marginally better)" }
     if ($delta -eq 0) { return "0 (same)" }
-    if ($delta -gt -1) { return "$delta (slightly worse)" }
-    if ($delta -gt -2) { return "$delta (worse)" }
+    if ($delta -gt -1) { return "$delta (marginally worse)" }
+    if ($delta -gt -2) { return "$delta (slightly worse)" }
+    if ($delta -gt -3) { return "$delta (worse)" }
     return "$delta (much worse)"
 }
 
 function Get-QualityDeltaEmoji {
     param([float]$Delta)
-    if ($Delta -ge 2) { return "+++" }
-    if ($Delta -ge 1) { return "++" }
-    if ($Delta -gt 0) { return "+" }
+    if ($Delta -ge 3) { return "+++" }
+    if ($Delta -ge 2) { return "++" }
+    if ($Delta -ge 1) { return "+" }
+    if ($Delta -gt 0) { return "~+" }
     if ($Delta -eq 0) { return "=" }
-    if ($Delta -gt -1) { return "-" }
-    if ($Delta -gt -2) { return "--" }
+    if ($Delta -gt -1) { return "~-" }
+    if ($Delta -gt -2) { return "-" }
+    if ($Delta -gt -3) { return "--" }
     return "---"
 }
 
@@ -155,8 +159,8 @@ $summaryLines.Add("")
 # Summary table
 $summaryLines.Add("### Summary")
 $summaryLines.Add("")
-$summaryLines.Add("| Scenario | Quality | Time | Tokens (in) | Winner |")
-$summaryLines.Add("|----------|---------|------|-------------|--------|")
+$summaryLines.Add("| Scenario | Quality (0-10) | Checklist | Time | Tokens (in) | Winner |")
+$summaryLines.Add("|----------|----------------|-----------|------|-------------|--------|")
 
 $overallVanilla = 0.0
 $overallSkilled = 0.0
@@ -174,6 +178,9 @@ foreach ($scenarioDir in $scenarioDirs) {
     $qualityDelta = "N/A"
     $winner = "N/A"
 
+    # Checklist scores
+    $checklistDelta = "N/A"
+
     if (Test-Path $evalFile) {
         $evalData = Get-Content $evalFile -Raw | ConvertFrom-Json
 
@@ -181,12 +188,25 @@ foreach ($scenarioDir in $scenarioDirs) {
         $skilledEval = $evalData.evaluations.skilled
 
         if ($vanillaEval -and $vanillaEval.score) {
-            $vanillaScore = "$($vanillaEval.score)/5"
+            $vanillaScore = "$($vanillaEval.score)/10"
             $overallVanilla += [float]$vanillaEval.score
         }
         if ($skilledEval -and $skilledEval.score) {
-            $skilledScore = "$($skilledEval.score)/5"
+            $skilledScore = "$($skilledEval.score)/10"
             $overallSkilled += [float]$skilledEval.score
+        }
+
+        # Calculate checklist delta
+        $vCheck = if ($vanillaEval -and $null -ne $vanillaEval.checklist_score -and $null -ne $vanillaEval.checklist_max) { "$($vanillaEval.checklist_score)/$($vanillaEval.checklist_max)" } else { $null }
+        $sCheck = if ($skilledEval -and $null -ne $skilledEval.checklist_score -and $null -ne $skilledEval.checklist_max) { "$($skilledEval.checklist_score)/$($skilledEval.checklist_max)" } else { $null }
+        if ($vCheck -and $sCheck) {
+            $clDelta = [float]$skilledEval.checklist_score - [float]$vanillaEval.checklist_score
+            $clEmoji = Get-QualityDeltaEmoji -Delta $clDelta
+            $checklistDelta = "$clEmoji $clDelta ($vCheck vs $sCheck)"
+        } elseif ($sCheck) {
+            $checklistDelta = "$sCheck (skilled only)"
+        } elseif ($vCheck) {
+            $checklistDelta = "$vCheck (vanilla only)"
         }
 
         if ($vanillaEval.score -and $skilledEval.score) {
@@ -247,7 +267,7 @@ foreach ($scenarioDir in $scenarioDirs) {
         $winner = Get-Winner @winnerParams
     }
 
-    $summaryLines.Add("| $scenarioName | $qualityDelta | $timeDelta | $tokenDelta | $winner |")
+    $summaryLines.Add("| $scenarioName | $qualityDelta | $checklistDelta | $timeDelta | $tokenDelta | $winner |")
 }
 
 $summaryLines.Add("")
@@ -265,7 +285,7 @@ if ($scenarioCount -gt 0) {
         $summaryLines.Add("### Overall Result: **Skills Degraded Response Quality**")
     }
     $summaryLines.Add("")
-    $summaryLines.Add("**Average Scores**: Vanilla $avgVanilla/5 | Skilled $avgSkilled/5")
+    $summaryLines.Add("**Average Scores**: Vanilla $avgVanilla/10 | Skilled $avgSkilled/10")
 } else {
     $summaryLines.Add("### Overall Result: **No scenarios evaluated**")
 }
@@ -305,8 +325,8 @@ foreach ($scenarioDir in $scenarioDirs) {
     $summaryLines.Add("|--------|---------|---------|-------|")
 
     # Quality row
-    $vScore = if ($vanillaEval -and $vanillaEval.score) { "$($vanillaEval.score)/5" } else { "N/A" }
-    $sScore = if ($skilledEval -and $skilledEval.score) { "$($skilledEval.score)/5" } else { "N/A" }
+    $vScore = if ($vanillaEval -and $vanillaEval.score) { "$($vanillaEval.score)/10" } else { "N/A" }
+    $sScore = if ($skilledEval -and $skilledEval.score) { "$($skilledEval.score)/10" } else { "N/A" }
     $qDelta = "N/A"
     if ($vanillaEval -and $vanillaEval.score -and $skilledEval -and $skilledEval.score) {
         $d = [float]$skilledEval.score - [float]$vanillaEval.score
@@ -355,6 +375,25 @@ foreach ($scenarioDir in $scenarioDirs) {
         $summaryLines.Add("")
     }
 
+    # Skill activation info
+    $skilledActivationsFile = Join-Path $scenarioDir.FullName "skilled-activations.json"
+    if (Test-Path $skilledActivationsFile) {
+        $activationData = Get-Content $skilledActivationsFile -Raw | ConvertFrom-Json
+        if ($activationData.Activated) {
+            $activationParts = @()
+            if ($activationData.Skills -and $activationData.Skills.Count -gt 0) {
+                $activationParts += "Skills: $($activationData.Skills -join ', ')"
+            }
+            if ($activationData.Agents -and $activationData.Agents.Count -gt 0) {
+                $activationParts += "Agents: $($activationData.Agents -join ', ')"
+            }
+            $summaryLines.Add("**Skills Activated**: $($activationParts -join ' | ')")
+        } else {
+            $summaryLines.Add("**Skills Activated**: :warning: **NONE** — skills were installed but not invoked")
+        }
+        $summaryLines.Add("")
+    }
+
     # Evaluation details in collapsible section
     if ($vanillaEval -or $skilledEval) {
         $summaryLines.Add("<details>")
@@ -365,7 +404,11 @@ foreach ($scenarioDir in $scenarioDirs) {
             $eval = if ($runType -eq "vanilla") { $vanillaEval } else { $skilledEval }
             if ($eval) {
                 $label = $runType.Substring(0,1).ToUpper() + $runType.Substring(1)
-                $summaryLines.Add("**$label** ($($eval.score)/5): Accuracy $($eval.accuracy)/5, Completeness $($eval.completeness)/5, Actionability $($eval.actionability)/5, Clarity $($eval.clarity)/5")
+                $checklistInfo = ""
+                if ($null -ne $eval.checklist_score -and $null -ne $eval.checklist_max) {
+                    $checklistInfo = " | Checklist $($eval.checklist_score)/$($eval.checklist_max)"
+                }
+                $summaryLines.Add("**$label** ($($eval.score)/10): Accuracy $($eval.accuracy)/10, Completeness $($eval.completeness)/10, Actionability $($eval.actionability)/10, Clarity $($eval.clarity)/10$checklistInfo")
                 if ($eval.reasoning) {
                     $summaryLines.Add("> $($eval.reasoning)")
                 }
