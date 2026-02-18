@@ -1,5 +1,7 @@
 # .NET Skills for AI Assistants
 
+[![Dashboard](https://github.com/ViktorHofer/dotnet-skills/actions/workflows/pages/pages-build-deployment/badge.svg)](https://viktorhofer.github.io/dotnet-skills/dev/bench/)
+
 This repository provides comprehensive .NET development expertise for AI assistants including [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli), [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), and [GitHub Agentic Workflows](https://github.com/github/gh-aw).
 
 ## What's Included
