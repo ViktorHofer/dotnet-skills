@@ -3,21 +3,22 @@
     Converts evaluation results into benchmark dashboard data.
 
 .DESCRIPTION
-    Reads evaluation results from the results directory and produces a data.json
-    file compatible with the custom benchmark dashboard. If an existing data.json
-    is provided, the new data point is appended to the existing history.
+    Reads evaluation results from the results directory and produces a per-plugin
+    JSON file (<PluginName>.json) compatible with the benchmark dashboard.
+    If an existing JSON file is provided, the new data point is appended to the
+    existing history.
 
 .PARAMETER ResultsDir
     Path to the results directory for this run.
 
 .PARAMETER PluginName
-    Name of the plugin these results belong to. Used to key entries in the data file.
+    Name of the plugin these results belong to. Used as the output filename.
 
 .PARAMETER OutputDir
     Path to write the output files. Defaults to ResultsDir.
 
 .PARAMETER ExistingDataFile
-    Optional path to an existing data.json file from gh-pages to append to.
+    Optional path to an existing <PluginName>.json file from gh-pages to append to.
 
 .PARAMETER CommitJson
     Optional JSON string with commit info (id, message, author, timestamp, url).
@@ -137,8 +138,8 @@ $efficiencyEntry = @{
     benches = $efficiencyBenches.ToArray()
 }
 
-$qualityKey = "$PluginName - Quality"
-$efficiencyKey = "$PluginName - Efficiency"
+$qualityKey = "Quality"
+$efficiencyKey = "Efficiency"
 
 # Load existing data or create new structure
 $benchmarkData = @{
@@ -174,12 +175,12 @@ if (-not $benchmarkData['entries'][$efficiencyKey]) {
 $benchmarkData['entries'][$qualityKey] += @($qualityEntry)
 $benchmarkData['entries'][$efficiencyKey] += @($efficiencyEntry)
 
-# Write data.json
+# Write <PluginName>.json
 $dataJson = $benchmarkData | ConvertTo-Json -Depth 10
-$dataJsonFile = Join-Path $OutputDir "data.json"
+$dataJsonFile = Join-Path $OutputDir "$PluginName.json"
 $dataJson | Out-File -FilePath $dataJsonFile -Encoding utf8
 
-Write-Host "[OK] Benchmark data.json generated: $dataJsonFile"
+Write-Host "[OK] Benchmark $PluginName.json generated: $dataJsonFile"
 Write-Host "   Quality entries: $($qualityBenches.Count)"
 Write-Host "   Efficiency entries: $($efficiencyBenches.Count)"
 Write-Host "   Total data points: $($benchmarkData['entries'][$qualityKey].Count)"
