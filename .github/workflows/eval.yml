@@ -377,16 +377,30 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: |
-          mkdir -p /tmp/deploy/data
-          cp /tmp/gh-pages/data/*.json /tmp/deploy/data/
-          cp eng/dashboard/dashboard.html /tmp/deploy/index.html
-          cp eng/dashboard/dashboard.js /tmp/deploy/dashboard.js
+          cd /tmp
+          REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+
+          # Clone existing gh-pages or create new branch
+          if git ls-remote --exit-code --heads "$REPO_URL" gh-pages > /dev/null 2>&1; then
+            git clone --branch gh-pages --single-branch "$REPO_URL" deploy
+          else
+            mkdir deploy && cd deploy && git init && git checkout -b gh-pages
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            cd /tmp
+          fi
 
           cd /tmp/deploy
-          git init
-          git checkout -b gh-pages
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Update files
+          mkdir -p data
+          cp /tmp/gh-pages/data/*.json data/
+          cp ${{ github.workspace }}/eng/dashboard/dashboard.html index.html
+          cp ${{ github.workspace }}/eng/dashboard/dashboard.js dashboard.js
+
           git add .
+          git diff --cached --quiet && echo "No changes to deploy" && exit 0
           git commit -m "Update benchmark data"
-          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          git push origin gh-pages
