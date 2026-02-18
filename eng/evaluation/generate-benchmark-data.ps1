@@ -143,8 +143,6 @@ $benchmarkData = @{
 
 if ($ExistingDataFile -and (Test-Path $ExistingDataFile)) {
     $existingContent = Get-Content $ExistingDataFile -Raw
-    # Strip legacy "window.BENCHMARK_DATA = " prefix if present
-    $existingContent = $existingContent -replace '^window\.BENCHMARK_DATA\s*=\s*', ''
     try {
         $benchmarkData = $existingContent | ConvertFrom-Json -AsHashtable
         $benchmarkData['lastUpdate'] = $now
