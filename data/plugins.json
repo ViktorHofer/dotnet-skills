@@ -1,4 +1,5 @@
 [
   "dotnet-unittest-skills",
-  "msbuild-skills"
+  "msbuild-skills",
+  "plugins"
 ]
