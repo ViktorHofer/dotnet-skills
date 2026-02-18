@@ -37,7 +37,7 @@ env:
   GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -247,3 +247,34 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md
+
+      - name: Generate Benchmark Data
+        if: always()
+        run: |
+          pwsh -File ./eng/evaluation/generate-benchmark-data.ps1 `
+            -ResultsDir "eng/evaluation/results/$env:RUN_ID"
+        shell: pwsh
+
+      - name: Store Quality Benchmark Result
+        if: github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: 'Skills Evaluation - Quality'
+          tool: 'customBiggerIsBetter'
+          output-file-path: eng/evaluation/results/${{ env.RUN_ID }}/benchmark-quality.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          gh-pages-branch: 'gh-pages'
+          benchmark-data-dir-path: 'dev/bench'
+
+      - name: Store Efficiency Benchmark Result
+        if: github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: 'Skills Evaluation - Efficiency'
+          tool: 'customSmallerIsBetter'
+          output-file-path: eng/evaluation/results/${{ env.RUN_ID }}/benchmark-efficiency.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          gh-pages-branch: 'gh-pages'
+          benchmark-data-dir-path: 'dev/bench'
