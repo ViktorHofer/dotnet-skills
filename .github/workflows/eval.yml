@@ -279,7 +279,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eval-${{ matrix.plugin }}-${{ env.RUN_ID }}
+          name: ${{ matrix.plugin }}
           path: ${{ env.RESULTS_BASE }}/${{ matrix.plugin }}/
           retention-days: 30
 
@@ -316,8 +316,7 @@ jobs:
       - name: Download evaluation artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: eval-*
-          path: artifacts/TestResults/
+          path: ${{ env.RESULTS_BASE }}/
 
       - name: Fetch existing benchmark data
         run: |
@@ -340,18 +339,14 @@ jobs:
             $existingFile = $null
           }
 
-          # Generate benchmark data for each plugin artifact
-          # Artifact dirs are named eval-<plugin>-<runId>, matching upload structure
-          $artifactDirs = Get-ChildItem -Path "$env:RESULTS_BASE" -Directory -ErrorAction SilentlyContinue
-          foreach ($artifactDir in $artifactDirs) {
-            if ($artifactDir.Name -notmatch '^eval-(.+)-(\d{8}-\d{6})$') {
-              Write-Warning "Skipping unexpected artifact directory: $($artifactDir.Name)"
-              continue
-            }
-            $plugin = $Matches[1]
+          # Generate benchmark data for each plugin
+          # Layout: artifacts/TestResults/<plugin>/<runId>/<scenario>/
+          $pluginDirs = Get-ChildItem -Path "$env:RESULTS_BASE" -Directory -ErrorAction SilentlyContinue
+          foreach ($pluginDir in $pluginDirs) {
+            $plugin = $pluginDir.Name
 
             # Find the run directory containing scenario results
-            $runDir = Get-ChildItem -Path $artifactDir.FullName -Directory |
+            $runDir = Get-ChildItem -Path $pluginDir.FullName -Directory |
               Where-Object { Get-ChildItem -Path $_.FullName -Directory -ErrorAction SilentlyContinue } |
               Select-Object -First 1
             if (-not $runDir) {
