@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771458808697,
+  "lastUpdate": 1771458993314,
   "entries": {
     "Quality": [
       {
@@ -135,6 +135,68 @@
         ],
         "tool": "customBiggerIsBetter",
         "date": 1771458808697,
+        "model": "claude-opus-4.5"
+      },
+      {
+        "benches": [
+          {
+            "value": 9.0,
+            "unit": "Score (1-5)",
+            "name": "bin-obj-clash - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (1-5)",
+            "name": "build-errors-nuget - Vanilla Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (1-5)",
+            "name": "eval-heavy - Vanilla Quality"
+          },
+          {
+            "value": 5.0,
+            "unit": "Score (1-5)",
+            "name": "generated-files - Vanilla Quality"
+          },
+          {
+            "value": 6.0,
+            "unit": "Score (1-5)",
+            "name": "incremental-broken - Vanilla Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (1-5)",
+            "name": "legacy-project - Skilled Quality"
+          },
+          {
+            "value": 6.0,
+            "unit": "Score (1-5)",
+            "name": "style-issues - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (1-5)",
+            "name": "Overall - Skilled Avg Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (1-5)",
+            "name": "Overall - Vanilla Avg Quality"
+          }
+        ],
+        "commit": {
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": ""
+        },
+        "tool": "customBiggerIsBetter",
+        "date": 1771458993314,
         "model": "claude-opus-4.5"
       }
     ],
@@ -291,6 +353,53 @@
         ],
         "tool": "customSmallerIsBetter",
         "date": 1771458808697,
+        "model": "claude-opus-4.5"
+      },
+      {
+        "benches": [
+          {
+            "value": 98.0,
+            "unit": "seconds",
+            "name": "bin-obj-clash - Skilled Time"
+          },
+          {
+            "value": 445400.0,
+            "unit": "tokens",
+            "name": "bin-obj-clash - Skilled Tokens In"
+          },
+          {
+            "value": 56.0,
+            "unit": "seconds",
+            "name": "legacy-project - Skilled Time"
+          },
+          {
+            "value": 199900.0,
+            "unit": "tokens",
+            "name": "legacy-project - Skilled Tokens In"
+          },
+          {
+            "value": 75.0,
+            "unit": "seconds",
+            "name": "style-issues - Skilled Time"
+          },
+          {
+            "value": 47500.0,
+            "unit": "tokens",
+            "name": "style-issues - Skilled Tokens In"
+          }
+        ],
+        "commit": {
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": ""
+        },
+        "tool": "customSmallerIsBetter",
+        "date": 1771458993314,
         "model": "claude-opus-4.5"
       }
     ]
