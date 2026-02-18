@@ -317,7 +317,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: eval-*
-          path: /tmp/artifacts/
+          path: artifacts/TestResults/
 
       - name: Fetch existing benchmark data
         run: |
@@ -341,8 +341,8 @@ jobs:
           }
 
           # Generate benchmark data for each plugin artifact
-          # Artifact dirs are named eval-<plugin>-<runId>
-          $artifactDirs = Get-ChildItem -Path "/tmp/artifacts" -Directory -ErrorAction SilentlyContinue
+          # Artifact dirs are named eval-<plugin>-<runId>, matching upload structure
+          $artifactDirs = Get-ChildItem -Path "$env:RESULTS_BASE" -Directory -ErrorAction SilentlyContinue
           foreach ($artifactDir in $artifactDirs) {
             if ($artifactDir.Name -notmatch '^eval-(.+)-(\d{8}-\d{6})$') {
               Write-Warning "Skipping unexpected artifact directory: $($artifactDir.Name)"
@@ -351,7 +351,7 @@ jobs:
             $plugin = $Matches[1]
 
             # Find the run directory containing scenario results
-            $runDir = Get-ChildItem -Path $artifactDir.FullName -Directory -Recurse -Depth 1 |
+            $runDir = Get-ChildItem -Path $artifactDir.FullName -Directory |
               Where-Object { Get-ChildItem -Path $_.FullName -Directory -ErrorAction SilentlyContinue } |
               Select-Object -First 1
             if (-not $runDir) {
