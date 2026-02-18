@@ -58,6 +58,6 @@ Ready-to-use templates for different distribution channels:
 
 | Template | Location | Description |
 |----------|----------|-------------|
-| Agent Instructions | `templates/AGENTS.md` | Copy to repo root as `AGENTS.md` for cross-agent MSBuild guidance |
-| Prompt Files | `templates/prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
-| Agentic Workflows | `templates/agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
+| Agent Instructions | `AGENTS.md` | Copy to repo root as `AGENTS.md` for cross-agent MSBuild guidance |
+| Prompt Files | `prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
+| Agentic Workflows | `agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
