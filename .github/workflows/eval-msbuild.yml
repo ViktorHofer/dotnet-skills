@@ -1,0 +1,253 @@
+name: Eval — msbuild-skills
+
+on:
+  pull_request:
+    paths:
+      - 'src/msbuild-skills/**'
+      - 'eng/evaluation/**'
+      - '.github/workflows/eval-msbuild.yml'
+
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+
+  workflow_dispatch:
+    inputs:
+      scenarios:
+        description: 'Scenarios to test (comma-separated, empty=all)'
+        required: false
+        default: ''
+      skip_vanilla:
+        description: 'Skip vanilla comparison (faster testing)'
+        required: false
+        type: boolean
+        default: false
+      parallelism:
+        description: 'Number of scenarios to run in parallel'
+        required: false
+        type: number
+        default: 4
+
+# Note: For local testing with act, secrets are loaded from .secrets file
+# For GitHub, secrets are configured in repository settings
+env:
+  GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install PowerShell
+        uses: PSModule/Install-PowerShell@v1
+
+      - name: Install Copilot CLI
+        run: |
+          npm install -g @github/copilot
+          copilot --version
+
+      - name: Create results directory
+        run: |
+          $runId = "${{ github.run_id }}-${{ github.run_attempt }}"
+          New-Item -ItemType Directory -Force -Path "eng/evaluation/results/$runId"
+          echo "RUN_ID=$runId" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      - name: Discover scenarios
+        id: discover
+        run: |
+          $inputScenarios = "${{ github.event.inputs.scenarios }}"
+          if ($inputScenarios) {
+            $scenarios = $inputScenarios -split ',' | ForEach-Object { $_.Trim() }
+          }
+          else {
+          $scenarios = Get-ChildItem -Path "src/msbuild-skills/testcases" -Directory |
+            Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
+              Select-Object -ExpandProperty Name
+          }
+          $scenarioList = $scenarios -join ","
+          Write-Host "Scenarios to evaluate: $scenarioList"
+          echo "SCENARIOS=$scenarioList" >> $env:GITHUB_ENV
+
+          # Set parallelism level
+          $parallelism = "${{ github.event.inputs.parallelism }}"
+          if (-not $parallelism -or $parallelism -eq '') {
+            $parallelism = 4
+          } else {
+            # Validate and convert to integer
+            try {
+              $parallelism = [int]$parallelism
+              if ($parallelism -lt 1) {
+                Write-Warning "Parallelism must be at least 1, using default of 4"
+                $parallelism = 4
+              }
+            } catch {
+              Write-Warning "Invalid parallelism value, using default of 4"
+              $parallelism = 4
+            }
+          }
+          Write-Host "Parallelism level: $parallelism"
+          echo "PARALLELISM=$parallelism" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run Vanilla Copilot (no plugins)
+        if: ${{ github.event.inputs.skip_vanilla != 'true' }}
+        run: |
+          # Ensure no custom plugins are installed (ignore error if not installed)
+          $ErrorActionPreference = "SilentlyContinue"
+          copilot plugin uninstall msbuild-skills 2>$null
+          $ErrorActionPreference = "Stop"
+
+          # Validate plugin state
+          $pluginList = copilot plugin list 2>&1 | Out-String
+          if ($pluginList -match "msbuild-skills") {
+            throw "❌ VALIDATION FAILED: msbuild-skills should NOT be installed for vanilla run"
+          }
+          Write-Host "✅ Validated: No msbuild-skills plugin installed"
+
+          # Run scenarios in parallel
+          $scenarios = $env:SCENARIOS -split ","
+          $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
+          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
+
+          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
+            $scenario = $_
+            $runId = $using:runId
+            Write-Host "`n=== Running vanilla: $scenario ==="
+            pwsh -File ./eng/evaluation/run-scenario.ps1 `
+              -ScenarioName $scenario `
+              -RunType "vanilla" `
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -PluginName "msbuild-skills" `
+              -MarketplaceName "dotnet-skills" `
+              -ScenariosBaseDir "src/msbuild-skills/testcases"
+          }
+
+          Write-Host "`n✅ All vanilla scenario runs completed"
+        shell: pwsh
+
+      - name: Install Plugin and Run Skilled Copilot
+        run: |
+          # Register the repo checkout as a local plugin marketplace
+          $repoRoot = "${{ github.workspace }}"
+          Write-Host "Registering marketplace from: $repoRoot"
+          Write-Host "Marketplace config exists: $(Test-Path (Join-Path $repoRoot '.github/plugin/marketplace.json'))"
+          copilot plugin marketplace add $repoRoot 2>&1 | Write-Host
+
+          # Browse available plugins
+          Write-Host "`nAvailable plugins in marketplace:"
+          copilot plugin marketplace browse dotnet-skills 2>&1 | Write-Host
+
+          # Install the plugin from the marketplace
+          Write-Host "`nInstalling msbuild-skills plugin..."
+          copilot plugin install msbuild-skills@dotnet-skills 2>&1 | Write-Host
+
+          # Validate plugin is installed
+          $pluginList = copilot plugin list 2>&1 | Out-String
+          if ($pluginList -notmatch "msbuild-skills") {
+            throw "❌ VALIDATION FAILED: msbuild-skills should be installed for skilled run"
+          }
+          Write-Host "✅ Validated: msbuild-skills plugin is installed"
+
+          # Run scenarios in parallel
+          $scenarios = $env:SCENARIOS -split ","
+          $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
+          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
+
+          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
+            $scenario = $_
+            $runId = $using:runId
+            Write-Host "`n=== Running skilled: $scenario ==="
+            pwsh -File ./eng/evaluation/run-scenario.ps1 `
+              -ScenarioName $scenario `
+              -RunType "skilled" `
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -PluginName "msbuild-skills" `
+              -MarketplaceName "dotnet-skills" `
+              -ScenariosBaseDir "src/msbuild-skills/testcases"
+          }
+
+          Write-Host "`n✅ All skilled scenario runs completed"
+        shell: pwsh
+
+      - name: Uninstall Plugin and Run Evaluation
+        run: |
+          # Uninstall plugin for clean evaluation (ignore error if not installed)
+          $ErrorActionPreference = "SilentlyContinue"
+          copilot plugin uninstall msbuild-skills 2>$null
+          $ErrorActionPreference = "Stop"
+
+          # Validate plugin is removed
+          $pluginList = copilot plugin list 2>&1 | Out-String
+          if ($pluginList -match "msbuild-skills") {
+            throw "❌ VALIDATION FAILED: msbuild-skills should NOT be installed for evaluation"
+          }
+          Write-Host "✅ Validated: No msbuild-skills plugin installed for evaluation"
+
+          # Evaluate scenarios in parallel
+          $scenarios = $env:SCENARIOS -split ","
+          $parallelism = [int]$env:PARALLELISM
+          $runId = $env:RUN_ID
+          Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
+
+          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
+            $scenario = $_
+            $runId = $using:runId
+            Write-Host "`n=== Evaluating: $scenario ==="
+            pwsh -File ./eng/evaluation/evaluate-response.ps1 `
+              -ScenarioName $scenario `
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -ScenariosBaseDir "src/msbuild-skills/testcases"
+          }
+
+          Write-Host "`n✅ All scenario evaluations completed"
+        shell: pwsh
+
+      - name: Upload Artifacts
+        id: upload-artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-results-${{ env.RUN_ID }}
+          path: eng/evaluation/results/${{ env.RUN_ID }}/
+          retention-days: 30
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          pwsh -File ./eng/evaluation/generate-summary.ps1 `
+            -ResultsDir "eng/evaluation/results/$env:RUN_ID" `
+            -PluginName "msbuild-skills" `
+            -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
+            -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
+
+          # Add to job summary
+          Get-Content "eng/evaluation/results/$env:RUN_ID/summary.md" >> $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        continue-on-error: true  # May fail in local act runs (no GitHub API)
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md

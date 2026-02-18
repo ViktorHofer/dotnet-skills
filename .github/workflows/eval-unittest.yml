@@ -1,14 +1,14 @@
-name: Copilot Skills Evaluation
+name: Eval — unittest
 
 on:
   pull_request:
     paths:
-      - 'src/msbuild-skills/**'
+      - 'src/unittest/**'
       - 'eng/evaluation/**'
-      - '.github/workflows/copilot-skills-evaluation.yml'
+      - '.github/workflows/eval-unittest.yml'
 
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+    - cron: '0 7 * * *'  # Daily at 7 AM UTC (offset from msbuild eval at 6 AM)
 
   workflow_dispatch:
     inputs:
@@ -26,24 +26,12 @@ on:
         required: false
         type: number
         default: 4
-      publish_benchmark:
-        description: 'Publish results to benchmark dashboard'
-        required: false
-        type: boolean
-        default: false
-
-# Note: For local testing with act, secrets are loaded from .secrets file
-# For GitHub, secrets are configured in repository settings
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 env:
   GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-  RESULTS_BASE: artifacts/TestResults
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 jobs:
@@ -70,11 +58,9 @@ jobs:
 
       - name: Create results directory
         run: |
-          $runId = Get-Date -Format 'yyyyMMdd-HHmmss'
-          $resultsDir = "$env:RESULTS_BASE/$runId"
-          New-Item -ItemType Directory -Force -Path $resultsDir
+          $runId = "${{ github.run_id }}-${{ github.run_attempt }}"
+          New-Item -ItemType Directory -Force -Path "eng/evaluation/results/$runId"
           echo "RUN_ID=$runId" >> $env:GITHUB_ENV
-          echo "RESULTS_DIR=$resultsDir" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Discover scenarios
@@ -85,8 +71,8 @@ jobs:
             $scenarios = $inputScenarios -split ',' | ForEach-Object { $_.Trim() }
           }
           else {
-          $scenarios = Get-ChildItem -Path "src/msbuild-skills/testcases" -Directory |
-            Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
+            $scenarios = Get-ChildItem -Path "src/unittest/testcases" -Directory |
+              Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
               Select-Object -ExpandProperty Name
           }
           $scenarioList = $scenarios -join ","
@@ -122,31 +108,35 @@ jobs:
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}
         run: |
-          # Ensure no custom plugins are installed (ignore error if not installed)
+          # Ensure unittest plugin is not installed (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall msbuild-skills 2>$null
+          copilot plugin uninstall unittest 2>$null
           $ErrorActionPreference = "Stop"
 
           # Validate plugin state
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "msbuild-skills") {
-            throw "❌ VALIDATION FAILED: msbuild-skills should NOT be installed for vanilla run"
+          if ($pluginList -match "\bunittest\b") {
+            throw "❌ VALIDATION FAILED: unittest should NOT be installed for vanilla run"
           }
-          Write-Host "✅ Validated: No msbuild-skills plugin installed"
+          Write-Host "✅ Validated: No unittest plugin installed"
 
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Running vanilla: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "vanilla" `
-              -ResultsDir $using:resultsDir
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -PluginName "unittest" `
+              -MarketplaceName "dotnet-skills" `
+              -ScenariosBaseDir "src/unittest/testcases"
           }
 
           Write-Host "`n✅ All vanilla scenario runs completed"
@@ -164,30 +154,34 @@ jobs:
           Write-Host "`nAvailable plugins in marketplace:"
           copilot plugin marketplace browse dotnet-skills 2>&1 | Write-Host
 
-          # Install the plugin from the marketplace
-          Write-Host "`nInstalling msbuild-skills plugin..."
-          copilot plugin install msbuild-skills@dotnet-skills 2>&1 | Write-Host
+          # Install the unittest plugin from the marketplace
+          Write-Host "`nInstalling unittest plugin..."
+          copilot plugin install unittest@dotnet-skills 2>&1 | Write-Host
 
           # Validate plugin is installed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -notmatch "msbuild-skills") {
-            throw "❌ VALIDATION FAILED: msbuild-skills should be installed for skilled run"
+          if ($pluginList -notmatch "\bunittest\b") {
+            throw "❌ VALIDATION FAILED: unittest should be installed for skilled run"
           }
-          Write-Host "✅ Validated: msbuild-skills plugin is installed"
+          Write-Host "✅ Validated: unittest plugin is installed"
 
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Running skilled: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "skilled" `
-              -ResultsDir $using:resultsDir
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -PluginName "unittest" `
+              -MarketplaceName "dotnet-skills" `
+              -ScenariosBaseDir "src/unittest/testcases"
           }
 
           Write-Host "`n✅ All skilled scenario runs completed"
@@ -197,28 +191,30 @@ jobs:
         run: |
           # Uninstall plugin for clean evaluation (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall msbuild-skills 2>$null
+          copilot plugin uninstall unittest 2>$null
           $ErrorActionPreference = "Stop"
 
           # Validate plugin is removed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "msbuild-skills") {
-            throw "❌ VALIDATION FAILED: msbuild-skills should NOT be installed for evaluation"
+          if ($pluginList -match "\bunittest\b") {
+            throw "❌ VALIDATION FAILED: unittest should NOT be installed for evaluation"
           }
-          Write-Host "✅ Validated: No msbuild-skills plugin installed for evaluation"
+          Write-Host "✅ Validated: No unittest plugin installed for evaluation"
 
           # Evaluate scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
+            $runId = $using:runId
             Write-Host "`n=== Evaluating: $scenario ==="
             pwsh -File ./eng/evaluation/evaluate-response.ps1 `
               -ScenarioName $scenario `
-              -ResultsDir $using:resultsDir
+              -ResultsDir "eng/evaluation/results/$runId" `
+              -ScenariosBaseDir "src/unittest/testcases"
           }
 
           Write-Host "`n✅ All scenario evaluations completed"
@@ -229,89 +225,27 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: evaluation-results-${{ env.RUN_ID }}
-          path: ${{ env.RESULTS_DIR }}/
+          name: eval-unittest-${{ env.RUN_ID }}
+          path: eng/evaluation/results/${{ env.RUN_ID }}/
           retention-days: 30
 
       - name: Generate Summary
         if: always()
         run: |
           pwsh -File ./eng/evaluation/generate-summary.ps1 `
-            -ResultsDir "$env:RESULTS_DIR" `
+            -ResultsDir "eng/evaluation/results/$env:RUN_ID" `
+            -PluginName "unittest" `
             -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
             -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
 
           # Add to job summary
-          Get-Content "$env:RESULTS_DIR/summary.md" >> $env:GITHUB_STEP_SUMMARY
+          Get-Content "eng/evaluation/results/$env:RUN_ID/summary.md" >> $env:GITHUB_STEP_SUMMARY
         shell: pwsh
 
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v4
-        continue-on-error: true  # May fail in local act runs (no GitHub API)
+        continue-on-error: true
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-path: ${{ env.RESULTS_DIR }}/summary.md
-
-
-  publish-benchmark:
-    needs: evaluate
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download evaluation artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: evaluation-results-*
-          path: ${{ env.RESULTS_BASE }}/
-          merge-multiple: true
-
-      - name: Fetch existing benchmark data
-        run: |
-          git fetch origin gh-pages:gh-pages 2>/dev/null || true
-          mkdir -p /tmp/gh-pages
-          git show gh-pages:dev/bench/data.json > /tmp/gh-pages/data.json 2>/dev/null || echo "" > /tmp/gh-pages/data.json
-
-      - name: Generate Benchmark Data
-        run: |
-          $commitJson = @{
-            id        = "${{ github.sha }}"
-            message   = $env:COMMIT_MSG
-            timestamp = "${{ github.event.head_commit.timestamp }}"
-            url       = "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-            author    = @{ name = "${{ github.event.head_commit.author.name }}"; username = "${{ github.actor }}" }
-          } | ConvertTo-Json -Compress
-
-          $existingFile = "/tmp/gh-pages/data.json"
-          if (-not (Get-Content $existingFile -Raw -ErrorAction SilentlyContinue)) {
-            $existingFile = $null
-          }
-
-          pwsh -File ./eng/evaluation/generate-benchmark-data.ps1 `
-            -ResultsDir "$env:RESULTS_BASE" `
-            -OutputDir "/tmp/gh-pages" `
-            -ExistingDataFile $existingFile `
-            -CommitJson $commitJson
-        shell: pwsh
-        env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
-
-      - name: Deploy to GitHub Pages
-        run: |
-          mkdir -p /tmp/deploy/dev/bench
-          cp /tmp/gh-pages/data.json /tmp/deploy/dev/bench/data.json
-          cp eng/evaluation/dashboard.html /tmp/deploy/dev/bench/index.html
-          cp eng/evaluation/dashboard.js /tmp/deploy/dev/bench/dashboard.js
-
-          cd /tmp/deploy
-          git init
-          git checkout -b gh-pages
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Update benchmark data"
-          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md
