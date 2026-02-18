@@ -11,6 +11,7 @@ This repository provides comprehensive .NET development expertise for AI assista
 | [`msbuild-skills`](src/msbuild-skills/) | MSBuild and .NET build skills: failure diagnosis, performance optimization, code quality, and modernization |
 | [`dotnet-unittest-skills`](src/dotnet-unittest-skills/) | C# unit test generation guidance for MSTest, NUnit, and xUnit |
 | [`polyglot-unittest-skills`](src/polyglot-unittest-skills/) | Multi-agent pipeline for generating unit tests in any language |
+| [`template-engine-skills`](src/template-engine-skills/) | .NET Template Engine skills: template discovery, instantiation, authoring via [DotnetTemplateMCP](https://github.com/YuliiaKovalova/dotnet-template-mcp) MCP server |
 
 ## Installation
 

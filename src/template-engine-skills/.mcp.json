@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+        "template-engine-mcp": {
+            "type": "stdio",
+            "command": "dnx",
+            "args": [
+                "-y",
+                "DotnetTemplateMCP@0.1.0-preview.2"
+            ],
+            "tools": [
+                "*"
+            ]
+        }
+    }
+}

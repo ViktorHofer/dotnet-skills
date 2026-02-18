@@ -1,0 +1,7 @@
+{
+  "name": "template-engine-skills",
+  "version": "1.0.0",
+  "description": ".NET Template Engine skills: template discovery, instantiation, authoring, and project scaffolding via MCP tools.",
+  "skills": "./skills/",
+  "agents": "./agents/"
+}
