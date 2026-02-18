@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771458662699,
+  "lastUpdate": 1771458808627,
   "entries": {
     "Quality": [
       {
@@ -49,6 +49,48 @@
         ],
         "date": 1771458662699,
         "model": "claude-opus-4.5"
+      },
+      {
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "value": 4.5,
+            "unit": "Score (1-5)"
+          }
+        ],
+        "tool": "customBiggerIsBetter",
+        "date": 1771458808627,
+        "model": "claude-opus-4.5"
       }
     ],
     "Efficiency": [
@@ -87,6 +129,43 @@
           }
         ],
         "date": 1771458662699,
+        "model": "claude-opus-4.5"
+      },
+      {
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "value": 117.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 313300.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "value": 140.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 438400.0,
+            "unit": "tokens"
+          }
+        ],
+        "tool": "customSmallerIsBetter",
+        "date": 1771458808627,
         "model": "claude-opus-4.5"
       }
     ]
