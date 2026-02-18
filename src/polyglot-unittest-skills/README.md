@@ -2,13 +2,13 @@
 
 Generates comprehensive unit tests for any programming language using a multi-agent pipeline (C#, TypeScript, Python, Go, Rust, Java, etc.).
 
-## Skills
+## 🔧 Skills
 
 | Skill | Description |
 |-------|-------------|
 | `polyglot-test-generation` | Orchestrates multi-agent test generation for any language |
 
-## Agents
+## 🤖 Agents
 
 | Agent | Description |
 |-------|-------------|
