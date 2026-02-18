@@ -3,18 +3,22 @@
     Converts evaluation results into benchmark dashboard data.
 
 .DESCRIPTION
-    Reads evaluation results from the results directory and produces a data.json
-    file compatible with the custom benchmark dashboard. If an existing data.json
-    is provided, the new data point is appended to the existing history.
+    Reads evaluation results from the results directory and produces a per-plugin
+    JSON file (<PluginName>.json) compatible with the benchmark dashboard.
+    If an existing JSON file is provided, the new data point is appended to the
+    existing history.
 
 .PARAMETER ResultsDir
     Path to the results directory for this run.
+
+.PARAMETER PluginName
+    Name of the plugin these results belong to. Used as the output filename.
 
 .PARAMETER OutputDir
     Path to write the output files. Defaults to ResultsDir.
 
 .PARAMETER ExistingDataFile
-    Optional path to an existing data.json file from gh-pages to append to.
+    Optional path to an existing <PluginName>.json file from gh-pages to append to.
 
 .PARAMETER CommitJson
     Optional JSON string with commit info (id, message, author, timestamp, url).
@@ -24,11 +28,17 @@ param(
     [Parameter(Mandatory)]
     [string]$ResultsDir,
 
+    [Parameter(Mandatory)]
+    [string]$PluginName,
+
     [Parameter()]
     [string]$OutputDir,
 
     [Parameter()]
     [string]$ExistingDataFile,
+
+    [Parameter(Mandatory)]
+    [string]$RunId,
 
     [Parameter()]
     [string]$CommitJson
@@ -56,8 +66,8 @@ $scenarioCount = 0
 
 foreach ($scenarioDir in $scenarioDirs) {
     $scenarioName = $scenarioDir.Name
-    $evalFile = Join-Path $scenarioDir.FullName "evaluation.json"
-    $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
+    $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
+    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
 
     if (Test-Path $evalFile) {
         $evalData = Get-Content $evalFile -Raw | ConvertFrom-Json
@@ -105,7 +115,7 @@ $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 # Detect model from skilled-stats.json files
 $model = $null
 foreach ($scenarioDir in $scenarioDirs) {
-    $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
+    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
     if (Test-Path $skilledStatsFile) {
         $skilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
         if ($skilledStats.Model) {
@@ -131,13 +141,16 @@ $efficiencyEntry = @{
     benches = $efficiencyBenches.ToArray()
 }
 
+$qualityKey = "Quality"
+$efficiencyKey = "Efficiency"
+
 # Load existing data or create new structure
 $benchmarkData = @{
     lastUpdate = $now
     repoUrl    = ""
     entries    = @{
-        "Skills Evaluation - Quality"    = @()
-        "Skills Evaluation - Efficiency" = @()
+        $qualityKey    = @()
+        $efficiencyKey = @()
     }
 }
 
@@ -155,22 +168,22 @@ if ($ExistingDataFile -and (Test-Path $ExistingDataFile)) {
 if (-not $benchmarkData['entries']) {
     $benchmarkData['entries'] = @{}
 }
-if (-not $benchmarkData['entries']['Skills Evaluation - Quality']) {
-    $benchmarkData['entries']['Skills Evaluation - Quality'] = @()
+if (-not $benchmarkData['entries'][$qualityKey]) {
+    $benchmarkData['entries'][$qualityKey] = @()
 }
-if (-not $benchmarkData['entries']['Skills Evaluation - Efficiency']) {
-    $benchmarkData['entries']['Skills Evaluation - Efficiency'] = @()
+if (-not $benchmarkData['entries'][$efficiencyKey]) {
+    $benchmarkData['entries'][$efficiencyKey] = @()
 }
 
-$benchmarkData['entries']['Skills Evaluation - Quality'] += @($qualityEntry)
-$benchmarkData['entries']['Skills Evaluation - Efficiency'] += @($efficiencyEntry)
+$benchmarkData['entries'][$qualityKey] += @($qualityEntry)
+$benchmarkData['entries'][$efficiencyKey] += @($efficiencyEntry)
 
-# Write data.json
+# Write <PluginName>.json
 $dataJson = $benchmarkData | ConvertTo-Json -Depth 10
-$dataJsonFile = Join-Path $OutputDir "data.json"
+$dataJsonFile = Join-Path $OutputDir "$PluginName.json"
 $dataJson | Out-File -FilePath $dataJsonFile -Encoding utf8
 
-Write-Host "[OK] Benchmark data.json generated: $dataJsonFile"
+Write-Host "[OK] Benchmark $PluginName.json generated: $dataJsonFile"
 Write-Host "   Quality entries: $($qualityBenches.Count)"
 Write-Host "   Efficiency entries: $($efficiencyBenches.Count)"
-Write-Host "   Total data points: $($benchmarkData['entries']['Skills Evaluation - Quality'].Count)"
+Write-Host "   Total data points: $($benchmarkData['entries'][$qualityKey].Count)"

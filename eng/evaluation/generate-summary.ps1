@@ -30,7 +30,10 @@ param(
     [string]$GitHubRunUrl,
 
     [Parameter()]
-    [string]$ArtifactsUrl
+    [string]$ArtifactsUrl,
+
+    [Parameter(Mandatory)]
+    [string]$RunId
 )
 
 $ErrorActionPreference = "Stop"
@@ -168,9 +171,9 @@ $scenarioCount = 0
 
 foreach ($scenarioDir in $scenarioDirs) {
     $scenarioName = $scenarioDir.Name
-    $evalFile = Join-Path $scenarioDir.FullName "evaluation.json"
-    $vanillaStatsFile = Join-Path $scenarioDir.FullName "vanilla-stats.json"
-    $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
+    $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
+    $vanillaStatsFile = Join-Path $scenarioDir.FullName $RunId "vanilla-stats.json"
+    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
 
     # Load evaluation
     $vanillaScore = "N/A"
@@ -317,9 +320,9 @@ $summaryLines.Add("")
 
 foreach ($scenarioDir in $scenarioDirs) {
     $scenarioName = $scenarioDir.Name
-    $evalFile = Join-Path $scenarioDir.FullName "evaluation.json"
-    $vanillaStatsFile = Join-Path $scenarioDir.FullName "vanilla-stats.json"
-    $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
+    $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
+    $vanillaStatsFile = Join-Path $scenarioDir.FullName $RunId "vanilla-stats.json"
+    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
 
     $vanillaStats = $null
     $skilledStats = $null

@@ -54,6 +54,9 @@ param(
 
     [string]$ScenariosBaseDir,
 
+    [Parameter(Mandatory)]
+    [string]$RunId,
+
     [string]$RepoRoot
 )
 
@@ -319,7 +322,7 @@ if (-not [System.IO.Path]::IsPathRooted($ScenariosBaseDir)) {
 }
 $scenarioBaseDir = Join-Path $ScenariosBaseDir $ScenarioName
 $scenarioSourceDir = $scenarioBaseDir
-$scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
+$scenarioResultsDir = Join-Path $ResultsDir $ScenarioName $RunId
 
 if (-not (Test-Path $scenarioSourceDir)) {
     throw "Scenario source directory not found: $scenarioSourceDir"
