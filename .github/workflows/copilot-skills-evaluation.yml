@@ -29,6 +29,10 @@ on:
 
 # Note: For local testing with act, secrets are loaded from .secrets file
 # For GitHub, secrets are configured in repository settings
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
 
