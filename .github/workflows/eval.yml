@@ -383,6 +383,7 @@ jobs:
 
           # Generate plugins.json manifest from all per-plugin JSON files
           $plugins = Get-ChildItem -Path "/tmp/gh-pages/data" -Filter "*.json" -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -ne "plugins.json" } |
             ForEach-Object { $_.BaseName }
           @($plugins) | ConvertTo-Json | Out-File -FilePath "/tmp/gh-pages/data/plugins.json" -Encoding utf8
           Write-Host "`n=== plugins.json: $($plugins -join ', ') ==="
