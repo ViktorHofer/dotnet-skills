@@ -1,6 +1,6 @@
 {
   "name": "polyglot-unittest-skills",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "GitHub Copilot CLI skills for polyglot test generation. Generates comprehensive unit tests for any programming language using a multi-agent pipeline.",
   "skills": "./skills/",
   "agents": "./agents/"

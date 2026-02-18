@@ -1,6 +1,6 @@
 {
   "name": "msbuild-skills",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "Comprehensive MSBuild and .NET build skills: failure diagnosis, performance optimization, code quality, and modernization.",
   "skills": "./skills/",
   "agents": "./agents/"
