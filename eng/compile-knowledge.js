@@ -2,7 +2,7 @@
 
 // Shared knowledge compiler for the MSBuild skills repository.
 // Compiles skill SKILL.md files into knowledge bundles for different consumers:
-//   - Copilot Extension (src/copilot-extension/src/knowledge/)
+//   - Copilot Extension (src/msbuild-skills/copilot-extension/src/knowledge/)
 //   - Agentic Workflows (src/msbuild-skills/agentic-workflows/shared/)
 //
 // Usage: node scripts/compile-knowledge.js
@@ -15,7 +15,7 @@ const SKILLS_DIR = path.resolve(__dirname, "../src/msbuild-skills/skills");
 // Output targets — each target gets its own set of knowledge files
 const TARGETS = {
   "copilot-extension": {
-    outputDir: path.resolve(__dirname, "../src/copilot-extension/src/knowledge"),
+    outputDir: path.resolve(__dirname, "../src/msbuild-skills/copilot-extension/src/knowledge"),
     maxChars: 50000,
     knowledgeMap: {
       "build-errors": [

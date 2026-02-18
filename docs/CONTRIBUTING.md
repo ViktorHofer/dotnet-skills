@@ -10,7 +10,8 @@ src/
 │   ├── plugin.json
 │   ├── agents/
 │   ├── skills/
-│   └── templates/
+│   ├── copilot-extension/       # @msbuild Copilot Extension
+│   └── ...
 ├── dotnet-unittest-skills/          # .NET unit test plugin
 │   ├── plugin.json
 │   └── skills/dotnet-unittest/
@@ -20,7 +21,6 @@ src/
 │   ├── plugin.json
 │   ├── agents/                  # 8 specialized agents
 │   └── skills/polyglot-test-generation/
-├── copilot-extension/           # @msbuild Copilot Extension
 └── ...
 ```
 

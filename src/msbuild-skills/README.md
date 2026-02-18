@@ -61,3 +61,9 @@ Ready-to-use templates for different distribution channels:
 | Agent Instructions | `AGENTS.md` | Copy to repo root as `AGENTS.md` for cross-agent MSBuild guidance |
 | Prompt Files | `prompts/` | Copy to `.github/prompts/` for VS Code Copilot Chat workflows |
 | Agentic Workflows | `agentic-workflows/` | Copy to `.github/workflows/` for CI-integrated MSBuild automation |
+
+## 🧩 Copilot Extension
+
+| Component | Location | Description |
+|-----------|----------|-------------|
+| Copilot Extension | [`copilot-extension/`](copilot-extension/) | Deployable `@msbuild` Copilot Extension for GitHub.com, VS Code, and Visual Studio |
