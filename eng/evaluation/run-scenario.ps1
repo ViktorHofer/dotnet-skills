@@ -13,7 +13,7 @@
     an 'expected-output.md' for evaluation and 'eval-test-prompt.txt' for custom prompts.
 
 .PARAMETER RunType
-    Either "vanilla" (no plugins) or "skilled" (with msbuild-skills plugin).
+    Either "vanilla" (no plugins) or "skilled" (with the skills plugin).
 
 .PARAMETER ResultsDir
     Path to the results directory for this run.
