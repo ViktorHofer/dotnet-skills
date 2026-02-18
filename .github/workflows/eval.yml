@@ -1,17 +1,21 @@
-name: Eval — msbuild-skills
+name: Eval
 
 on:
   pull_request:
     paths:
-      - 'src/msbuild-skills/**'
+      - 'src/**'
       - 'eng/evaluation/**'
-      - '.github/workflows/eval-msbuild.yml'
+      - '.github/workflows/eval.yml'
 
   schedule:
     - cron: '0 6 * * *'  # Daily at 6 AM UTC
 
   workflow_dispatch:
     inputs:
+      plugins:
+        description: 'Plugins to evaluate (comma-separated, empty=all with testcases)'
+        required: false
+        default: ''
       scenarios:
         description: 'Scenarios to test (comma-separated, empty=all)'
         required: false
@@ -26,20 +30,62 @@ on:
         required: false
         type: number
         default: 4
+      publish_benchmark:
+        description: 'Publish results to benchmark dashboard'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # Note: For local testing with act, secrets are loaded from .secrets file
 # For GitHub, secrets are configured in repository settings
 env:
   GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+  RESULTS_BASE: artifacts/TestResults
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.find.outputs.plugins }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find plugins with testcases
+        id: find
+        run: |
+          $input = "${{ github.event.inputs.plugins }}"
+          if ($input) {
+            $plugins = $input -split ',' | ForEach-Object { $_.Trim() }
+          } else {
+            $plugins = Get-ChildItem -Path "src" -Directory |
+              Where-Object { Test-Path (Join-Path $_.FullName "testcases") } |
+              Select-Object -ExpandProperty Name
+          }
+
+          $json = $plugins | ConvertTo-Json -Compress
+          # Ensure it's always an array
+          if ($plugins.Count -eq 1) { $json = "[$json]" }
+          Write-Host "Plugins to evaluate: $json"
+          echo "plugins=$json" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
   evaluate:
+    needs: discover
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJson(needs.discover.outputs.plugins) }}
 
     steps:
       - name: Checkout repository
@@ -57,25 +103,26 @@ jobs:
 
       - name: Create results directory
         run: |
-          $runId = "${{ github.run_id }}-${{ github.run_attempt }}"
-          New-Item -ItemType Directory -Force -Path "eng/evaluation/results/$runId"
+          $runId = Get-Date -Format 'yyyyMMdd-HHmmss'
+          $resultsDir = "$env:RESULTS_BASE/${{ matrix.plugin }}/$runId"
+          New-Item -ItemType Directory -Force -Path $resultsDir
           echo "RUN_ID=$runId" >> $env:GITHUB_ENV
+          echo "RESULTS_DIR=$resultsDir" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Discover scenarios
-        id: discover
         run: |
           $inputScenarios = "${{ github.event.inputs.scenarios }}"
           if ($inputScenarios) {
             $scenarios = $inputScenarios -split ',' | ForEach-Object { $_.Trim() }
           }
           else {
-          $scenarios = Get-ChildItem -Path "src/msbuild-skills/testcases" -Directory |
-            Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
+            $scenarios = Get-ChildItem -Path "src/${{ matrix.plugin }}/testcases" -Directory |
+              Where-Object { Test-Path (Join-Path $_.FullName "expected-output.md") } |
               Select-Object -ExpandProperty Name
           }
           $scenarioList = $scenarios -join ","
-          Write-Host "Scenarios to evaluate: $scenarioList"
+          Write-Host "Scenarios to evaluate for ${{ matrix.plugin }}: $scenarioList"
           echo "SCENARIOS=$scenarioList" >> $env:GITHUB_ENV
 
           # Set parallelism level
@@ -83,7 +130,6 @@ jobs:
           if (-not $parallelism -or $parallelism -eq '') {
             $parallelism = 4
           } else {
-            # Validate and convert to integer
             try {
               $parallelism = [int]$parallelism
               if ($parallelism -lt 1) {
@@ -107,35 +153,38 @@ jobs:
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}
         run: |
-          # Ensure no custom plugins are installed (ignore error if not installed)
+          $plugin = "${{ matrix.plugin }}"
+
+          # Ensure plugin is not installed (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall msbuild-skills 2>$null
+          copilot plugin uninstall $plugin 2>$null
           $ErrorActionPreference = "Stop"
 
           # Validate plugin state
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "msbuild-skills") {
-            throw "❌ VALIDATION FAILED: msbuild-skills should NOT be installed for vanilla run"
+          if ($pluginList -match "\b$plugin\b") {
+            throw "❌ VALIDATION FAILED: $plugin should NOT be installed for vanilla run"
           }
-          Write-Host "✅ Validated: No msbuild-skills plugin installed"
+          Write-Host "✅ Validated: No $plugin plugin installed"
 
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $runId = $env:RUN_ID
+          $resultsDir = $env:RESULTS_DIR
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
-            $runId = $using:runId
+            $plugin = $using:plugin
+            $resultsDir = $using:resultsDir
             Write-Host "`n=== Running vanilla: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "vanilla" `
-              -ResultsDir "eng/evaluation/results/$runId" `
-              -PluginName "msbuild-skills" `
+              -ResultsDir $resultsDir `
+              -PluginName $plugin `
               -MarketplaceName "dotnet-skills" `
-              -ScenariosBaseDir "src/msbuild-skills/testcases"
+              -ScenariosBaseDir "src/$plugin/testcases"
           }
 
           Write-Host "`n✅ All vanilla scenario runs completed"
@@ -143,6 +192,8 @@ jobs:
 
       - name: Install Plugin and Run Skilled Copilot
         run: |
+          $plugin = "${{ matrix.plugin }}"
+
           # Register the repo checkout as a local plugin marketplace
           $repoRoot = "${{ github.workspace }}"
           Write-Host "Registering marketplace from: $repoRoot"
@@ -154,33 +205,34 @@ jobs:
           copilot plugin marketplace browse dotnet-skills 2>&1 | Write-Host
 
           # Install the plugin from the marketplace
-          Write-Host "`nInstalling msbuild-skills plugin..."
-          copilot plugin install msbuild-skills@dotnet-skills 2>&1 | Write-Host
+          Write-Host "`nInstalling $plugin plugin..."
+          copilot plugin install "$plugin@dotnet-skills" 2>&1 | Write-Host
 
           # Validate plugin is installed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -notmatch "msbuild-skills") {
-            throw "❌ VALIDATION FAILED: msbuild-skills should be installed for skilled run"
+          if ($pluginList -notmatch "\b$plugin\b") {
+            throw "❌ VALIDATION FAILED: $plugin should be installed for skilled run"
           }
-          Write-Host "✅ Validated: msbuild-skills plugin is installed"
+          Write-Host "✅ Validated: $plugin plugin is installed"
 
           # Run scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $runId = $env:RUN_ID
+          $resultsDir = $env:RESULTS_DIR
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
-            $runId = $using:runId
+            $resultsDir = $using:resultsDir
+            $plugin = $using:plugin
             Write-Host "`n=== Running skilled: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "skilled" `
-              -ResultsDir "eng/evaluation/results/$runId" `
-              -PluginName "msbuild-skills" `
+              -ResultsDir $resultsDir `
+              -PluginName $plugin `
               -MarketplaceName "dotnet-skills" `
-              -ScenariosBaseDir "src/msbuild-skills/testcases"
+              -ScenariosBaseDir "src/$plugin/testcases"
           }
 
           Write-Host "`n✅ All skilled scenario runs completed"
@@ -188,32 +240,35 @@ jobs:
 
       - name: Uninstall Plugin and Run Evaluation
         run: |
+          $plugin = "${{ matrix.plugin }}"
+
           # Uninstall plugin for clean evaluation (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall msbuild-skills 2>$null
+          copilot plugin uninstall $plugin 2>$null
           $ErrorActionPreference = "Stop"
 
           # Validate plugin is removed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "msbuild-skills") {
-            throw "❌ VALIDATION FAILED: msbuild-skills should NOT be installed for evaluation"
+          if ($pluginList -match "\b$plugin\b") {
+            throw "❌ VALIDATION FAILED: $plugin should NOT be installed for evaluation"
           }
-          Write-Host "✅ Validated: No msbuild-skills plugin installed for evaluation"
+          Write-Host "✅ Validated: No $plugin plugin installed for evaluation"
 
           # Evaluate scenarios in parallel
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
-          $runId = $env:RUN_ID
+          $resultsDir = $env:RESULTS_DIR
           Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
-            $runId = $using:runId
+            $resultsDir = $using:resultsDir
+            $plugin = $using:plugin
             Write-Host "`n=== Evaluating: $scenario ==="
             pwsh -File ./eng/evaluation/evaluate-response.ps1 `
               -ScenarioName $scenario `
-              -ResultsDir "eng/evaluation/results/$runId" `
-              -ScenariosBaseDir "src/msbuild-skills/testcases"
+              -ResultsDir $resultsDir `
+              -ScenariosBaseDir "src/$plugin/testcases"
           }
 
           Write-Host "`n✅ All scenario evaluations completed"
@@ -224,31 +279,30 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: evaluation-results-${{ env.RUN_ID }}
-          path: eng/evaluation/results/${{ env.RUN_ID }}/
+          name: eval-${{ matrix.plugin }}-${{ env.RUN_ID }}
+          path: ${{ env.RESULTS_BASE }}/${{ matrix.plugin }}/
           retention-days: 30
 
       - name: Generate Summary
         if: always()
         run: |
           pwsh -File ./eng/evaluation/generate-summary.ps1 `
-            -ResultsDir "eng/evaluation/results/$env:RUN_ID" `
-            -PluginName "msbuild-skills" `
+            -ResultsDir "$env:RESULTS_DIR" `
+            -PluginName "${{ matrix.plugin }}" `
             -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
             -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
 
           # Add to job summary
-          Get-Content "eng/evaluation/results/$env:RUN_ID/summary.md" >> $env:GITHUB_STEP_SUMMARY
+          Get-Content "$env:RESULTS_DIR/summary.md" >> $env:GITHUB_STEP_SUMMARY
         shell: pwsh
 
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v4
-        continue-on-error: true  # May fail in local act runs (no GitHub API)
+        continue-on-error: true
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-path: eng/evaluation/results/${{ env.RUN_ID }}/summary.md
-
+          body-path: ${{ env.RESULTS_DIR }}/summary.md
 
   publish-benchmark:
     needs: evaluate
@@ -262,16 +316,15 @@ jobs:
       - name: Download evaluation artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: evaluation-results-*
-          path: ${{ env.RESULTS_BASE }}/
+          pattern: eval-*
+          path: /tmp/results/
           merge-multiple: true
 
       - name: Fetch existing benchmark data
         run: |
           git fetch origin gh-pages:gh-pages 2>/dev/null || true
           mkdir -p /tmp/gh-pages
-          git show gh-pages:data.json > /tmp/gh-pages/data.json 2>/dev/null || \
-            git show gh-pages:dev/bench/data.json > /tmp/gh-pages/data.json 2>/dev/null || true
+          git show gh-pages:data.json > /tmp/gh-pages/data.json 2>/dev/null || true
 
       - name: Generate Benchmark Data
         run: |
@@ -288,17 +341,33 @@ jobs:
             $existingFile = $null
           }
 
-          pwsh -File ./eng/dashboard/generate-benchmark-data.ps1 `
-            -ResultsDir "$env:RESULTS_BASE" `
-            -OutputDir "/tmp/gh-pages" `
-            -ExistingDataFile $existingFile `
-            -CommitJson $commitJson
+          # Generate benchmark data for each plugin
+          $pluginDirs = Get-ChildItem -Path "/tmp/results" -Directory -ErrorAction SilentlyContinue
+          foreach ($pluginDir in $pluginDirs) {
+            # Results are under <plugin>/<runId>/<scenarios>
+            $runDir = Get-ChildItem -Path $pluginDir.FullName -Directory | Select-Object -First 1
+            if (-not $runDir) {
+              Write-Warning "No run directory found for $($pluginDir.Name), skipping"
+              continue
+            }
+            Write-Host "`n=== Generating benchmark data for: $($pluginDir.Name) ==="
+            pwsh -File ./eng/dashboard/generate-benchmark-data.ps1 `
+              -ResultsDir $runDir.FullName `
+              -PluginName $pluginDir.Name `
+              -OutputDir "/tmp/gh-pages" `
+              -ExistingDataFile $existingFile `
+              -CommitJson $commitJson
+
+            # After first plugin, use the updated file as the existing data
+            $existingFile = "/tmp/gh-pages/data.json"
+          }
         shell: pwsh
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
 
       - name: Deploy to GitHub Pages
         run: |
+          mkdir -p /tmp/deploy
           cp /tmp/gh-pages/data.json /tmp/deploy/data.json
           cp eng/dashboard/dashboard.html /tmp/deploy/index.html
           cp eng/dashboard/dashboard.js /tmp/deploy/dashboard.js

@@ -10,6 +10,9 @@
 .PARAMETER ResultsDir
     Path to the results directory for this run.
 
+.PARAMETER PluginName
+    Name of the plugin these results belong to. Used to key entries in the data file.
+
 .PARAMETER OutputDir
     Path to write the output files. Defaults to ResultsDir.
 
@@ -23,6 +26,9 @@
 param(
     [Parameter(Mandatory)]
     [string]$ResultsDir,
+
+    [Parameter(Mandatory)]
+    [string]$PluginName,
 
     [Parameter()]
     [string]$OutputDir,
@@ -131,13 +137,16 @@ $efficiencyEntry = @{
     benches = $efficiencyBenches.ToArray()
 }
 
+$qualityKey = "$PluginName - Quality"
+$efficiencyKey = "$PluginName - Efficiency"
+
 # Load existing data or create new structure
 $benchmarkData = @{
     lastUpdate = $now
     repoUrl    = ""
     entries    = @{
-        "Skills Evaluation - Quality"    = @()
-        "Skills Evaluation - Efficiency" = @()
+        $qualityKey    = @()
+        $efficiencyKey = @()
     }
 }
 
@@ -155,15 +164,15 @@ if ($ExistingDataFile -and (Test-Path $ExistingDataFile)) {
 if (-not $benchmarkData['entries']) {
     $benchmarkData['entries'] = @{}
 }
-if (-not $benchmarkData['entries']['Skills Evaluation - Quality']) {
-    $benchmarkData['entries']['Skills Evaluation - Quality'] = @()
+if (-not $benchmarkData['entries'][$qualityKey]) {
+    $benchmarkData['entries'][$qualityKey] = @()
 }
-if (-not $benchmarkData['entries']['Skills Evaluation - Efficiency']) {
-    $benchmarkData['entries']['Skills Evaluation - Efficiency'] = @()
+if (-not $benchmarkData['entries'][$efficiencyKey]) {
+    $benchmarkData['entries'][$efficiencyKey] = @()
 }
 
-$benchmarkData['entries']['Skills Evaluation - Quality'] += @($qualityEntry)
-$benchmarkData['entries']['Skills Evaluation - Efficiency'] += @($efficiencyEntry)
+$benchmarkData['entries'][$qualityKey] += @($qualityEntry)
+$benchmarkData['entries'][$efficiencyKey] += @($efficiencyEntry)
 
 # Write data.json
 $dataJson = $benchmarkData | ConvertTo-Json -Depth 10
@@ -173,4 +182,4 @@ $dataJson | Out-File -FilePath $dataJsonFile -Encoding utf8
 Write-Host "[OK] Benchmark data.json generated: $dataJsonFile"
 Write-Host "   Quality entries: $($qualityBenches.Count)"
 Write-Host "   Efficiency entries: $($efficiencyBenches.Count)"
-Write-Host "   Total data points: $($benchmarkData['entries']['Skills Evaluation - Quality'].Count)"
+Write-Host "   Total data points: $($benchmarkData['entries'][$qualityKey].Count)"
