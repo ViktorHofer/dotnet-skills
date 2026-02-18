@@ -2,7 +2,7 @@
 
 ## Plugin Versioning
 
-This repository contains plugins under `src/plugins/`. Each plugin has a `plugin.json` with a `version` field following [Semantic Versioning](https://semver.org/).
+This repository contains plugins under `src/`. Each plugin has a `plugin.json` with a `version` field following [Semantic Versioning](https://semver.org/).
 
 **When making changes to a plugin, always bump its version in `plugin.json`:**
 

@@ -5,19 +5,23 @@ We welcome contributions! This repository ships several types of artifacts — e
 ## Repository Structure
 
 ```
-src/msbuild-skills/
-├── plugin.json                  # Plugin manifest (bump version on releases)
-├── .mcp.json                    # MCP server configuration (binlog-mcp)
-├── agents/                      # Custom agents (*.agent.md)
-├── skills/                      # Skills (*/SKILL.md)
-├── samples/                     # Test/demo sample projects
-│   └── DEMO.md                  # Presenter-ready demo guide
-└── templates/                   # Distribution templates for end users
-    ├── AGENTS.md                # Template for repo-root AGENTS.md
-    ├── prompts/                 # Reusable .prompt.md files
-    └── agentic-workflows/       # GitHub Agentic Workflow templates
-        ├── shared/              # Shared components (imported by workflows)
-        └── *.md                 # Workflow definitions
+src/
+├── msbuild-skills/              # MSBuild plugin
+│   ├── plugin.json
+│   ├── agents/
+│   ├── skills/
+│   └── templates/
+├── unittest/                    # .NET unit test plugin
+│   ├── plugin.json
+│   └── skills/dotnet-unittest/
+│       ├── SKILL.md
+│       └── references/          # Framework-specific guidance
+├── polyglot-test-agent/         # Polyglot test generation plugin
+│   ├── plugin.json
+│   ├── agents/                  # 8 specialized agents
+│   └── skills/polyglot-test-generation/
+├── copilot-extension/           # @msbuild Copilot Extension
+└── ...
 ```
 
 ## Adding a Skill
@@ -52,6 +56,8 @@ private feed auth, version conflicts, and lock files. DO NOT use for non-.NET pa
 ```
 
 ## Adding a Custom Agent
+
+> **Multi-plugin repository**: This repo contains multiple plugins. When adding a skill or agent, place it in the correct plugin directory. MSBuild-specific content goes in `src/msbuild-skills/`. Unit testing content for .NET goes in `src/unittest/`. Polyglot test generation content goes in `src/polyglot-test-agent/`.
 
 Agents are autonomous AI personas that orchestrate multi-step workflows — they take actions, run tools, and dispatch to skills.
 
