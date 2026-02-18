@@ -104,7 +104,7 @@ jobs:
       - name: Create results directory
         run: |
           $runId = Get-Date -Format 'yyyyMMdd-HHmmss'
-          $resultsDir = "$env:RESULTS_BASE/${{ matrix.plugin }}/$runId"
+          $resultsDir = "$env:RESULTS_BASE/${{ matrix.plugin }}"
           New-Item -ItemType Directory -Force -Path $resultsDir
           echo "RUN_ID=$runId" >> $env:GITHUB_ENV
           echo "RESULTS_DIR=$resultsDir" >> $env:GITHUB_ENV
@@ -171,17 +171,20 @@ jobs:
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
           $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
             $plugin = $using:plugin
             $resultsDir = $using:resultsDir
+            $runId = $using:runId
             Write-Host "`n=== Running vanilla: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "vanilla" `
               -ResultsDir $resultsDir `
+              -RunId $runId `
               -PluginName $plugin `
               -MarketplaceName "dotnet-skills" `
               -ScenariosBaseDir "src/$plugin/testcases"
@@ -219,17 +222,20 @@ jobs:
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
           $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
             $resultsDir = $using:resultsDir
+            $runId = $using:runId
             $plugin = $using:plugin
             Write-Host "`n=== Running skilled: $scenario ==="
             pwsh -File ./eng/evaluation/run-scenario.ps1 `
               -ScenarioName $scenario `
               -RunType "skilled" `
               -ResultsDir $resultsDir `
+              -RunId $runId `
               -PluginName $plugin `
               -MarketplaceName "dotnet-skills" `
               -ScenariosBaseDir "src/$plugin/testcases"
@@ -258,16 +264,19 @@ jobs:
           $scenarios = $env:SCENARIOS -split ","
           $parallelism = [int]$env:PARALLELISM
           $resultsDir = $env:RESULTS_DIR
+          $runId = $env:RUN_ID
           Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
 
           $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
             $scenario = $_
             $resultsDir = $using:resultsDir
+            $runId = $using:runId
             $plugin = $using:plugin
             Write-Host "`n=== Evaluating: $scenario ==="
             pwsh -File ./eng/evaluation/evaluate-response.ps1 `
               -ScenarioName $scenario `
               -ResultsDir $resultsDir `
+              -RunId $runId `
               -ScenariosBaseDir "src/$plugin/testcases"
           }
 
@@ -288,6 +297,7 @@ jobs:
         run: |
           pwsh -File ./eng/evaluation/generate-summary.ps1 `
             -ResultsDir "$env:RESULTS_DIR" `
+            -RunId "$env:RUN_ID" `
             -PluginName "${{ matrix.plugin }}" `
             -GitHubRunUrl "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" `
             -ArtifactsUrl "${{ steps.upload-artifacts.outputs.artifact-url }}"
@@ -338,25 +348,30 @@ jobs:
           } | ConvertTo-Json -Compress
 
           # Generate benchmark data for each plugin
-          # Layout: artifacts/TestResults/<plugin>/<runId>/<scenario>/
+          # Layout: artifacts/TestResults/<plugin>/<scenario>/<runId>/
           $pluginDirs = Get-ChildItem -Path "$env:RESULTS_BASE" -Directory -ErrorAction SilentlyContinue
           foreach ($pluginDir in $pluginDirs) {
             $plugin = $pluginDir.Name
 
-            # Find the run directory containing scenario results
-            $runDir = Get-ChildItem -Path $pluginDir.FullName -Directory |
-              Where-Object { Get-ChildItem -Path $_.FullName -Directory -ErrorAction SilentlyContinue } |
-              Select-Object -First 1
-            if (-not $runDir) {
+            # Detect the runId from the first scenario's subdirectory
+            $firstScenario = Get-ChildItem -Path $pluginDir.FullName -Directory | Select-Object -First 1
+            if (-not $firstScenario) {
               Write-Warning "No scenario results found for $plugin, skipping"
               continue
             }
+            $runIdDir = Get-ChildItem -Path $firstScenario.FullName -Directory | Select-Object -First 1
+            if (-not $runIdDir) {
+              Write-Warning "No run results found for $plugin/$($firstScenario.Name), skipping"
+              continue
+            }
+            $runId = $runIdDir.Name
 
-            Write-Host "`n=== Generating benchmark data for: $plugin ==="
+            Write-Host "`n=== Generating benchmark data for: $plugin (run: $runId) ==="
             $existingFile = "/tmp/gh-pages/data/$plugin.json"
             $params = @{
-              ResultsDir = $runDir.FullName
+              ResultsDir = $pluginDir.FullName
               PluginName = $plugin
+              RunId      = $runId
               OutputDir  = "/tmp/gh-pages/data"
               CommitJson = $commitJson
             }

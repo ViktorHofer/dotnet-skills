@@ -35,6 +35,9 @@ param(
 
     [int]$TimeoutSeconds = 300,
 
+    [Parameter(Mandatory)]
+    [string]$RunId,
+
     [string]$RepoRoot
 )
 
@@ -186,7 +189,7 @@ Write-Host ("=" * 60)
 Write-Host "[EVAL] Evaluating Scenario: $ScenarioName"
 Write-Host ("=" * 60)
 
-$scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
+$scenarioResultsDir = Join-Path $ResultsDir $ScenarioName $RunId
 
 # Read expected output from scenario folder
 if (-not $ScenariosBaseDir) {

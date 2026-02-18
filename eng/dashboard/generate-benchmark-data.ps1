@@ -37,6 +37,9 @@ param(
     [Parameter()]
     [string]$ExistingDataFile,
 
+    [Parameter(Mandatory)]
+    [string]$RunId,
+
     [Parameter()]
     [string]$CommitJson
 )
@@ -63,8 +66,8 @@ $scenarioCount = 0
 
 foreach ($scenarioDir in $scenarioDirs) {
     $scenarioName = $scenarioDir.Name
-    $evalFile = Join-Path $scenarioDir.FullName "evaluation.json"
-    $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
+    $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
+    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
 
     if (Test-Path $evalFile) {
         $evalData = Get-Content $evalFile -Raw | ConvertFrom-Json
@@ -112,7 +115,7 @@ $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 # Detect model from skilled-stats.json files
 $model = $null
 foreach ($scenarioDir in $scenarioDirs) {
-    $skilledStatsFile = Join-Path $scenarioDir.FullName "skilled-stats.json"
+    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
     if (Test-Path $skilledStatsFile) {
         $skilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
         if ($skilledStats.Model) {

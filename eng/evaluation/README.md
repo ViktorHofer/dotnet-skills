@@ -113,7 +113,7 @@ $ErrorActionPreference = "Continue"
     2>&1 | Tee-Object -FilePath act-eval.log
 ```
 
-Results will appear in `artifacts/TestResults/<timestamp>/summary.md` (e.g., `20260218-120000`).
+Results will appear in `artifacts/TestResults/<plugin>/<scenario>/<timestamp>/` (e.g., `20260218-120000`).
 Uploaded artifacts are stored in `.act-artifacts/` (git-ignored).
 
 > **⚠️ Windows + act caveat:** You must invoke `act` directly from PowerShell with `2>&1 | Tee-Object` (or `2>&1 | Out-Host`). Using `cmd /c act ... > file 2>&1` causes `context canceled` errors that kill long-running Docker exec steps. This is a known issue with act v0.2.x on Windows.
