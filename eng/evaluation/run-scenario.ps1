@@ -22,14 +22,14 @@
     Maximum time to wait for Copilot CLI to complete (default: 300).
 
 .PARAMETER PluginName
-    Name of the Copilot plugin to install/uninstall (default: msbuild-skills).
+    Name of the Copilot plugin to install/uninstall.
 
 .PARAMETER MarketplaceName
     Name of the local plugin marketplace (default: dotnet-skills).
 
 .PARAMETER ScenariosBaseDir
     Path to the testcases directory. Can be relative (resolved against RepoRoot)
-    or absolute. Defaults to src/msbuild-skills/testcases.
+    or absolute.
 
 .PARAMETER RepoRoot
     Root directory of the repository. Defaults to two levels up from this script.
@@ -48,7 +48,7 @@ param(
 
     [int]$TimeoutSeconds = 300,
 
-    [string]$PluginName = "msbuild-skills",
+    [string]$PluginName,
 
     [string]$MarketplaceName = "dotnet-skills",
 
@@ -234,7 +234,7 @@ Write-Host "[SCENARIO] Running: $ScenarioName ($RunType)"
 Write-Host ("=" * 60)
 
 if (-not $ScenariosBaseDir) {
-    $ScenariosBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases"
+    throw "ScenariosBaseDir is required."
 }
 if (-not [System.IO.Path]::IsPathRooted($ScenariosBaseDir)) {
     $ScenariosBaseDir = Join-Path $RepoRoot $ScenariosBaseDir

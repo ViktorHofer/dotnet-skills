@@ -15,7 +15,7 @@
 
 .PARAMETER ScenariosBaseDir
     Path to the testcases directory. Can be relative (resolved against RepoRoot)
-    or absolute. Defaults to src/msbuild-skills/testcases.
+    or absolute.
 
 .PARAMETER TimeoutSeconds
     Maximum time to wait for evaluation Copilot CLI to complete.
@@ -190,7 +190,7 @@ $scenarioResultsDir = Join-Path $ResultsDir $ScenarioName
 
 # Read expected output from scenario folder
 if (-not $ScenariosBaseDir) {
-    $ScenariosBaseDir = Join-Path $RepoRoot "src\msbuild-skills\testcases"
+    throw "ScenariosBaseDir is required."
 }
 if (-not [System.IO.Path]::IsPathRooted($ScenariosBaseDir)) {
     $ScenariosBaseDir = Join-Path $RepoRoot $ScenariosBaseDir

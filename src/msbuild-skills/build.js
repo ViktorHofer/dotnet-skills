@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 // Validates that all SKILL.md files follow repository conventions.
-// Run: node eng/validate-skills.js
+// This is the build.js entry point for the msbuild-skills component.
+// Run: node src/msbuild-skills/build.js
 
 const fs = require("node:fs");
 const path = require("node:path");
 
-const SKILLS_DIR = path.resolve(__dirname, "../src/msbuild-skills/skills");
+const SKILLS_DIR = path.resolve(__dirname, "skills");
 const DOMAIN_GATE_PATTERN = /Only activate in MSBuild\/\.NET build contexts/;
 
 let errors = 0;
