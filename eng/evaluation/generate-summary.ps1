@@ -159,8 +159,8 @@ $summaryLines.Add("")
 # Summary table
 $summaryLines.Add("### Summary")
 $summaryLines.Add("")
-$summaryLines.Add("| Scenario | Quality (0-10) | Checklist | Time | Tokens (in) | Winner |")
-$summaryLines.Add("|----------|----------------|-----------|------|-------------|--------|")
+$summaryLines.Add("| Scenario | Quality (0-10) | Checklist | Time | Tokens (in) | Skills | Winner |")
+$summaryLines.Add("|----------|----------------|-----------|------|-------------|--------|--------|")
 
 $overallVanilla = 0.0
 $overallSkilled = 0.0
@@ -267,7 +267,26 @@ foreach ($scenarioDir in $scenarioDirs) {
         $winner = Get-Winner @winnerParams
     }
 
-    $summaryLines.Add("| $scenarioName | $qualityDelta | $checklistDelta | $timeDelta | $tokenDelta | $winner |")
+    # Load skill activation for summary table
+    $skillsSummary = "-"
+    $skilledActivationsFileSummary = Join-Path $scenarioDir.FullName "skilled-activations.json"
+    if (Test-Path $skilledActivationsFileSummary) {
+        $actData = Get-Content $skilledActivationsFileSummary -Raw | ConvertFrom-Json
+        if ($actData.Activated) {
+            $parts = @()
+            if ($actData.Skills -and $actData.Skills.Count -gt 0) {
+                $parts += $actData.Skills
+            }
+            if ($actData.Agents -and $actData.Agents.Count -gt 0) {
+                $parts += $actData.Agents
+            }
+            $skillsSummary = $parts -join ', '
+        } else {
+            $skillsSummary = ":warning: NONE"
+        }
+    }
+
+    $summaryLines.Add("| $scenarioName | $qualityDelta | $checklistDelta | $timeDelta | $tokenDelta | $skillsSummary | $winner |")
 }
 
 $summaryLines.Add("")
