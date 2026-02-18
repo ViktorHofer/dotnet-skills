@@ -270,8 +270,7 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages 2>/dev/null || true
           mkdir -p /tmp/gh-pages
-          git show gh-pages:dev/bench/data.json > /tmp/gh-pages/data.json 2>/dev/null || \
-            git show gh-pages:dev/bench/data.js > /tmp/gh-pages/data.js 2>/dev/null || true
+          git show gh-pages:dev/bench/data.json > /tmp/gh-pages/data.json 2>/dev/null || true
 
       - name: Generate Benchmark Data
         run: |
@@ -283,13 +282,9 @@ jobs:
             author    = @{ name = "${{ github.event.head_commit.author.name }}"; username = "${{ github.actor }}" }
           } | ConvertTo-Json -Compress
 
-          # Try data.json first, fall back to legacy data.js
           $existingFile = "/tmp/gh-pages/data.json"
           if (-not (Test-Path $existingFile) -or -not (Get-Content $existingFile -Raw -ErrorAction SilentlyContinue)) {
-            $existingFile = "/tmp/gh-pages/data.js"
-            if (-not (Test-Path $existingFile) -or -not (Get-Content $existingFile -Raw -ErrorAction SilentlyContinue)) {
-              $existingFile = $null
-            }
+            $existingFile = $null
           }
 
           pwsh -File ./eng/evaluation/generate-benchmark-data.ps1 `
