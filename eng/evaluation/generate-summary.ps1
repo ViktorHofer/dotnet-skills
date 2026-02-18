@@ -272,7 +272,7 @@ foreach ($scenarioDir in $scenarioDirs) {
 
     # Load skill activation for summary table
     $skillsSummary = "-"
-    $skilledActivationsFileSummary = Join-Path $scenarioDir.FullName "skilled-activations.json"
+    $skilledActivationsFileSummary = Join-Path $scenarioDir.FullName $RunId "skilled-activations.json"
     if (Test-Path $skilledActivationsFileSummary) {
         $actData = Get-Content $skilledActivationsFileSummary -Raw | ConvertFrom-Json
         if ($actData.Activated) {
@@ -398,7 +398,7 @@ foreach ($scenarioDir in $scenarioDirs) {
     }
 
     # Skill activation info
-    $skilledActivationsFile = Join-Path $scenarioDir.FullName "skilled-activations.json"
+    $skilledActivationsFile = Join-Path $scenarioDir.FullName $RunId "skilled-activations.json"
     if (Test-Path $skilledActivationsFile) {
         $activationData = Get-Content $skilledActivationsFile -Raw | ConvertFrom-Json
         if ($activationData.Activated) {
