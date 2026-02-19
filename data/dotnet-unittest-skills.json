@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460016286,
+  "lastUpdate": 1771460076426,
   "entries": {
     "Quality": [
       {
@@ -436,6 +436,43 @@
           "message": ""
         },
         "benches": []
+      },
+      {
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 8.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 9.0
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 8.5
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 0.0
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          }
+        },
+        "date": 1771460076426
       }
     ],
     "Efficiency": [
@@ -775,6 +812,43 @@
           "message": ""
         },
         "benches": []
+      },
+      {
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 113.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 325900.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 108.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 304400.0
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          }
+        },
+        "date": 1771460076426
       }
     ]
   }
