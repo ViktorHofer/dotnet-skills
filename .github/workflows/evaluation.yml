@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'eng/evaluation/**'
-      - '.github/workflows/eval.yml'
+      - '.github/workflows/evaluation.yml'
 
   schedule:
     - cron: '*/15 * * * *'  # Every 15 minutes

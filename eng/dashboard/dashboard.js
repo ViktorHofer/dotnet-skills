@@ -312,8 +312,8 @@
           y: {
             ticks: { color: '#8b949e' },
             grid: { color: '#30363d' },
-            suggestedMin: title.includes('Quality') ? 0 : undefined,
-            suggestedMax: title.includes('Quality') ? 10 : undefined
+            suggestedMin: 0,
+            suggestedMax: 10
           }
         }
       }
