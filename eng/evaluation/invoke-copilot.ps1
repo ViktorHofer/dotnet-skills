@@ -63,28 +63,39 @@ function Invoke-CopilotCli {
         Where-Object { $_.CommandType -eq 'Application' } |
         Select-Object -First 1 -ExpandProperty Source
 
-    $configDirArg = ""
-    if ($ConfigDir) {
-        $configDirArg = " --config-dir `"$ConfigDir`""
-    }
+    # Build argument list — using ArgumentList (Collection<string>) instead of the
+    # Arguments string property so .NET handles escaping automatically. This avoids
+    # breakage when the prompt contains quotes, special characters, or is very long.
+    $argList = [System.Collections.Generic.List[string]]::new()
 
     if (-not $copilotCmd) {
         if ($env:OS -match 'Windows') {
             $copilotCmd = "cmd.exe"
-            $copilotArgs = "/c copilot -p `"$Prompt`" --model $Model --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
+            $argList.Add("/c")
+            $argList.Add("copilot")
         } else {
             $copilotCmd = "/usr/bin/env"
-            $copilotArgs = "copilot -p `"$Prompt`" --model $Model --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
+            $argList.Add("copilot")
         }
-    } else {
-        $copilotArgs = "-p `"$Prompt`" --model $Model --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
+    }
+
+    $argList.Add("-p")
+    $argList.Add($Prompt)
+    $argList.Add("--model")
+    $argList.Add($Model)
+    $argList.Add("--allow-all-tools")
+    $argList.Add("--allow-all-paths")
+    $argList.Add("--no-ask-user")
+    if ($ConfigDir) {
+        $argList.Add("--config-dir")
+        $argList.Add($ConfigDir)
     }
 
     Write-Host "   Copilot executable: $copilotCmd"
 
     $processInfo = New-Object System.Diagnostics.ProcessStartInfo
     $processInfo.FileName = $copilotCmd
-    $processInfo.Arguments = $copilotArgs
+    foreach ($a in $argList) { $processInfo.ArgumentList.Add($a) }
     $processInfo.WorkingDirectory = $WorkingDir
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
