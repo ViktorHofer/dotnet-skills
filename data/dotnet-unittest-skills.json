@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771459996414,
+  "lastUpdate": 1771460000517,
   "entries": {
     "Quality": [
       {
@@ -352,6 +352,43 @@
           "timestamp": "",
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
         }
+      },
+      {
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "timestamp": ""
+        },
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 8.0,
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (1-5)"
+          },
+          {
+            "value": 9.0,
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (1-5)"
+          },
+          {
+            "value": 8.5,
+            "name": "Overall - Skilled Avg Quality",
+            "unit": "Score (1-5)"
+          },
+          {
+            "value": 0.0,
+            "name": "Overall - Vanilla Avg Quality",
+            "unit": "Score (1-5)"
+          }
+        ],
+        "date": 1771460000517
       }
     ],
     "Efficiency": [
@@ -632,6 +669,43 @@
           "timestamp": "",
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
         }
+      },
+      {
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "timestamp": ""
+        },
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 102.0,
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 281200.0,
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 129.0,
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 293200.0,
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens"
+          }
+        ],
+        "date": 1771460000517
       }
     ]
   }
