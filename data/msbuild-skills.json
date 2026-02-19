@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771459977422,
+  "lastUpdate": 1771459978869,
   "entries": {
     "Quality": [
       {
@@ -684,69 +684,64 @@
         }
       },
       {
-        "model": "claude-opus-4.5",
+        "tool": "customBiggerIsBetter",
         "benches": [
           {
-            "value": 9.0,
             "unit": "Score (1-5)",
-            "name": "bin-obj-clash - Skilled Quality"
+            "name": "build-errors-nuget - Vanilla Quality",
+            "value": 8.0
           },
           {
-            "value": 7.0,
             "unit": "Score (1-5)",
-            "name": "build-errors-sdk - Skilled Quality"
+            "name": "build-errors-sdk - Vanilla Quality",
+            "value": 6.0
           },
           {
-            "value": 9.0,
             "unit": "Score (1-5)",
-            "name": "legacy-project - Skilled Quality"
+            "name": "eval-heavy - Skilled Quality",
+            "value": 8.0
           },
           {
-            "value": 8.0,
             "unit": "Score (1-5)",
-            "name": "multitarget - Vanilla Quality"
+            "name": "generated-files - Skilled Quality",
+            "value": 9.0
           },
           {
-            "value": 7.0,
             "unit": "Score (1-5)",
-            "name": "parallel-bottleneck - Skilled Quality"
+            "name": "multitarget - Skilled Quality",
+            "value": 9.0
           },
           {
-            "value": 7.0,
             "unit": "Score (1-5)",
-            "name": "parallel-bottleneck - Vanilla Quality"
+            "name": "multitarget - Vanilla Quality",
+            "value": 8.0
           },
           {
-            "value": 8.0,
             "unit": "Score (1-5)",
-            "name": "style-issues - Skilled Quality"
+            "name": "style-issues - Vanilla Quality",
+            "value": 8.0
           },
           {
-            "value": 8.0,
             "unit": "Score (1-5)",
-            "name": "style-issues - Vanilla Quality"
+            "name": "Overall - Skilled Avg Quality",
+            "value": 8.67
           },
           {
-            "value": 8.0,
             "unit": "Score (1-5)",
-            "name": "Overall - Skilled Avg Quality"
-          },
-          {
-            "value": 4.6,
-            "unit": "Score (1-5)",
-            "name": "Overall - Vanilla Avg Quality"
+            "name": "Overall - Vanilla Avg Quality",
+            "value": 10.0
           }
         ],
-        "date": 1771459977422,
-        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5",
+        "date": 1771459978869,
         "commit": {
-          "message": "",
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "timestamp": "",
+          "message": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "author": {
-            "name": "",
-            "username": "ViktorHofer"
+            "username": "ViktorHofer",
+            "name": ""
           }
         }
       }
@@ -1453,89 +1448,49 @@
         }
       },
       {
-        "model": "claude-opus-4.5",
+        "tool": "customSmallerIsBetter",
         "benches": [
           {
-            "value": 114.0,
             "unit": "seconds",
-            "name": "bin-obj-clash - Skilled Time"
+            "name": "eval-heavy - Skilled Time",
+            "value": 28.0
           },
           {
-            "value": 559200.0,
             "unit": "tokens",
-            "name": "bin-obj-clash - Skilled Tokens In"
+            "name": "eval-heavy - Skilled Tokens In",
+            "value": 116600.0
           },
           {
-            "value": 43.0,
             "unit": "seconds",
-            "name": "build-errors-sdk - Skilled Time"
+            "name": "generated-files - Skilled Time",
+            "value": 57.0
           },
           {
-            "value": 139800.0,
             "unit": "tokens",
-            "name": "build-errors-sdk - Skilled Tokens In"
+            "name": "generated-files - Skilled Tokens In",
+            "value": 199700.0
           },
           {
-            "value": 47.0,
             "unit": "seconds",
-            "name": "legacy-project - Skilled Time"
+            "name": "multitarget - Skilled Time",
+            "value": 46.0
           },
           {
-            "value": 169200.0,
             "unit": "tokens",
-            "name": "legacy-project - Skilled Tokens In"
-          },
-          {
-            "value": 53.0,
-            "unit": "seconds",
-            "name": "multitarget - Skilled Time"
-          },
-          {
-            "value": 134300.0,
-            "unit": "tokens",
-            "name": "multitarget - Skilled Tokens In"
-          },
-          {
-            "value": 119.0,
-            "unit": "seconds",
-            "name": "parallel-bottleneck - Skilled Time"
-          },
-          {
-            "value": 552700.0,
-            "unit": "tokens",
-            "name": "parallel-bottleneck - Skilled Tokens In"
-          },
-          {
-            "value": 121.0,
-            "unit": "seconds",
-            "name": "perf-analyzers - Skilled Time"
-          },
-          {
-            "value": 756600.0,
-            "unit": "tokens",
-            "name": "perf-analyzers - Skilled Tokens In"
-          },
-          {
-            "value": 87.0,
-            "unit": "seconds",
-            "name": "style-issues - Skilled Time"
-          },
-          {
-            "value": 38300.0,
-            "unit": "tokens",
-            "name": "style-issues - Skilled Tokens In"
+            "name": "multitarget - Skilled Tokens In",
+            "value": 170800.0
           }
         ],
-        "date": 1771459977422,
-        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5",
+        "date": 1771459978869,
         "commit": {
-          "message": "",
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "timestamp": "",
+          "message": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "author": {
-            "name": "",
-            "username": "ViktorHofer"
+            "username": "ViktorHofer",
+            "name": ""
           }
         }
       }
