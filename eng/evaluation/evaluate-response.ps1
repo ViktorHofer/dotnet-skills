@@ -141,41 +141,12 @@ if (-not (Test-Path $expectedFile)) {
 }
 Write-Host "[INFO] Expected output loaded from: $expectedFile"
 
-# Process each run type
+# Process each run type - prepare eval dirs, then run concurrently
 $runTypes = @("vanilla", "skilled")
 $evaluations = @{}
 
-foreach ($runType in $runTypes) {
-    $outputFile = Join-Path $scenarioResultsDir "${runType}-output.txt"
-
-    if (-not (Test-Path $outputFile)) {
-        Write-Warning "[WARN] Output file not found for $runType run: $outputFile"
-        $evaluations[$runType] = [PSCustomObject]@{
-            score         = 0
-            accuracy      = 0
-            completeness  = 0
-            actionability = 0
-            clarity       = 0
-            reasoning     = "Output file not found - run may have failed or was skipped"
-        }
-        continue
-    }
-
-    $actualOutput = Get-Content $outputFile -Raw
-    Write-Host ""
-    Write-Host "[EVAL] Evaluating $runType response ($($actualOutput.Length) chars)..."
-
-    # Create a temp evaluation directory with the files Copilot needs to read
-    $evalDir = Join-Path ([System.IO.Path]::GetTempPath()) "copilot-eval-${runType}-$(Get-Random)"
-    New-Item -ItemType Directory -Force -Path $evalDir | Out-Null
-
-    try {
-        # Write the expected output and actual response as files in the eval directory
-        Copy-Item -Path $expectedFile -Destination (Join-Path $evalDir "expected-output.md")
-        Copy-Item -Path $outputFile -Destination (Join-Path $evalDir "actual-response.txt")
-
-        # Write the evaluation instructions
-        $instructions = @"
+# Evaluation instructions template (identical for all run types)
+$instructions = @"
 # Evaluation Task
 
 Read the two files in this directory:
@@ -214,25 +185,77 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
 
 {"score": <0-10>, "accuracy": <0-10>, "completeness": <0-10>, "actionability": <0-10>, "clarity": <0-10>, "checklist_score": <number|null>, "checklist_max": <number|null>, "reasoning": "<brief explanation of scoring decisions>"}
 "@
-        $instructions | Out-File -FilePath (Join-Path $evalDir "INSTRUCTIONS.md") -Encoding utf8
 
-        # Build a short prompt that tells Copilot to read the files
-        $evalPrompt = "Read the files in this directory: INSTRUCTIONS.md, expected-output.md, and actual-response.txt. Follow the instructions in INSTRUCTIONS.md to evaluate the actual response against the expected output. Your response must be ONLY a JSON object as specified in the instructions. Do not include any markdown code fences, explanatory text, or anything other than the raw JSON object."
+$evalPrompt = "Read the files in this directory: INSTRUCTIONS.md, expected-output.md, and actual-response.txt. Follow the instructions in INSTRUCTIONS.md to evaluate the actual response against the expected output. Your response must be ONLY a JSON object as specified in the instructions. Do not include any markdown code fences, explanatory text, or anything other than the raw JSON object."
 
-        # Run evaluation with Copilot (vanilla - no plugins) with retry logic
-        $evaluation = $null
+# Phase 1: Prepare evaluation directories for each run type
+$evalTasks = @()
+foreach ($runType in $runTypes) {
+    $outputFile = Join-Path $scenarioResultsDir "${runType}-output.txt"
 
-        for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
-            Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$MaxRetries)..."
-            $evalOutput = Invoke-CopilotCli `
-                -Prompt $evalPrompt `
+    if (-not (Test-Path $outputFile)) {
+        Write-Warning "[WARN] Output file not found for $runType run: $outputFile"
+        $evaluations[$runType] = [PSCustomObject]@{
+            score         = 0
+            accuracy      = 0
+            completeness  = 0
+            actionability = 0
+            clarity       = 0
+            reasoning     = "Output file not found - run may have failed or was skipped"
+        }
+        continue
+    }
+
+    $actualOutput = Get-Content $outputFile -Raw
+    Write-Host ""
+    Write-Host "[EVAL] Preparing $runType evaluation ($($actualOutput.Length) chars)..."
+
+    $evalDir = Join-Path ([System.IO.Path]::GetTempPath()) "copilot-eval-${runType}-$(Get-Random)"
+    New-Item -ItemType Directory -Force -Path $evalDir | Out-Null
+    Copy-Item -Path $expectedFile -Destination (Join-Path $evalDir "expected-output.md")
+    Copy-Item -Path $outputFile -Destination (Join-Path $evalDir "actual-response.txt")
+    $instructions | Out-File -FilePath (Join-Path $evalDir "INSTRUCTIONS.md") -Encoding utf8
+
+    $evalTasks += @{
+        RunType = $runType
+        EvalDir = $evalDir
+    }
+}
+
+# Phase 2: Run evaluations concurrently
+if ($evalTasks.Count -gt 0) {
+    Write-Host ""
+    Write-Host "[EVAL] Running $($evalTasks.Count) evaluation(s) concurrently..."
+
+    $scriptRootPath = $PSScriptRoot
+
+    $evalResults = $evalTasks | ForEach-Object -ThrottleLimit $evalTasks.Count -Parallel {
+        $task = $_
+        $runType = $task.RunType
+        $evalDir = $task.EvalDir
+        $retries = $using:MaxRetries
+        $timeout = $using:TimeoutSeconds
+        $mdl = $using:Model
+        $prompt = $using:evalPrompt
+        $resultsDir = $using:scenarioResultsDir
+        $sr = $using:scriptRootPath
+
+        # Import helper function in this parallel runspace
+        . (Join-Path $sr "invoke-copilot.ps1")
+
+        $rawOutput = $null
+
+        for ($attempt = 1; $attempt -le $retries; $attempt++) {
+            Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$retries)..."
+            $output = Invoke-CopilotCli `
+                -Prompt $prompt `
                 -WorkingDir $evalDir `
-                -TimeoutSeconds $TimeoutSeconds `
-                -Model $Model
+                -TimeoutSeconds $timeout `
+                -Model $mdl
 
-            if ($null -eq $evalOutput -or $evalOutput.Trim() -eq '') {
+            if ($null -eq $output -or $output.Trim() -eq '') {
                 Write-Warning "[EVAL] Attempt ${attempt}: Copilot returned no output (timeout or error)"
-                if ($attempt -lt $MaxRetries) {
+                if ($attempt -lt $retries) {
                     $delay = 60 * $attempt
                     Write-Host "[EVAL] Waiting ${delay}s before retry..."
                     Start-Sleep -Seconds $delay
@@ -240,32 +263,44 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
                 continue
             }
 
-            # Save raw evaluation output
-            $evalRawFile = Join-Path $scenarioResultsDir "${runType}-eval-raw.txt"
-            $evalOutput | Out-File -FilePath $evalRawFile -Encoding utf8
+            # Basic validation: check for parseable JSON with a score field
+            $valid = $false
+            try {
+                if ($output -match '(?s)\{[^{}]*"score"\s*:\s*\d[^{}]*\}') {
+                    $null = $Matches[0] | ConvertFrom-Json
+                    $valid = $true
+                }
+            } catch { }
 
-            # Parse evaluation
-            $evaluation = Parse-EvaluationJson -Output $evalOutput
-
-            # Check if parsing produced a valid result (reasoning field is only set
-            # to the failure message when parsing fails)
-            if ($evaluation.reasoning -ne "Failed to parse evaluation response from Copilot") {
-                Write-Host "[EVAL] Successfully parsed evaluation on attempt $attempt"
+            if ($valid) {
+                $rawOutput = $output
+                Write-Host "[EVAL] Successfully got valid evaluation on attempt $attempt for $runType"
                 break
             }
 
-            Write-Warning "[EVAL] Attempt ${attempt}: Failed to parse evaluation JSON"
-            $evaluation = $null
-            if ($attempt -lt $MaxRetries) {
+            Write-Warning "[EVAL] Attempt ${attempt}: Failed to parse evaluation JSON for $runType"
+            $output | Out-File -FilePath (Join-Path $resultsDir "${runType}-eval-raw-attempt${attempt}.txt") -Encoding utf8
+            if ($attempt -lt $retries) {
                 $delay = 60 * $attempt
                 Write-Host "[EVAL] Waiting ${delay}s before retry..."
                 Start-Sleep -Seconds $delay
             }
         }
 
-        if ($null -eq $evaluation) {
+        [PSCustomObject]@{
+            RunType   = $runType
+            RawOutput = $rawOutput
+            EvalDir   = $evalDir
+        }
+    }
+
+    # Phase 3: Parse results and cleanup
+    foreach ($result in @($evalResults)) {
+        $runType = $result.RunType
+
+        if ($null -eq $result.RawOutput) {
             Write-Warning "[EVAL] All $MaxRetries attempts failed for $runType"
-            $evaluation = [PSCustomObject]@{
+            $evaluations[$runType] = [PSCustomObject]@{
                 score         = $null
                 accuracy      = $null
                 completeness  = $null
@@ -273,22 +308,26 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
                 clarity       = $null
                 reasoning     = "All evaluation attempts failed (timeout or parse error)"
             }
+        } else {
+            $evalRawFile = Join-Path $scenarioResultsDir "${runType}-eval-raw.txt"
+            $result.RawOutput | Out-File -FilePath $evalRawFile -Encoding utf8
+
+            $evaluation = Parse-EvaluationJson -Output $result.RawOutput
+            $evaluations[$runType] = $evaluation
         }
 
-        $evaluations[$runType] = $evaluation
-
-        Write-Host "   Score: $($evaluation.score)/10"
-        Write-Host "   Accuracy: $($evaluation.accuracy)/10"
-        Write-Host "   Completeness: $($evaluation.completeness)/10"
-        Write-Host "   Actionability: $($evaluation.actionability)/10"
-        Write-Host "   Clarity: $($evaluation.clarity)/10"
-        if ($null -ne $evaluation.checklist_score) {
-            Write-Host "   Checklist: $($evaluation.checklist_score)/$($evaluation.checklist_max)"
+        $e = $evaluations[$runType]
+        Write-Host "   [$runType] Score: $($e.score)/10"
+        Write-Host "   [$runType] Accuracy: $($e.accuracy)/10"
+        Write-Host "   [$runType] Completeness: $($e.completeness)/10"
+        Write-Host "   [$runType] Actionability: $($e.actionability)/10"
+        Write-Host "   [$runType] Clarity: $($e.clarity)/10"
+        if ($null -ne $e.checklist_score) {
+            Write-Host "   [$runType] Checklist: $($e.checklist_score)/$($e.checklist_max)"
         }
-        Write-Host "   Reasoning: $($evaluation.reasoning)"
-    }
-    finally {
-        Remove-Item -Path $evalDir -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "   [$runType] Reasoning: $($e.reasoning)"
+
+        Remove-Item -Path $result.EvalDir -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 

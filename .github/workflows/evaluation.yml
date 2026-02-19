@@ -29,7 +29,7 @@ on:
         description: 'Number of scenarios to run in parallel'
         required: false
         type: number
-        default: 4
+        default: 8
       model:
         description: 'Copilot model to use (e.g. claude-opus-4.5, claude-sonnet-4.5)'
         required: false
@@ -54,6 +54,7 @@ env:
   DOTNET_VERSION: '10.0.x'
   DEFAULT_MODEL: 'claude-opus-4.5'
   DEFAULT_MAX_RETRIES: 3
+  DEFAULT_PARALLELISM: 8
 
 permissions:
   contents: write
@@ -144,17 +145,17 @@ jobs:
           # Set parallelism level
           $parallelism = "${{ github.event.inputs.parallelism }}"
           if (-not $parallelism -or $parallelism -eq '') {
-            $parallelism = 4
+            $parallelism = $env:DEFAULT_PARALLELISM
           } else {
             try {
               $parallelism = [int]$parallelism
               if ($parallelism -lt 1) {
-                Write-Warning "Parallelism must be at least 1, using default of 4"
-                $parallelism = 4
+                Write-Warning "Parallelism must be at least 1, using default of $env:DEFAULT_PARALLELISM"
+                $parallelism = $env:DEFAULT_PARALLELISM
               }
             } catch {
-              Write-Warning "Invalid parallelism value, using default of 4"
-              $parallelism = 4
+              Write-Warning "Invalid parallelism value, using default of $env:DEFAULT_PARALLELISM"
+              $parallelism = $env:DEFAULT_PARALLELISM
             }
           }
           Write-Host "Parallelism level: $parallelism"
