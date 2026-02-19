@@ -1,14 +1,14 @@
-name: Eval
+name: Evaluation
 
 on:
   pull_request:
     paths:
       - 'src/**'
       - 'eng/evaluation/**'
-      - '.github/workflows/eval.yml'
+      - '.github/workflows/evaluation.yml'
 
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+    - cron: '*/15 * * * *'  # Every 15 minutes
 
   workflow_dispatch:
     inputs:
@@ -30,14 +30,20 @@ on:
         required: false
         type: number
         default: 4
-      publish_benchmark:
-        description: 'Publish results to benchmark dashboard'
+      model:
+        description: 'Copilot model to use (e.g. claude-opus-4.5, claude-sonnet-4.5)'
         required: false
-        type: boolean
-        default: false
+        default: 'claude-opus-4.5'
+      max_retries:
+        description: 'Maximum number of retries per scenario on failure'
+        required: false
+        type: number
+        default: 3
+
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # PRs: cancel previous runs on same branch. Schedule/dispatch: unique group per run (never cancel).
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
 
 # Note: For local testing with act, secrets are loaded from .secrets file
@@ -45,6 +51,9 @@ concurrency:
 env:
   GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
   RESULTS_BASE: artifacts/TestResults
+  DOTNET_VERSION: '10.0.x'
+  DEFAULT_MODEL: 'claude-opus-4.5'
+  DEFAULT_MAX_RETRIES: 3
 
 permissions:
   contents: write
@@ -96,6 +105,13 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Cache Copilot CLI
+        id: cache-copilot
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-copilot-${{ runner.os }}-${{ hashFiles('.github/workflows/evaluation.yml') }}
+
       - name: Install Copilot CLI
         run: |
           npm install -g @github/copilot
@@ -143,144 +159,107 @@ jobs:
           }
           Write-Host "Parallelism level: $parallelism"
           echo "PARALLELISM=$parallelism" >> $env:GITHUB_ENV
+
+          # Set model
+          $model = "${{ github.event.inputs.model }}"
+          if (-not $model -or $model -eq '') {
+            $model = "$env:DEFAULT_MODEL"
+          }
+          Write-Host "Model: $model"
+          echo "COPILOT_MODEL=$model" >> $env:GITHUB_ENV
+
+          # Set max retries
+          $maxRetries = "${{ github.event.inputs.max_retries }}"
+          if (-not $maxRetries -or $maxRetries -eq '') {
+            $maxRetries = $env:DEFAULT_MAX_RETRIES
+          } else {
+            try {
+              $maxRetries = [int]$maxRetries
+              if ($maxRetries -lt 1) {
+                Write-Warning "Max retries must be at least 1, using default of $env:DEFAULT_MAX_RETRIES"
+                $maxRetries = $env:DEFAULT_MAX_RETRIES
+              }
+            } catch {
+              Write-Warning "Invalid max retries value, using default of $env:DEFAULT_MAX_RETRIES"
+              $maxRetries = $env:DEFAULT_MAX_RETRIES
+            }
+          }
+          Write-Host "Max retries: $maxRetries"
+          echo "MAX_RETRIES=$maxRetries" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}
         run: |
-          $plugin = "${{ matrix.plugin }}"
-
-          # Ensure plugin is not installed (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall $plugin 2>$null
+          copilot plugin uninstall "${{ matrix.plugin }}" 2>$null
           $ErrorActionPreference = "Stop"
 
-          # Validate plugin state
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "\b$plugin\b") {
-            throw "❌ VALIDATION FAILED: $plugin should NOT be installed for vanilla run"
-          }
-          Write-Host "✅ Validated: No $plugin plugin installed"
-
-          # Run scenarios in parallel
-          $scenarios = $env:SCENARIOS -split ","
-          $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
-          $runId = $env:RUN_ID
-          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
-
-          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
-            $scenario = $_
-            $plugin = $using:plugin
-            $resultsDir = $using:resultsDir
-            $runId = $using:runId
-            Write-Host "`n=== Running vanilla: $scenario ==="
-            pwsh -File ./eng/evaluation/run-scenario.ps1 `
-              -ScenarioName $scenario `
-              -RunType "vanilla" `
-              -ResultsDir $resultsDir `
-              -RunId $runId `
-              -PluginName $plugin `
-              -MarketplaceName "dotnet-skills" `
-              -ScenariosBaseDir "src/$plugin/testcases"
+          if ($pluginList -match "\b${{ matrix.plugin }}\b") {
+            throw "❌ VALIDATION FAILED: ${{ matrix.plugin }} should NOT be installed for vanilla run"
           }
 
-          Write-Host "`n✅ All vanilla scenario runs completed"
+          pwsh -File ./eng/evaluation/run-scenarios-parallel.ps1 `
+            -Script "./eng/evaluation/run-scenario.ps1" `
+            -RunType "vanilla" `
+            -Scenarios "$env:SCENARIOS" `
+            -Parallelism $env:PARALLELISM `
+            -Plugin "${{ matrix.plugin }}" `
+            -ResultsDir "$env:RESULTS_DIR" `
+            -RunId "$env:RUN_ID" `
+            -Model "$env:COPILOT_MODEL" `
+            -MaxRetries $env:MAX_RETRIES
         shell: pwsh
 
       - name: Install Plugin and Run Skilled Copilot
         run: |
           $plugin = "${{ matrix.plugin }}"
-
-          # Register the repo checkout as a local plugin marketplace
-          $repoRoot = "${{ github.workspace }}"
-          Write-Host "Registering marketplace from: $repoRoot"
-          Write-Host "Marketplace config exists: $(Test-Path (Join-Path $repoRoot '.github/plugin/marketplace.json'))"
-          copilot plugin marketplace add $repoRoot 2>&1 | Write-Host
-
-          # Browse available plugins
-          Write-Host "`nAvailable plugins in marketplace:"
-          copilot plugin marketplace browse dotnet-skills 2>&1 | Write-Host
-
-          # Install the plugin from the marketplace
-          Write-Host "`nInstalling $plugin plugin..."
+          copilot plugin marketplace add "${{ github.workspace }}" 2>&1 | Write-Host
           copilot plugin install "$plugin@dotnet-skills" 2>&1 | Write-Host
 
-          # Validate plugin is installed
           $pluginList = copilot plugin list 2>&1 | Out-String
           if ($pluginList -notmatch "\b$plugin\b") {
             throw "❌ VALIDATION FAILED: $plugin should be installed for skilled run"
           }
-          Write-Host "✅ Validated: $plugin plugin is installed"
 
-          # Run scenarios in parallel
-          $scenarios = $env:SCENARIOS -split ","
-          $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
-          $runId = $env:RUN_ID
-          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
-
-          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
-            $scenario = $_
-            $resultsDir = $using:resultsDir
-            $runId = $using:runId
-            $plugin = $using:plugin
-            Write-Host "`n=== Running skilled: $scenario ==="
-            pwsh -File ./eng/evaluation/run-scenario.ps1 `
-              -ScenarioName $scenario `
-              -RunType "skilled" `
-              -ResultsDir $resultsDir `
-              -RunId $runId `
-              -PluginName $plugin `
-              -MarketplaceName "dotnet-skills" `
-              -ScenariosBaseDir "src/$plugin/testcases"
-          }
-
-          Write-Host "`n✅ All skilled scenario runs completed"
+          pwsh -File ./eng/evaluation/run-scenarios-parallel.ps1 `
+            -Script "./eng/evaluation/run-scenario.ps1" `
+            -RunType "skilled" `
+            -Scenarios "$env:SCENARIOS" `
+            -Parallelism $env:PARALLELISM `
+            -Plugin "$plugin" `
+            -ResultsDir "$env:RESULTS_DIR" `
+            -RunId "$env:RUN_ID" `
+            -Model "$env:COPILOT_MODEL" `
+            -MaxRetries $env:MAX_RETRIES
         shell: pwsh
 
       - name: Uninstall Plugin and Run Evaluation
         run: |
-          $plugin = "${{ matrix.plugin }}"
-
-          # Uninstall plugin for clean evaluation (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall $plugin 2>$null
+          copilot plugin uninstall "${{ matrix.plugin }}" 2>$null
           $ErrorActionPreference = "Stop"
 
-          # Validate plugin is removed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "\b$plugin\b") {
-            throw "❌ VALIDATION FAILED: $plugin should NOT be installed for evaluation"
-          }
-          Write-Host "✅ Validated: No $plugin plugin installed for evaluation"
-
-          # Evaluate scenarios in parallel
-          $scenarios = $env:SCENARIOS -split ","
-          $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
-          $runId = $env:RUN_ID
-          Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
-
-          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
-            $scenario = $_
-            $resultsDir = $using:resultsDir
-            $runId = $using:runId
-            $plugin = $using:plugin
-            Write-Host "`n=== Evaluating: $scenario ==="
-            pwsh -File ./eng/evaluation/evaluate-response.ps1 `
-              -ScenarioName $scenario `
-              -ResultsDir $resultsDir `
-              -RunId $runId `
-              -ScenariosBaseDir "src/$plugin/testcases"
+          if ($pluginList -match "\b${{ matrix.plugin }}\b") {
+            throw "❌ VALIDATION FAILED: ${{ matrix.plugin }} should NOT be installed for evaluation"
           }
 
-          Write-Host "`n✅ All scenario evaluations completed"
+          pwsh -File ./eng/evaluation/run-scenarios-parallel.ps1 `
+            -Script "./eng/evaluation/evaluate-response.ps1" `
+            -Scenarios "$env:SCENARIOS" `
+            -Parallelism $env:PARALLELISM `
+            -Plugin "${{ matrix.plugin }}" `
+            -ResultsDir "$env:RESULTS_DIR" `
+            -RunId "$env:RUN_ID" `
+            -Model "$env:COPILOT_MODEL" `
+            -MaxRetries $env:MAX_RETRIES
         shell: pwsh
 
       - name: Upload Artifacts
@@ -316,7 +295,11 @@ jobs:
 
   publish-benchmark:
     needs: evaluate
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
+    if: github.ref == 'refs/heads/main'
+    # Serialize gh-pages pushes across concurrent workflow runs to avoid race conditions
+    concurrency:
+      group: publish-benchmark-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
 
     steps:
@@ -332,19 +315,22 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages 2>/dev/null || true
           mkdir -p /tmp/gh-pages/data
-          # Copy all existing per-plugin JSON files and manifest
-          for f in $(git ls-tree --name-only gh-pages:data 2>/dev/null); do
-            git show "gh-pages:data/$f" > "/tmp/gh-pages/data/$f" 2>/dev/null || true
-          done
+          git checkout gh-pages -- data/ 2>/dev/null && cp -r data/* /tmp/gh-pages/data/ && git checkout HEAD -- . || true
 
       - name: Generate Benchmark Data
         run: |
+          # Use git log instead of github.event.head_commit (which is null for schedule/dispatch)
+          $sha = "${{ github.sha }}"
+          $commitMsg = git log -1 --format='%s' $sha
+          $commitTimestamp = git log -1 --format='%aI' $sha
+          $commitAuthor = git log -1 --format='%an' $sha
+
           $commitJson = @{
-            id        = "${{ github.sha }}"
-            message   = $env:COMMIT_MSG
-            timestamp = "${{ github.event.head_commit.timestamp }}"
-            url       = "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-            author    = @{ name = "${{ github.event.head_commit.author.name }}"; username = "${{ github.actor }}" }
+            id        = $sha
+            message   = $commitMsg
+            timestamp = $commitTimestamp
+            url       = "https://github.com/${{ github.repository }}/commit/$sha"
+            author    = @{ name = $commitAuthor; username = "${{ github.actor }}" }
           } | ConvertTo-Json -Compress
 
           # Generate benchmark data for each plugin
@@ -388,8 +374,6 @@ jobs:
           @($plugins) | ConvertTo-Json | Out-File -FilePath "/tmp/gh-pages/data/plugins.json" -Encoding utf8
           Write-Host "`n=== plugins.json: $($plugins -join ', ') ==="
         shell: pwsh
-        env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
 
       - name: Deploy to GitHub Pages
         run: |

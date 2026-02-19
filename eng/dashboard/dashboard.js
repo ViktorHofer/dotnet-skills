@@ -75,26 +75,39 @@
       <div class="charts-grid" id="efficiency-${plugin}"></div>
     `;
 
-    // Summary cards
+    // Summary cards — compute averages across the last 50 entries
     const summaryDiv = document.getElementById(`summary-${plugin}`);
-    const latestQuality = qualityEntries[qualityEntries.length - 1];
-    if (latestQuality) {
-      const skilledAvg = latestQuality.benches.find(b => b.name === 'Overall - Skilled Avg Quality');
-      const vanillaAvg = latestQuality.benches.find(b => b.name === 'Overall - Vanilla Avg Quality');
-      if (skilledAvg && vanillaAvg) {
-        const delta = (skilledAvg.value - vanillaAvg.value).toFixed(2);
+    const SUMMARY_WINDOW = 50;
+    if (qualityEntries.length > 0) {
+      // Use only the most recent entries for summary cards
+      const recentEntries = qualityEntries.slice(-SUMMARY_WINDOW);
+      let skilledTotal = 0, skilledCount = 0, vanillaTotal = 0, vanillaCount = 0;
+      recentEntries.forEach(entry => {
+        entry.benches.forEach(b => {
+          if (b.name.endsWith('- Skilled Quality')) { skilledTotal += b.value; skilledCount++; }
+          if (b.name.endsWith('- Vanilla Quality')) { vanillaTotal += b.value; vanillaCount++; }
+        });
+      });
+      const skilledAvg = skilledCount > 0 ? skilledTotal / skilledCount : null;
+      const vanillaAvg = vanillaCount > 0 ? vanillaTotal / vanillaCount : null;
+      const latestModel = qualityEntries[qualityEntries.length - 1].model;
+      const windowLabel = qualityEntries.length > SUMMARY_WINDOW
+        ? `last ${SUMMARY_WINDOW} of ${qualityEntries.length} runs`
+        : `${qualityEntries.length} runs`;
+      if (skilledAvg !== null && vanillaAvg !== null) {
+        const delta = (skilledAvg - vanillaAvg).toFixed(2);
         const deltaClass = delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
         const deltaSign = delta > 0 ? '+' : '';
         summaryDiv.innerHTML = `
           <div class="card">
             <div class="card-label">Skilled Avg</div>
-            <div class="card-value" style="color: var(--skilled)">${skilledAvg.value.toFixed(2)}</div>
-            <div class="card-delta">out of 10.0</div>
+            <div class="card-value" style="color: var(--skilled)">${skilledAvg.toFixed(2)}</div>
+            <div class="card-delta">${windowLabel}</div>
           </div>
           <div class="card">
             <div class="card-label">Vanilla Avg</div>
-            <div class="card-value" style="color: var(--vanilla)">${vanillaAvg.value.toFixed(2)}</div>
-            <div class="card-delta">out of 10.0</div>
+            <div class="card-value" style="color: var(--vanilla)">${vanillaAvg.toFixed(2)}</div>
+            <div class="card-delta">${windowLabel}</div>
           </div>
           <div class="card">
             <div class="card-label">Delta</div>
@@ -104,11 +117,11 @@
           <div class="card">
             <div class="card-label">Data Points</div>
             <div class="card-value">${qualityEntries.length}</div>
-            <div class="card-delta">evaluation runs</div>
+            <div class="card-delta">total evaluation runs</div>
           </div>
           <div class="card">
             <div class="card-label">Model</div>
-            <div class="card-value" style="font-size: 18px">${latestQuality.model || 'N/A'}</div>
+            <div class="card-value" style="font-size: 18px">${latestModel || 'N/A'}</div>
             <div class="card-delta">latest run</div>
           </div>
         `;
@@ -118,17 +131,13 @@
     // Quality charts
     const qualityChartsDiv = document.getElementById(`quality-${plugin}`);
     if (qualityEntries.length > 0) {
-      createPairedChart(
-        qualityChartsDiv, 'Overall Average Quality', qualityEntries,
-        'Overall - Skilled Avg Quality', 'Overall - Vanilla Avg Quality',
-        'Skilled', 'Vanilla', '#58a6ff', '#8b949e'
-      );
-
+      // Discover scenarios from all entries (not just latest, which may have partial data)
       const scenarios = new Set();
-      const latest = qualityEntries[qualityEntries.length - 1];
-      latest.benches.forEach(b => {
-        const match = b.name.match(/^(.+) - (Skilled|Vanilla) Quality$/);
-        if (match) scenarios.add(match[1]);
+      qualityEntries.forEach(entry => {
+        entry.benches.forEach(b => {
+          const match = b.name.match(/^(.+) - (Skilled|Vanilla) Quality$/);
+          if (match) scenarios.add(match[1]);
+        });
       });
 
       scenarios.forEach(scenario => {
@@ -143,11 +152,13 @@
     // Efficiency charts
     const efficiencyChartsDiv = document.getElementById(`efficiency-${plugin}`);
     if (efficiencyEntries.length > 0) {
-      const latestEff = efficiencyEntries[efficiencyEntries.length - 1];
+      // Discover scenarios from all entries (not just latest, which may have partial data)
       const effScenarios = new Set();
-      latestEff.benches.forEach(b => {
-        const match = b.name.match(/^(.+) - Skilled Time$/);
-        if (match) effScenarios.add(match[1]);
+      efficiencyEntries.forEach(entry => {
+        entry.benches.forEach(b => {
+          const match = b.name.match(/^(.+) - Skilled Time$/);
+          if (match) effScenarios.add(match[1]);
+        });
       });
 
       effScenarios.forEach(scenario => {
@@ -159,7 +170,7 @@
 
         const labels = efficiencyEntries.map(e => {
           const d = new Date(e.date);
-          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         });
 
         const timeData = efficiencyEntries.map(e => {
@@ -237,7 +248,7 @@
 
     const labels = entries.map(e => {
       const d = new Date(e.date);
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     });
 
     const dataA = entries.map(e => {
@@ -306,8 +317,8 @@
           y: {
             ticks: { color: '#8b949e' },
             grid: { color: '#30363d' },
-            suggestedMin: title.includes('Quality') ? 0 : undefined,
-            suggestedMax: title.includes('Quality') ? 10 : undefined
+            suggestedMin: 0,
+            suggestedMax: 10
           }
         }
       }

@@ -60,10 +60,6 @@ if (-not $scenarioDirs) {
 $qualityBenches = [System.Collections.Generic.List[object]]::new()
 $efficiencyBenches = [System.Collections.Generic.List[object]]::new()
 
-$totalVanilla = 0.0
-$totalSkilled = 0.0
-$scenarioCount = 0
-
 foreach ($scenarioDir in $scenarioDirs) {
     $scenarioName = $scenarioDir.Name
     $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
@@ -76,13 +72,10 @@ foreach ($scenarioDir in $scenarioDirs) {
 
         if ($skilledEval -and $skilledEval.score) {
             $qualityBenches.Add(@{ name = "$scenarioName - Skilled Quality"; unit = "Score (0-10)"; value = [float]$skilledEval.score })
-            $totalSkilled += [float]$skilledEval.score
-            $scenarioCount++
         }
 
         if ($vanillaEval -and $vanillaEval.score) {
             $qualityBenches.Add(@{ name = "$scenarioName - Vanilla Quality"; unit = "Score (0-10)"; value = [float]$vanillaEval.score })
-            $totalVanilla += [float]$vanillaEval.score
         }
     }
 
@@ -95,11 +88,6 @@ foreach ($scenarioDir in $scenarioDirs) {
             $efficiencyBenches.Add(@{ name = "$scenarioName - Skilled Tokens In"; unit = "tokens"; value = [float]$skilledStats.TokensIn })
         }
     }
-}
-
-if ($scenarioCount -gt 0) {
-    $qualityBenches.Add(@{ name = "Overall - Skilled Avg Quality"; unit = "Score (0-10)"; value = [math]::Round($totalSkilled / $scenarioCount, 2) })
-    $qualityBenches.Add(@{ name = "Overall - Vanilla Avg Quality"; unit = "Score (0-10)"; value = [math]::Round($totalVanilla / $scenarioCount, 2) })
 }
 
 # Build commit info
