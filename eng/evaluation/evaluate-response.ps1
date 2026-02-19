@@ -56,7 +56,7 @@ function Invoke-EvaluationCopilot {
         [int]$TimeoutSeconds = 300
     )
 
-# Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
+    # Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
     # Use -All to search across all PATH entries, not just the first match
     $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
         Where-Object { $_.CommandType -eq 'Application' } |

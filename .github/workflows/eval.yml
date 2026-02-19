@@ -182,8 +182,6 @@ jobs:
               -RunType "vanilla" `
               -ResultsDir $resultsDir `
               -RunId $runId `
-              -PluginName $plugin `
-              -MarketplaceName "dotnet-skills" `
               -ScenariosBaseDir "src/$plugin/testcases"
           }
 
@@ -233,8 +231,6 @@ jobs:
               -RunType "skilled" `
               -ResultsDir $resultsDir `
               -RunId $runId `
-              -PluginName $plugin `
-              -MarketplaceName "dotnet-skills" `
               -ScenariosBaseDir "src/$plugin/testcases"
           }
 

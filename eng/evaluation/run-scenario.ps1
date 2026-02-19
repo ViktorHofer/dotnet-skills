@@ -21,12 +21,6 @@
 .PARAMETER TimeoutSeconds
     Maximum time to wait for Copilot CLI to complete (default: 300).
 
-.PARAMETER PluginName
-    Name of the Copilot plugin to install/uninstall.
-
-.PARAMETER MarketplaceName
-    Name of the local plugin marketplace (default: dotnet-skills).
-
 .PARAMETER ScenariosBaseDir
     Path to the testcases directory. Can be relative (resolved against RepoRoot)
     or absolute.
@@ -48,10 +42,6 @@ param(
 
     [int]$TimeoutSeconds = 300,
 
-    [string]$PluginName,
-
-    [string]$MarketplaceName = "dotnet-skills",
-
     [string]$ScenariosBaseDir,
 
     [Parameter(Mandatory)]
@@ -71,25 +61,6 @@ if (-not $RepoRoot) {
 . (Join-Path $PSScriptRoot "parse-copilot-stats.ps1")
 
 #region Helper Functions
-
-function Assert-PluginState {
-    param(
-        [string]$PluginName,
-        [bool]$ShouldBeInstalled
-    )
-
-    $output = & copilot plugin list 2>&1 | Out-String
-    $isInstalled = $output -match $PluginName
-
-    if ($ShouldBeInstalled -and -not $isInstalled) {
-        throw "[FAIL] VALIDATION FAILED: Plugin '$PluginName' should be installed but is NOT. Output: $output"
-    }
-    if (-not $ShouldBeInstalled -and $isInstalled) {
-        throw "[FAIL] VALIDATION FAILED: Plugin '$PluginName' should NOT be installed but IS. Output: $output"
-    }
-
-    Write-Host "[OK] Plugin state validated: '$PluginName' installed=$isInstalled (expected=$ShouldBeInstalled)"
-}
 
 function Get-SkillActivation {
     param(
@@ -338,33 +309,7 @@ New-Item -ItemType Directory -Force -Path $scenarioResultsDir | Out-Null
 # Step 1: Copy scenario to a clean temp directory
 $workingDir = Copy-ScenarioToTemp -ScenarioSourceDir $scenarioSourceDir -ScenarioName $ScenarioName -RunType $RunType
 
-# Step 2: Configure plugin state
-$pluginName = $PluginName
-$marketplaceName = $MarketplaceName
-
-if ($RunType -eq "vanilla") {
-    Write-Host ""
-    Write-Host "[PLUGIN] Uninstalling plugin for vanilla run..."
-    $prevPref = $ErrorActionPreference
-    $ErrorActionPreference = "SilentlyContinue"
-    & copilot plugin uninstall $pluginName 2>&1 | Out-Null
-    $ErrorActionPreference = $prevPref
-    # Swallow error if not installed - that's the desired state
-    Assert-PluginState -PluginName $pluginName -ShouldBeInstalled $false
-} elseif ($RunType -eq "skilled") {
-    Write-Host ""
-    Write-Host "[PLUGIN] Installing plugin for skilled run..."
-    # Register the repo as a local marketplace (idempotent - ignore if already added)
-    $prevPref = $ErrorActionPreference
-    $ErrorActionPreference = "SilentlyContinue"
-    & copilot plugin marketplace add $RepoRoot 2>&1 | Write-Host
-    $ErrorActionPreference = $prevPref
-    # Install plugin from the marketplace
-    & copilot plugin install "${pluginName}@${marketplaceName}" 2>&1 | Write-Host
-    Assert-PluginState -PluginName $pluginName -ShouldBeInstalled $true
-}
-
-# Step 3: Build the prompt
+# Step 2: Build the prompt
 # Read eval-test-prompt.txt from the ORIGINAL testcase dir (before exclusion)
 $promptFile = Join-Path $scenarioBaseDir "eval-test-prompt.txt"
 if (Test-Path $promptFile) {
@@ -375,7 +320,7 @@ if (Test-Path $promptFile) {
     Write-Host "[PROMPT] Using default prompt (no eval-test-prompt.txt found)"
 }
 
-# Step 4: Run Copilot CLI
+# Step 3: Run Copilot CLI
 $outputFile = Join-Path $scenarioResultsDir "${RunType}-output.txt"
 
 # Create a per-run config directory for session isolation (must be absolute path)
@@ -411,7 +356,7 @@ if ($null -eq $output) {
     Write-Warning "[RETRY] All $maxRetries attempts failed for $ScenarioName ($RunType)"
 }
 
-# Step 5: Parse stats
+# Step 4: Parse stats
 Write-Host ""
 Write-Host "[STATS] Parsing stats..."
 $stats = Parse-CopilotStats -Output $output
@@ -431,7 +376,7 @@ Write-Host "   Model: $($stats.Model)"
 Write-Host "   Tokens In: $($stats.TokensIn)"
 Write-Host "   Tokens Out: $($stats.TokensOut)"
 
-# Step 5b: Extract skill activation from session logs
+# Step 4b: Extract skill activation from session logs
 Write-Host ""
 Write-Host "[ACTIVATION] Checking skill activation from session logs..."
 $activation = Get-SkillActivation -ConfigDir $sessionConfigDir
@@ -466,7 +411,7 @@ if ($activation.SessionId) {
     Write-Host "   Session ID: $($activation.SessionId)"
 }
 
-# Step 6: Clean up temp directory
+# Step 5: Clean up temp directory
 Write-Host ""
 Write-Host "[CLEAN] Removing temp working directory: $workingDir"
 Remove-Item -Path $workingDir -Recurse -Force -ErrorAction SilentlyContinue
