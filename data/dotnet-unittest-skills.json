@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771512186267,
+  "lastUpdate": 1771512214551,
   "entries": {
     "Efficiency": [
       {
@@ -847,6 +847,43 @@
           "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
           "timestamp": "2026-02-19T14:25:04+00:00"
         }
+      },
+      {
+        "model": "claude-opus-4.5",
+        "tool": "customSmallerIsBetter",
+        "date": 1771512214551,
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-19T14:25:04+00:00",
+          "message": "Return null on non-zero exit code to enable retries",
+          "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe"
+        },
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 168.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 650400.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 104.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 361400.0
+          }
+        ]
       }
     ],
     "Quality": [
@@ -1702,6 +1739,43 @@
           "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
           "timestamp": "2026-02-19T14:25:04+00:00"
         }
+      },
+      {
+        "model": "claude-opus-4.5",
+        "tool": "customBiggerIsBetter",
+        "date": 1771512214551,
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-19T14:25:04+00:00",
+          "message": "Return null on non-zero exit code to enable retries",
+          "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe"
+        },
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          }
+        ]
       }
     ]
   },
