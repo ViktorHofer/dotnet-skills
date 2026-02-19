@@ -1,65 +1,60 @@
 # Expected Findings: legacy-project
 
 ## Problem Summary
-A non-SDK-style (legacy) .NET project with ~48 lines of verbose XML that should be modernized to SDK-style format (~6 lines).
+A non-SDK-style (legacy) .NET project with ~60 lines of verbose XML, `packages.config`, and `AssemblyInfo.cs` that should be modernized to SDK-style format (~10 lines).
 
 ## Expected Findings
 
-### 1. Non-SDK-Style Project Format
-- **Issue**: Project uses legacy format with `<Import Project="$(MSBuildExtensionsPath)\..."`, explicit `<Compile Include>` items, framework `<Reference>` entries, `ProjectGuid`, separate `AssemblyInfo.cs`, Debug/Release PropertyGroups
-- **Solution**: Migrate to SDK-style `<Project Sdk="Microsoft.NET.Sdk">` format
+### Finding 1: Non-SDK-Style Project Format
+- Explicit `<Import>` statements, `ToolsVersion`, `xmlns` attribute
+- **Fix**: Replace with `<Project Sdk="Microsoft.NET.Sdk">`
 
-### 2. Explicit File Includes
-- **Issue**: Every .cs file is listed with `<Compile Include="...">`
-- **Solution**: Remove — SDK-style projects use implicit globbing
+### Finding 2: TFM Migration
+- Uses `<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>` (legacy property name)
+- **Fix**: Map to `<TargetFramework>net472</TargetFramework>` — preserving the original framework, NOT upgrading to net8.0
 
-### 3. Framework References
-- **Issue**: Explicit `<Reference Include="System">`, `System.Core`, etc.
-- **Solution**: Remove — SDK handles standard framework references
+### Finding 3: Explicit File Includes
+- `<Compile Include="Calculator.cs" />` etc. listed individually
+- **Fix**: Remove — SDK-style uses implicit globbing
 
-### 4. Separate AssemblyInfo.cs
-- **Issue**: Assembly attributes in `Properties/AssemblyInfo.cs`
-- **Solution**: Move relevant attributes to .csproj properties (or let SDK auto-generate them) and delete AssemblyInfo.cs
+### Finding 4: packages.config → PackageReference
+- `packages.config` with Newtonsoft.Json and Serilog, plus `<Reference>` elements with `<HintPath>`
+- **Fix**: Migrate to `<PackageReference Include="..." Version="..." />` and delete packages.config
 
-### 5. Redundant Debug/Release Configurations
-- **Issue**: Separate PropertyGroups for Debug and Release with boilerplate
-- **Solution**: Remove — SDK provides sensible defaults
+### Finding 5: AssemblyInfo.cs
+- `Properties/AssemblyInfo.cs` with assembly attributes
+- **Fix**: Move to csproj properties or set `<GenerateAssemblyInfo>false</GenerateAssemblyInfo>` to keep the file
 
-### 6. MSBuild Import Statements
-- **Issue**: Explicit `<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />`
-- **Solution**: Remove — `Sdk` attribute handles imports
+### Finding 6: Boilerplate Removal
+- Debug/Release PropertyGroups, framework References, ProjectGuid, FileAlignment, etc.
+- **Fix**: Delete — SDK provides defaults
 
 ## Expected Modernized Result
-The modernized .csproj should be approximately 6 lines:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>LegacyApp</RootNamespace>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+  </ItemGroup>
 </Project>
 ```
-
-## Key Concepts That Should Be Mentioned
-- SDK-style vs non-SDK-style project format
-- Implicit file globbing in SDK-style projects
-- MSBuild `Sdk` attribute replacing explicit imports
-- Auto-generated AssemblyInfo
-- Default Debug/Release configurations in SDK projects
 
 ## Evaluation Checklist
 Award 1 point for each item correctly identified and addressed:
 
-- [ ] Identified project as non-SDK-style (legacy format)
-- [ ] Suggested migration to SDK-style Project Sdk="Microsoft.NET.Sdk"
-- [ ] Identified explicit Compile Include items as unnecessary
-- [ ] Explained SDK-style implicit globbing replaces explicit includes
-- [ ] Identified framework Reference elements as removable
-- [ ] Identified AssemblyInfo.cs as replaceable by SDK auto-generation
-- [ ] Identified redundant Debug/Release PropertyGroups
-- [ ] Identified explicit MSBuild Import statements as unnecessary
-- [ ] Provided a modernized .csproj example (roughly correct structure)
-- [ ] Mentioned that modernized project should be ~6 lines vs ~48
+1. [ ] Identified project as non-SDK-style and recommended `<Project Sdk="Microsoft.NET.Sdk">`
+2. [ ] Correctly mapped `TargetFrameworkVersion v4.7.2` to `TargetFramework net472` (NOT net8.0 — preserving original framework)
+3. [ ] Identified explicit Compile Include items as unnecessary due to SDK implicit globbing
+4. [ ] Identified `packages.config` and recommended migration to `<PackageReference>` format
+5. [ ] Provided correct PackageReference XML for both Newtonsoft.Json and Serilog (with versions)
+6. [ ] Identified AssemblyInfo.cs as replaceable by SDK auto-generation (or mentioned `GenerateAssemblyInfo` property)
+7. [ ] Identified HintPath references and framework Reference elements as removable
+8. [ ] Identified Debug/Release PropertyGroups and other boilerplate (ProjectGuid, FileAlignment) as removable
+9. [ ] Provided a complete modernized .csproj example that would work correctly
+10. [ ] Mentioned `try-convert` or .NET Upgrade Assistant as migration tools, or explained binding redirect changes
 
 Total: __/10
 

@@ -1,0 +1,1 @@
+This project multi-targets net8.0, netstandard2.0, and net472 but fails to build on some target frameworks. Diagnose which TFMs are failing and why, then provide the correct MSBuild fix with proper conditional syntax. Consider both PackageReference-based and preprocessor-based approaches.

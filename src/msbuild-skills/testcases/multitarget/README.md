@@ -2,28 +2,29 @@
 
 Demonstrates TFM-specific build issues in a multi-targeting project.
 
-## Issues Demonstrated
+## Issues (Surface Level)
 
+### 1. Missing Span<T> Polyfill
 - `ReadOnlySpan<byte>` usage fails on `netstandard2.0` and `net472` without `System.Memory` package
-- Conditional compilation patterns for platform-specific APIs
-- Different API availability across TFMs
+- CS0246 on older TFMs
+
+## Issues (Subtle / Skill-Specific)
+
+### 2. MSBuild Condition Syntax
+- Preferred: `$([MSBuild]::IsTargetFrameworkCompatible())` function (robust, future-proof)
+- Alternative: Explicit TFM listing with `Or` conditions
+- The skill teaches both patterns; base LLMs often only use the explicit form
+
+### 3. Preprocessor Symbol Names
+- Correct: `NET8_0_OR_GREATER`, `NETSTANDARD2_0`, `NETFRAMEWORK`
+- Wrong: `NET8.0_OR_GREATER`, `NET80_OR_GREATER`
 
 ## Skills Tested
 
-- `multitarget-tfm-issues` — TFM compatibility, conditional compilation
-- `common-build-errors` — CS0246 on specific TFMs
+- `multitarget-tfm-issues` — TFM compatibility, conditional compilation, polyfill packages
 
 ## How to Test
 
 ```bash
 dotnet build MultiTargetLib.csproj   # Fails on netstandard2.0 and net472
-```
-
-## Expected Fix
-
-Add conditional PackageReference for older TFMs:
-```xml
-<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net472'">
-  <PackageReference Include="System.Memory" Version="4.5.5" />
-</ItemGroup>
 ```

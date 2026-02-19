@@ -1,0 +1,1 @@
+Build this solution and diagnose any build failures or warnings related to output paths. Explain the root causes of each issue, why it would cause problems during parallel builds, and provide specific fixes for each one.

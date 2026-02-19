@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- BUG: MaxCpuCount is a command-line setting, not a project property.
+       Setting it here has NO effect on build parallelism. -->
+  <PropertyGroup>
+    <MaxCpuCount>8</MaxCpuCount>
+  </PropertyGroup>
+</Project>
