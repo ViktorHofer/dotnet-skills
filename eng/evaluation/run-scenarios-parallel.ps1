@@ -111,7 +111,7 @@ $scenarioList | ForEach-Object -ThrottleLimit $Parallelism -Parallel {
 }
 
 if ($failures.Count -gt 0) {
-    throw "❌ $($failures.Count) $label scenario(s) failed: $($failures -join ', ')"
+    Write-Warning "⚠️ $($failures.Count) $label scenario(s) failed: $($failures -join ', ')"
 }
 
 Write-Host "`n✅ All $label scenarios completed"

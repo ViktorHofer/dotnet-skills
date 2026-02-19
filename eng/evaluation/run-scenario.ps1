@@ -242,7 +242,7 @@ for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
     Start-Sleep -Seconds $delay
 }
 if ($null -eq $output) {
-    Write-Warning "[RETRY] All $MaxRetries attempts failed for $ScenarioName ($RunType)"
+    throw "All $MaxRetries attempts failed for $ScenarioName ($RunType)"
 }
 
 # Step 4: Parse stats

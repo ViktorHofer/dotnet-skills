@@ -170,7 +170,14 @@ function Invoke-CopilotCli {
 
     if ($exitCode -ne 0) {
         Write-Warning "Copilot CLI exited with code $exitCode"
-        if ($stderr) { Write-Warning "Stderr: $stderr" }
+        if ($stderr) {
+            Write-Warning "Stderr output:"
+            foreach ($line in ($stderr -split "`n")) {
+                if ($line.Trim()) { Write-Warning "  $line" }
+            }
+        } else {
+            Write-Warning "No stderr output captured"
+        }
         return $null
     }
 
