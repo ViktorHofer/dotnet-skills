@@ -137,16 +137,6 @@
             "value": 9.0,
             "name": "order-service-mstest - Vanilla Quality",
             "unit": "Score (0-10)"
-          },
-          {
-            "value": 8.5,
-            "name": "Overall - Skilled Avg Quality",
-            "unit": "Score (0-10)"
-          },
-          {
-            "value": 8.0,
-            "name": "Overall - Vanilla Avg Quality",
-            "unit": "Score (0-10)"
           }
         ],
         "model": "claude-opus-4.5",
@@ -196,16 +186,6 @@
             "unit": "Score (0-10)",
             "value": 7.0,
             "name": "order-service-mstest - Vanilla Quality"
-          },
-          {
-            "unit": "Score (0-10)",
-            "value": 7.5,
-            "name": "Overall - Skilled Avg Quality"
-          },
-          {
-            "unit": "Score (0-10)",
-            "value": 7.5,
-            "name": "Overall - Vanilla Avg Quality"
           }
         ]
       },
@@ -231,16 +211,6 @@
           {
             "name": "order-service-mstest - Vanilla Quality",
             "value": 9.0,
-            "unit": "Score (0-10)"
-          },
-          {
-            "name": "Overall - Skilled Avg Quality",
-            "value": 8.0,
-            "unit": "Score (0-10)"
-          },
-          {
-            "name": "Overall - Vanilla Avg Quality",
-            "value": 8.0,
             "unit": "Score (0-10)"
           }
         ],

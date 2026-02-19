@@ -527,16 +527,6 @@
             "value": 8.0,
             "name": "style-issues - Vanilla Quality",
             "unit": "Score (0-10)"
-          },
-          {
-            "value": 7.83,
-            "name": "Overall - Skilled Avg Quality",
-            "unit": "Score (0-10)"
-          },
-          {
-            "value": 7.0,
-            "name": "Overall - Vanilla Avg Quality",
-            "unit": "Score (0-10)"
           }
         ],
         "model": "claude-opus-4.5",
@@ -686,16 +676,6 @@
             "unit": "Score (0-10)",
             "value": 7.0,
             "name": "style-issues - Vanilla Quality"
-          },
-          {
-            "unit": "Score (0-10)",
-            "value": 7.67,
-            "name": "Overall - Skilled Avg Quality"
-          },
-          {
-            "unit": "Score (0-10)",
-            "value": 6.92,
-            "name": "Overall - Vanilla Avg Quality"
           }
         ]
       },
@@ -816,16 +796,6 @@
           {
             "name": "style-issues - Vanilla Quality",
             "value": 7.0,
-            "unit": "Score (0-10)"
-          },
-          {
-            "name": "Overall - Skilled Avg Quality",
-            "value": 7.45,
-            "unit": "Score (0-10)"
-          },
-          {
-            "name": "Overall - Vanilla Avg Quality",
-            "value": 7.73,
             "unit": "Score (0-10)"
           }
         ],
