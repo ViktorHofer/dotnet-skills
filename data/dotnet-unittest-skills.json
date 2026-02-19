@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460010618,
+  "lastUpdate": 1771460013174,
   "entries": {
     "Quality": [
       {
@@ -406,26 +406,20 @@
         ]
       },
       {
-        "benches": [
-          {
-            "name": "calculator-xunit - Vanilla Quality",
-            "unit": "Score (1-5)",
-            "value": 8.0
-          }
-        ],
+        "benches": [],
         "model": null,
-        "tool": "customBiggerIsBetter",
         "commit": {
-          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "timestamp": "",
           "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "author": {
-            "username": "ViktorHofer",
-            "name": ""
-          }
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
         },
-        "date": 1771460010618
+        "tool": "customBiggerIsBetter",
+        "date": 1771460013174
       }
     ],
     "Efficiency": [
@@ -737,18 +731,18 @@
       {
         "benches": [],
         "model": null,
-        "tool": "customSmallerIsBetter",
         "commit": {
-          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "timestamp": "",
           "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "author": {
-            "username": "ViktorHofer",
-            "name": ""
-          }
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
         },
-        "date": 1771460010618
+        "tool": "customSmallerIsBetter",
+        "date": 1771460013174
       }
     ]
   }
