@@ -37,7 +37,8 @@ on:
         default: false
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # PRs: cancel previous runs on same branch. Schedule/dispatch: unique group per run (never cancel).
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
 
 # Note: For local testing with act, secrets are loaded from .secrets file
