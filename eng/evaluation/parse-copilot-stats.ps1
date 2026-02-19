@@ -34,12 +34,16 @@ function Parse-CopilotStats {
     if ($Output -match "Total usage est:\s+(\d+) Premium request") {
         $stats.PremiumRequests = [int]$Matches[1]
     }
-    if ($Output -match "API time spent:\s+(\d+)m\s+([\d.]+)s") {
+    if ($Output -match "API time spent:\s+(\d+)h\s+(\d+)m\s+([\d.]+)s") {
+        $stats.ApiTimeSeconds = [int]$Matches[1] * 3600 + [int]$Matches[2] * 60 + [math]::Round([float]$Matches[3])
+    } elseif ($Output -match "API time spent:\s+(\d+)m\s+([\d.]+)s") {
         $stats.ApiTimeSeconds = [int]$Matches[1] * 60 + [math]::Round([float]$Matches[2])
     } elseif ($Output -match "API time spent:\s+([\d.]+)s") {
         $stats.ApiTimeSeconds = [math]::Round([float]$Matches[1])
     }
-    if ($Output -match "Total session time:\s+(\d+)m\s+([\d.]+)s") {
+    if ($Output -match "Total session time:\s+(\d+)h\s+(\d+)m\s+([\d.]+)s") {
+        $stats.TotalTimeSeconds = [int]$Matches[1] * 3600 + [int]$Matches[2] * 60 + [math]::Round([float]$Matches[3])
+    } elseif ($Output -match "Total session time:\s+(\d+)m\s+([\d.]+)s") {
         $stats.TotalTimeSeconds = [int]$Matches[1] * 60 + [math]::Round([float]$Matches[2])
     } elseif ($Output -match "Total session time:\s+([\d.]+)s") {
         $stats.TotalTimeSeconds = [math]::Round([float]$Matches[1])

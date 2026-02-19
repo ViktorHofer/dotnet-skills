@@ -124,8 +124,6 @@ function Format-TokenCount {
     return "$Value"
 }
 
-#endregion
-
 #region Main Logic
 
 Write-Host ""
