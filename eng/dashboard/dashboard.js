@@ -75,14 +75,20 @@
       <div class="charts-grid" id="efficiency-${plugin}"></div>
     `;
 
-    // Summary cards — compute averages client-side from per-scenario data
+    // Summary cards — compute averages across all entries
     const summaryDiv = document.getElementById(`summary-${plugin}`);
-    const latestQuality = qualityEntries[qualityEntries.length - 1];
-    if (latestQuality) {
-      const skilledScores = latestQuality.benches.filter(b => b.name.endsWith('- Skilled Quality'));
-      const vanillaScores = latestQuality.benches.filter(b => b.name.endsWith('- Vanilla Quality'));
-      const skilledAvg = skilledScores.length > 0 ? skilledScores.reduce((s, b) => s + b.value, 0) / skilledScores.length : null;
-      const vanillaAvg = vanillaScores.length > 0 ? vanillaScores.reduce((s, b) => s + b.value, 0) / vanillaScores.length : null;
+    if (qualityEntries.length > 0) {
+      // Collect all skilled/vanilla scores across all entries
+      let skilledTotal = 0, skilledCount = 0, vanillaTotal = 0, vanillaCount = 0;
+      qualityEntries.forEach(entry => {
+        entry.benches.forEach(b => {
+          if (b.name.endsWith('- Skilled Quality')) { skilledTotal += b.value; skilledCount++; }
+          if (b.name.endsWith('- Vanilla Quality')) { vanillaTotal += b.value; vanillaCount++; }
+        });
+      });
+      const skilledAvg = skilledCount > 0 ? skilledTotal / skilledCount : null;
+      const vanillaAvg = vanillaCount > 0 ? vanillaTotal / vanillaCount : null;
+      const latestModel = qualityEntries[qualityEntries.length - 1].model;
       if (skilledAvg !== null && vanillaAvg !== null) {
         const delta = (skilledAvg - vanillaAvg).toFixed(2);
         const deltaClass = delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
@@ -110,7 +116,7 @@
           </div>
           <div class="card">
             <div class="card-label">Model</div>
-            <div class="card-value" style="font-size: 18px">${latestQuality.model || 'N/A'}</div>
+            <div class="card-value" style="font-size: 18px">${latestModel || 'N/A'}</div>
             <div class="card-delta">latest run</div>
           </div>
         `;
