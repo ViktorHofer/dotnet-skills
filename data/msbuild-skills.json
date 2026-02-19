@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460230056,
+  "lastUpdate": 1771460279012,
   "entries": {
     "Quality": [
       {
@@ -1377,6 +1377,73 @@
           }
         ],
         "model": "claude-opus-4.5"
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "bin-obj-clash - Vanilla Quality",
+            "unit": "Score (1-5)",
+            "value": 4.0
+          },
+          {
+            "name": "build-errors-sdk - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 6.0
+          },
+          {
+            "name": "eval-heavy - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 8.0
+          },
+          {
+            "name": "generated-files - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 9.0
+          },
+          {
+            "name": "generated-files - Vanilla Quality",
+            "unit": "Score (1-5)",
+            "value": 6.0
+          },
+          {
+            "name": "incremental-broken - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 5.0
+          },
+          {
+            "name": "parallel-bottleneck - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 6.0
+          },
+          {
+            "name": "style-issues - Vanilla Quality",
+            "unit": "Score (1-5)",
+            "value": 7.0
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 6.8
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 3.4
+          }
+        ],
+        "commit": {
+          "message": "",
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          }
+        },
+        "tool": "customBiggerIsBetter",
+        "date": 1771460279012
       }
     ],
     "Efficiency": [
@@ -2829,6 +2896,103 @@
           }
         ],
         "model": "claude-opus-4.5"
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "bin-obj-clash - Skilled Time",
+            "unit": "seconds",
+            "value": 115.0
+          },
+          {
+            "name": "bin-obj-clash - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 468200.0
+          },
+          {
+            "name": "build-errors-nuget - Skilled Time",
+            "unit": "seconds",
+            "value": 48.0
+          },
+          {
+            "name": "build-errors-nuget - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 155400.0
+          },
+          {
+            "name": "build-errors-sdk - Skilled Time",
+            "unit": "seconds",
+            "value": 53.0
+          },
+          {
+            "name": "build-errors-sdk - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 155900.0
+          },
+          {
+            "name": "eval-heavy - Skilled Time",
+            "unit": "seconds",
+            "value": 24.0
+          },
+          {
+            "name": "eval-heavy - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 83100.0
+          },
+          {
+            "name": "generated-files - Skilled Time",
+            "unit": "seconds",
+            "value": 96.0
+          },
+          {
+            "name": "generated-files - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 500500.0
+          },
+          {
+            "name": "incremental-broken - Skilled Time",
+            "unit": "seconds",
+            "value": 24.0
+          },
+          {
+            "name": "incremental-broken - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 63500.0
+          },
+          {
+            "name": "legacy-project - Skilled Time",
+            "unit": "seconds",
+            "value": 49.0
+          },
+          {
+            "name": "legacy-project - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 162100.0
+          },
+          {
+            "name": "parallel-bottleneck - Skilled Time",
+            "unit": "seconds",
+            "value": 103.0
+          },
+          {
+            "name": "parallel-bottleneck - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 570400.0
+          }
+        ],
+        "commit": {
+          "message": "",
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          }
+        },
+        "tool": "customSmallerIsBetter",
+        "date": 1771460279012
       }
     ]
   }

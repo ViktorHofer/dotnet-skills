@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460229988,
+  "lastUpdate": 1771460278946,
   "entries": {
     "Quality": [
       {
@@ -595,6 +595,38 @@
           }
         ],
         "model": null
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 8.0
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 8.0
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 0.0
+          }
+        ],
+        "commit": {
+          "message": "",
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          }
+        },
+        "tool": "customBiggerIsBetter",
+        "date": 1771460278946
       }
     ],
     "Efficiency": [
@@ -1067,6 +1099,33 @@
         },
         "benches": [],
         "model": null
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 111.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 267900.0
+          }
+        ],
+        "commit": {
+          "message": "",
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          }
+        },
+        "tool": "customSmallerIsBetter",
+        "date": 1771460278946
       }
     ]
   }
