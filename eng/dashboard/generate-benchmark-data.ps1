@@ -75,13 +75,13 @@ foreach ($scenarioDir in $scenarioDirs) {
         $skilledEval = $evalData.evaluations.skilled
 
         if ($skilledEval -and $skilledEval.score) {
-            $qualityBenches.Add(@{ name = "$scenarioName - Skilled Quality"; unit = "Score (1-5)"; value = [float]$skilledEval.score })
+            $qualityBenches.Add(@{ name = "$scenarioName - Skilled Quality"; unit = "Score (0-10)"; value = [float]$skilledEval.score })
             $totalSkilled += [float]$skilledEval.score
             $scenarioCount++
         }
 
         if ($vanillaEval -and $vanillaEval.score) {
-            $qualityBenches.Add(@{ name = "$scenarioName - Vanilla Quality"; unit = "Score (1-5)"; value = [float]$vanillaEval.score })
+            $qualityBenches.Add(@{ name = "$scenarioName - Vanilla Quality"; unit = "Score (0-10)"; value = [float]$vanillaEval.score })
             $totalVanilla += [float]$vanillaEval.score
         }
     }
@@ -98,8 +98,8 @@ foreach ($scenarioDir in $scenarioDirs) {
 }
 
 if ($scenarioCount -gt 0) {
-    $qualityBenches.Add(@{ name = "Overall - Skilled Avg Quality"; unit = "Score (1-5)"; value = [math]::Round($totalSkilled / $scenarioCount, 2) })
-    $qualityBenches.Add(@{ name = "Overall - Vanilla Avg Quality"; unit = "Score (1-5)"; value = [math]::Round($totalVanilla / $scenarioCount, 2) })
+    $qualityBenches.Add(@{ name = "Overall - Skilled Avg Quality"; unit = "Score (0-10)"; value = [math]::Round($totalSkilled / $scenarioCount, 2) })
+    $qualityBenches.Add(@{ name = "Overall - Vanilla Avg Quality"; unit = "Score (0-10)"; value = [math]::Round($totalVanilla / $scenarioCount, 2) })
 }
 
 # Build commit info
