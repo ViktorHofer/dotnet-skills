@@ -149,6 +149,7 @@ jobs:
 
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}
+        continue-on-error: true
         run: |
           $ErrorActionPreference = "SilentlyContinue"
           copilot plugin uninstall "${{ matrix.plugin }}" 2>$null
@@ -170,6 +171,7 @@ jobs:
         shell: pwsh
 
       - name: Install Plugin and Run Skilled Copilot
+        continue-on-error: true
         run: |
           $plugin = "${{ matrix.plugin }}"
           copilot plugin marketplace add "${{ github.workspace }}" 2>&1 | Write-Host
