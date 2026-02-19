@@ -110,11 +110,8 @@ $scenarioList | ForEach-Object -ThrottleLimit $Parallelism -Parallel {
     }
 }
 
-if ($failures.Count -eq $scenarioList.Count) {
-    throw "❌ Test run completed. All $($scenarioList.Count) $label scenario(s) failed: $($failures -join ', ')"
-}
-elseif ($failures.Count -gt 0) {
-    Write-Warning "⚠️ Test run completed. $($failures.Count)/$($scenarioList.Count) $label scenario(s) failed: $($failures -join ', ')"
+if ($failures.Count -gt 0) {
+    throw "❌ Test run completed. $($failures.Count)/$($scenarioList.Count) $label scenario(s) failed: $($failures -join ', ')"
 }
 else {
     Write-Host "✅ Test run completed. All $label scenarios passed successfully."
