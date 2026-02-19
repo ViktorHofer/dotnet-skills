@@ -314,6 +314,10 @@ jobs:
   publish-benchmark:
     needs: evaluate
     if: github.ref == 'refs/heads/main'
+    # Serialize gh-pages pushes across concurrent workflow runs to avoid race conditions
+    concurrency:
+      group: publish-benchmark-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
 
     steps:
