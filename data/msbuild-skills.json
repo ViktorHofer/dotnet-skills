@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771516559913,
+  "lastUpdate": 1771518081818,
   "entries": {
     "Efficiency": [
       {
@@ -4097,6 +4097,143 @@
         "model": "claude-opus-4.5",
         "date": 1771516559913,
         "tool": "customSmallerIsBetter"
+      },
+      {
+        "benches": [
+          {
+            "value": 103.0,
+            "name": "bin-obj-clash - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 171000.0,
+            "name": "bin-obj-clash - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 101.0,
+            "name": "build-errors-cs - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 215000.0,
+            "name": "build-errors-cs - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 80.0,
+            "name": "build-errors-nuget - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 122900.0,
+            "name": "build-errors-nuget - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 83.0,
+            "name": "build-errors-sdk - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 176700.0,
+            "name": "build-errors-sdk - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 68.0,
+            "name": "eval-heavy - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 86600.0,
+            "name": "eval-heavy - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 134.0,
+            "name": "generated-files - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 713800.0,
+            "name": "generated-files - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 46.0,
+            "name": "incremental-broken - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 85900.0,
+            "name": "incremental-broken - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 24.0,
+            "name": "legacy-project - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 57200.0,
+            "name": "legacy-project - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 105.0,
+            "name": "multitarget - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 213000.0,
+            "name": "multitarget - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 52.0,
+            "name": "parallel-bottleneck - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 260700.0,
+            "name": "parallel-bottleneck - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 269.0,
+            "name": "perf-analyzers - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 970100.0,
+            "name": "perf-analyzers - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 139.0,
+            "name": "style-issues - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 171600.0,
+            "name": "style-issues - Skilled Tokens In",
+            "unit": "tokens"
+          }
+        ],
+        "commit": {
+          "id": "d48d26543f6a2209bf371f8d9be0c7f927883cfe",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "YuliiaKovalova"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/d48d26543f6a2209bf371f8d9be0c7f927883cfe",
+          "timestamp": "2026-02-19T16:01:44+00:00",
+          "message": "Update template-engine-skills to v0.1.0-preview.3 (#48)"
+        },
+        "date": 1771518081818,
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5"
       }
     ],
     "Quality": [
@@ -7975,6 +8112,143 @@
         "model": "claude-opus-4.5",
         "date": 1771516559913,
         "tool": "customBiggerIsBetter"
+      },
+      {
+        "benches": [
+          {
+            "value": 8.0,
+            "name": "bin-obj-clash - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 4.0,
+            "name": "bin-obj-clash - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "build-errors-cs - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "build-errors-cs - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "build-errors-nuget - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "build-errors-nuget - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "build-errors-sdk - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "build-errors-sdk - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "eval-heavy - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "eval-heavy - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 5.0,
+            "name": "generated-files - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "generated-files - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "incremental-broken - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "incremental-broken - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 1.0,
+            "name": "legacy-project - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "legacy-project - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "multitarget - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "multitarget - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "parallel-bottleneck - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "parallel-bottleneck - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "perf-analyzers - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "perf-analyzers - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "style-issues - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "style-issues - Vanilla Quality",
+            "unit": "Score (0-10)"
+          }
+        ],
+        "commit": {
+          "id": "d48d26543f6a2209bf371f8d9be0c7f927883cfe",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "YuliiaKovalova"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/d48d26543f6a2209bf371f8d9be0c7f927883cfe",
+          "timestamp": "2026-02-19T16:01:44+00:00",
+          "message": "Update template-engine-skills to v0.1.0-preview.3 (#48)"
+        },
+        "date": 1771518081818,
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5"
       }
     ]
   },
