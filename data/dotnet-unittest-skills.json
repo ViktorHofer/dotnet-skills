@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771512514970,
+  "lastUpdate": 1771512541363,
   "entries": {
     "Efficiency": [
       {
@@ -995,6 +995,43 @@
           },
           "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe"
         }
+      },
+      {
+        "benches": [
+          {
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time",
+            "value": 95.0
+          },
+          {
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 210300.0
+          },
+          {
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time",
+            "value": 97.0
+          },
+          {
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 321600.0
+          }
+        ],
+        "tool": "customSmallerIsBetter",
+        "date": 1771512541363,
+        "commit": {
+          "message": "Return null on non-zero exit code to enable retries",
+          "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
+          "timestamp": "2026-02-19T14:25:04+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "model": "claude-opus-4.5"
       }
     ],
     "Quality": [
@@ -1998,6 +2035,43 @@
           },
           "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe"
         }
+      },
+      {
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 9.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 7.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 9.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 7.0
+          }
+        ],
+        "tool": "customBiggerIsBetter",
+        "date": 1771512541363,
+        "commit": {
+          "message": "Return null on non-zero exit code to enable retries",
+          "id": "bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
+          "timestamp": "2026-02-19T14:25:04+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/bfc2b3bd3047922b1728e7a26f45b07beaf9dfbe",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "model": "claude-opus-4.5"
       }
     ]
   },
