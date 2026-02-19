@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771512541363,
+  "lastUpdate": 1771515650298,
   "entries": {
     "Efficiency": [
       {
@@ -1032,6 +1032,43 @@
           }
         },
         "model": "claude-opus-4.5"
+      },
+      {
+        "date": 1771515650298,
+        "commit": {
+          "message": "Fix evaluation failure handling and stderr visibility",
+          "id": "08efdf506d1b0f608f041caf7038213a151898a4",
+          "timestamp": "2026-02-19T15:25:08+00:00",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/08efdf506d1b0f608f041caf7038213a151898a4"
+        },
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 121.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 417100.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 118.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 388100.0
+          }
+        ],
+        "tool": "customSmallerIsBetter"
       }
     ],
     "Quality": [
@@ -2072,6 +2109,43 @@
           }
         },
         "model": "claude-opus-4.5"
+      },
+      {
+        "date": 1771515650298,
+        "commit": {
+          "message": "Fix evaluation failure handling and stderr visibility",
+          "id": "08efdf506d1b0f608f041caf7038213a151898a4",
+          "timestamp": "2026-02-19T15:25:08+00:00",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/08efdf506d1b0f608f041caf7038213a151898a4"
+        },
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          }
+        ],
+        "tool": "customBiggerIsBetter"
       }
     ]
   },
