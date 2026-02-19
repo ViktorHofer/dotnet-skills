@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771518081760,
+  "lastUpdate": 1771520241844,
   "entries": {
     "Efficiency": [
       {
@@ -1216,6 +1216,43 @@
         },
         "date": 1771518081760,
         "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5"
+      },
+      {
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 260.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 317100.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 88.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 155600.0
+          }
+        ],
+        "date": 1771520241844,
+        "tool": "customSmallerIsBetter",
+        "commit": {
+          "message": "Improve evaluation performance: higher parallelism and concurrent eval",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "2026-02-19T16:21:58+00:00",
+          "id": "509c430469ab0e7024727e0a6aa1dc13240f523c",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/509c430469ab0e7024727e0a6aa1dc13240f523c"
+        },
         "model": "claude-opus-4.5"
       }
     ],
@@ -2441,6 +2478,43 @@
         },
         "date": 1771518081760,
         "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5"
+      },
+      {
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 6.0
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 5.0
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          }
+        ],
+        "date": 1771520241844,
+        "tool": "customBiggerIsBetter",
+        "commit": {
+          "message": "Improve evaluation performance: higher parallelism and concurrent eval",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "2026-02-19T16:21:58+00:00",
+          "id": "509c430469ab0e7024727e0a6aa1dc13240f523c",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/509c430469ab0e7024727e0a6aa1dc13240f523c"
+        },
         "model": "claude-opus-4.5"
       }
     ]
