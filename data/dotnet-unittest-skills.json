@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460076426,
+  "lastUpdate": 1771460117937,
   "entries": {
     "Quality": [
       {
@@ -473,6 +473,48 @@
           }
         },
         "date": 1771460076426
+      },
+      {
+        "benches": [
+          {
+            "value": 9.0,
+            "unit": "Score (1-5)",
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "value": 6.0,
+            "unit": "Score (1-5)",
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (1-5)",
+            "name": "order-service-mstest - Vanilla Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (1-5)",
+            "name": "Overall - Skilled Avg Quality"
+          },
+          {
+            "value": 14.0,
+            "unit": "Score (1-5)",
+            "name": "Overall - Vanilla Avg Quality"
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "timestamp": "",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          }
+        },
+        "tool": "customBiggerIsBetter",
+        "date": 1771460117937,
+        "model": "claude-opus-4.5"
       }
     ],
     "Efficiency": [
@@ -849,6 +891,33 @@
           }
         },
         "date": 1771460076426
+      },
+      {
+        "benches": [
+          {
+            "value": 141.0,
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "value": 442000.0,
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In"
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "timestamp": "",
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          }
+        },
+        "tool": "customSmallerIsBetter",
+        "date": 1771460117937,
+        "model": "claude-opus-4.5"
       }
     ]
   }
