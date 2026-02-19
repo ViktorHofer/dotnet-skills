@@ -270,12 +270,15 @@ function Invoke-CopilotWithTimeout {
     $completed = $process.WaitForExit($TimeoutSeconds * 1000)
     $elapsed = (Get-Date) - $startTime
 
+    # Flush async output streams — the parameterless WaitForExit() ensures
+    # all redirected stdout/stderr has been processed by the event handlers
+    if ($completed) {
+        $process.WaitForExit()
+    }
+
     # Unregister events
     Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
     Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
-
-    # Small delay to ensure async output is flushed
-    Start-Sleep -Milliseconds 500
 
     $stdout = $stdoutBuilder.ToString()
     $stderr = $stderrBuilder.ToString()
