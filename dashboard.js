@@ -75,25 +75,27 @@
       <div class="charts-grid" id="efficiency-${plugin}"></div>
     `;
 
-    // Summary cards
+    // Summary cards — compute averages client-side from per-scenario data
     const summaryDiv = document.getElementById(`summary-${plugin}`);
     const latestQuality = qualityEntries[qualityEntries.length - 1];
     if (latestQuality) {
-      const skilledAvg = latestQuality.benches.find(b => b.name === 'Overall - Skilled Avg Quality');
-      const vanillaAvg = latestQuality.benches.find(b => b.name === 'Overall - Vanilla Avg Quality');
-      if (skilledAvg && vanillaAvg) {
-        const delta = (skilledAvg.value - vanillaAvg.value).toFixed(2);
+      const skilledScores = latestQuality.benches.filter(b => b.name.endsWith('- Skilled Quality'));
+      const vanillaScores = latestQuality.benches.filter(b => b.name.endsWith('- Vanilla Quality'));
+      const skilledAvg = skilledScores.length > 0 ? skilledScores.reduce((s, b) => s + b.value, 0) / skilledScores.length : null;
+      const vanillaAvg = vanillaScores.length > 0 ? vanillaScores.reduce((s, b) => s + b.value, 0) / vanillaScores.length : null;
+      if (skilledAvg !== null && vanillaAvg !== null) {
+        const delta = (skilledAvg - vanillaAvg).toFixed(2);
         const deltaClass = delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
         const deltaSign = delta > 0 ? '+' : '';
         summaryDiv.innerHTML = `
           <div class="card">
             <div class="card-label">Skilled Avg</div>
-            <div class="card-value" style="color: var(--skilled)">${skilledAvg.value.toFixed(2)}</div>
+            <div class="card-value" style="color: var(--skilled)">${skilledAvg.toFixed(2)}</div>
             <div class="card-delta">out of 10.0</div>
           </div>
           <div class="card">
             <div class="card-label">Vanilla Avg</div>
-            <div class="card-value" style="color: var(--vanilla)">${vanillaAvg.value.toFixed(2)}</div>
+            <div class="card-value" style="color: var(--vanilla)">${vanillaAvg.toFixed(2)}</div>
             <div class="card-delta">out of 10.0</div>
           </div>
           <div class="card">
@@ -118,12 +120,6 @@
     // Quality charts
     const qualityChartsDiv = document.getElementById(`quality-${plugin}`);
     if (qualityEntries.length > 0) {
-      createPairedChart(
-        qualityChartsDiv, 'Overall Average Quality', qualityEntries,
-        'Overall - Skilled Avg Quality', 'Overall - Vanilla Avg Quality',
-        'Skilled', 'Vanilla', '#58a6ff', '#8b949e'
-      );
-
       const scenarios = new Set();
       const latest = qualityEntries[qualityEntries.length - 1];
       latest.benches.forEach(b => {

@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771488367981,
+  "lastUpdate": 1771490593957,
   "entries": {
     "Efficiency": [
       {
@@ -112,6 +112,43 @@
           "timestamp": "",
           "id": "3e5ec6a8a0b5bcef97507ac9576b2b24164a03e6"
         }
+      },
+      {
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "timestamp": "",
+          "message": "",
+          "id": "4cea859c1d8d6c4033ffe2461a607d134b441315",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/4cea859c1d8d6c4033ffe2461a607d134b441315"
+        },
+        "tool": "customSmallerIsBetter",
+        "date": 1771490593957,
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time",
+            "value": 82.0
+          },
+          {
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 222400.0
+          },
+          {
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time",
+            "value": 114.0
+          },
+          {
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 302700.0
+          }
+        ]
       }
     ],
     "Quality": [
@@ -225,6 +262,43 @@
           "timestamp": "",
           "id": "3e5ec6a8a0b5bcef97507ac9576b2b24164a03e6"
         }
+      },
+      {
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "timestamp": "",
+          "message": "",
+          "id": "4cea859c1d8d6c4033ffe2461a607d134b441315",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/4cea859c1d8d6c4033ffe2461a607d134b441315"
+        },
+        "tool": "customBiggerIsBetter",
+        "date": 1771490593957,
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 9.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 7.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 8.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 9.0
+          }
+        ]
       }
     ]
   },
