@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771459843035,
+  "lastUpdate": 1771459950396,
   "entries": {
     "Quality": [
       {
@@ -219,6 +219,43 @@
             "name": "order-service-mstest - Vanilla Quality"
           }
         ]
+      },
+      {
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "date": 1771459950396
       }
     ],
     "Efficiency": [
@@ -386,6 +423,33 @@
         },
         "tool": "customSmallerIsBetter",
         "benches": []
+      },
+      {
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "value": 112.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 256100.0,
+            "unit": "tokens"
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "date": 1771459950396
       }
     ]
   }

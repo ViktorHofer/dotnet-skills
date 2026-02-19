@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771459843102,
+  "lastUpdate": 1771459950455,
   "entries": {
     "Quality": [
       {
@@ -461,6 +461,78 @@
             "name": "Overall - Vanilla Avg Quality"
           }
         ]
+      },
+      {
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "bin-obj-clash - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "bin-obj-clash - Vanilla Quality",
+            "value": 4.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "eval-heavy - Skilled Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "incremental-broken - Skilled Quality",
+            "value": 6.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "legacy-project - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "multitarget - Vanilla Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "parallel-bottleneck - Vanilla Quality",
+            "value": 7.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "perf-analyzers - Skilled Quality",
+            "value": 7.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "style-issues - Skilled Quality",
+            "value": 7.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "value": 7.67,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "value": 3.17,
+            "unit": "Score (1-5)"
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "date": 1771459950455
       }
     ],
     "Efficiency": [
@@ -962,6 +1034,93 @@
             "name": "style-issues - Skilled Tokens In"
           }
         ]
+      },
+      {
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bin-obj-clash - Skilled Time",
+            "value": 86.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "bin-obj-clash - Skilled Tokens In",
+            "value": 250800.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "eval-heavy - Skilled Time",
+            "value": 39.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "eval-heavy - Skilled Tokens In",
+            "value": 94000.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "incremental-broken - Skilled Time",
+            "value": 25.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "incremental-broken - Skilled Tokens In",
+            "value": 71200.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "legacy-project - Skilled Time",
+            "value": 64.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "legacy-project - Skilled Tokens In",
+            "value": 200300.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "parallel-bottleneck - Skilled Time",
+            "value": 85.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "parallel-bottleneck - Skilled Tokens In",
+            "value": 456500.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "perf-analyzers - Skilled Time",
+            "value": 158.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "perf-analyzers - Skilled Tokens In",
+            "value": 1100000.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "style-issues - Skilled Time",
+            "value": 95.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "style-issues - Skilled Tokens In",
+            "value": 38000.0,
+            "unit": "tokens"
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": ""
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "date": 1771459950455
       }
     ]
   }
