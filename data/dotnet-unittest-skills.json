@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771523301762,
+  "lastUpdate": 1771527580311,
   "entries": {
     "Efficiency": [
       {
@@ -1328,6 +1328,43 @@
           },
           "message": "Fix Write-Error in parallel runner causing premature exit"
         }
+      },
+      {
+        "date": 1771527580311,
+        "commit": {
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "benches": [
+          {
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time",
+            "value": 110.0
+          },
+          {
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 461100.0
+          },
+          {
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time",
+            "value": 107.0
+          },
+          {
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 334800.0
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "tool": "customSmallerIsBetter"
       }
     ],
     "Quality": [
@@ -2664,6 +2701,43 @@
           },
           "message": "Fix Write-Error in parallel runner causing premature exit"
         }
+      },
+      {
+        "date": 1771527580311,
+        "commit": {
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 8.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 9.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 8.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 9.0
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "tool": "customBiggerIsBetter"
       }
     ]
   },
