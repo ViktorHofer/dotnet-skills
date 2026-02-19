@@ -18,6 +18,11 @@
       "name": "dotnet-unittest-skills",
       "source": "./src/dotnet-unittest-skills",
       "description": "Provides guidance for generating comprehensive C# unit tests in .NET projects using MSTest, NUnit, or xUnit frameworks."
+    },
+    {
+      "name": "template-engine-skills",
+      "source": "./src/template-engine-skills",
+      "description": "Skills for .NET template discovery, inspection, and project scaffolding via the Template Engine MCP server."
     }
   ]
 }
