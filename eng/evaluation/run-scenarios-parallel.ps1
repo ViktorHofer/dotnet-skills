@@ -106,7 +106,7 @@ $scenarioList | ForEach-Object -ThrottleLimit $Parallelism -Parallel {
 
     if ($exitCode -ne 0) {
         $failures.Add($scenario)
-        Write-Error "[$scenario] Scenario $scenario ($label) failed with exit code $exitCode"
+        Write-Warning "[$scenario] Scenario $scenario ($label) failed with exit code $exitCode"
     }
 }
 
