@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460010286,
+  "lastUpdate": 1771460010618,
   "entries": {
     "Quality": [
       {
@@ -406,20 +406,26 @@
         ]
       },
       {
+        "benches": [
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (1-5)",
+            "value": 8.0
+          }
+        ],
+        "model": null,
+        "tool": "customBiggerIsBetter",
         "commit": {
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "timestamp": "",
           "message": "",
           "author": {
-            "name": "",
-            "username": "ViktorHofer"
-          },
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+            "username": "ViktorHofer",
+            "name": ""
+          }
         },
-        "date": 1771460010286,
-        "benches": [],
-        "model": null,
-        "tool": "customBiggerIsBetter"
+        "date": 1771460010618
       }
     ],
     "Efficiency": [
@@ -729,20 +735,20 @@
         ]
       },
       {
+        "benches": [],
+        "model": null,
+        "tool": "customSmallerIsBetter",
         "commit": {
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "timestamp": "",
           "message": "",
           "author": {
-            "name": "",
-            "username": "ViktorHofer"
-          },
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+            "username": "ViktorHofer",
+            "name": ""
+          }
         },
-        "date": 1771460010286,
-        "benches": [],
-        "model": null,
-        "tool": "customSmallerIsBetter"
+        "date": 1771460010618
       }
     ]
   }
