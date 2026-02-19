@@ -67,7 +67,7 @@ function Get-QualityDeltaEmoji {
     return "---"
 }
 
-function Get-TimeDelta {
+function Get-PercentDelta {
     param([int]$Vanilla, [int]$Skilled)
     if ($null -eq $Vanilla -or $null -eq $Skilled -or $Vanilla -eq 0) {
         return "N/A"
@@ -77,6 +77,8 @@ function Get-TimeDelta {
     if ($pct -le 0) { return "${pct}%" }
     return "+${pct}%"
 }
+
+#endregion
 
 function Get-Winner {
     param(
@@ -120,17 +122,6 @@ function Format-TokenCount {
         return "$([math]::Round([int]$Value / 1000, 1))k"
     }
     return "$Value"
-}
-
-function Get-TokenDelta {
-    param([int]$Vanilla, [int]$Skilled)
-    if ($null -eq $Vanilla -or $null -eq $Skilled -or $Vanilla -eq 0) {
-        return "N/A"
-    }
-    $ratio = ($Skilled / $Vanilla) * 100
-    $pct = [math]::Round($ratio - 100)
-    if ($pct -le 0) { return "${pct}%" }
-    return "+${pct}%"
 }
 
 #endregion
@@ -244,13 +235,13 @@ foreach ($scenarioDir in $scenarioDirs) {
     # Time delta
     $timeDelta = "N/A"
     if ($vanillaStats -and $vanillaStats.TotalTimeSeconds -and $skilledStats -and $skilledStats.TotalTimeSeconds) {
-        $timeDelta = Get-TimeDelta -Vanilla ([int]$vanillaStats.TotalTimeSeconds) -Skilled ([int]$skilledStats.TotalTimeSeconds)
+        $timeDelta = Get-PercentDelta -Vanilla ([int]$vanillaStats.TotalTimeSeconds) -Skilled ([int]$skilledStats.TotalTimeSeconds)
     }
 
     # Token delta
     $tokenDelta = "N/A"
     if ($vanillaStats -and $skilledStats -and $vanillaStats.TokensIn -and $skilledStats.TokensIn) {
-        $tokenDelta = Get-TokenDelta -Vanilla ([int]$vanillaStats.TokensIn) -Skilled ([int]$skilledStats.TokensIn)
+        $tokenDelta = Get-PercentDelta -Vanilla ([int]$vanillaStats.TokensIn) -Skilled ([int]$skilledStats.TokensIn)
     }
 
     # Winner
@@ -347,7 +338,7 @@ foreach ($scenarioDir in $scenarioDirs) {
     $sTime = if ($skilledStats -and $skilledStats.TotalTimeSeconds) { "$($skilledStats.TotalTimeSeconds)s" } else { "N/A" }
     $tDelta = "N/A"
     if ($vanillaStats -and $skilledStats -and $vanillaStats.TotalTimeSeconds -and $skilledStats.TotalTimeSeconds) {
-        $tDelta = Get-TimeDelta -Vanilla ([int]$vanillaStats.TotalTimeSeconds) -Skilled ([int]$skilledStats.TotalTimeSeconds)
+        $tDelta = Get-PercentDelta -Vanilla ([int]$vanillaStats.TotalTimeSeconds) -Skilled ([int]$skilledStats.TotalTimeSeconds)
     }
     $summaryLines.Add("| Time | $vTime | $sTime | $tDelta |")
 
@@ -366,7 +357,7 @@ foreach ($scenarioDir in $scenarioDirs) {
         $sTokens = "$sIn / $sOut"
     }
     if ($vanillaStats -and $skilledStats -and $vanillaStats.TokensIn -and $skilledStats.TokensIn) {
-        $tkDelta = Get-TokenDelta -Vanilla ([int]$vanillaStats.TokensIn) -Skilled ([int]$skilledStats.TokensIn)
+        $tkDelta = Get-PercentDelta -Vanilla ([int]$vanillaStats.TokensIn) -Skilled ([int]$skilledStats.TokensIn)
     }
     $summaryLines.Add("| Tokens (in/out) | $vTokens | $sTokens | $tkDelta |")
 
