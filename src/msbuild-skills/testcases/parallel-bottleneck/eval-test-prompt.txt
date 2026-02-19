@@ -1,1 +1,1 @@
-Build this solution with parallel build enabled and analyze the build parallelism. Are there any bottlenecks in the dependency graph?
+Build this solution with parallel build enabled and analyze the build parallelism. Review the full build infrastructure including Directory.Build.props. Are there any bottlenecks in the dependency graph? Suggest specific MSBuild techniques to improve parallelism.

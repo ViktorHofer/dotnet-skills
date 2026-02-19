@@ -5,11 +5,31 @@
 
   <Import Project="imports\level1.props" />
 
+  <!-- BUG: Overly broad glob scans entire directory tree including .git/, node_modules/, etc.
+       The bin/obj exclude is insufficient — still hits thousands of irrelevant files.
+       Should use specific extensions: "**/*.config" or specific subdirectories. -->
   <ItemGroup>
     <AdditionalFiles Include="**\*.*" Exclude="**\bin\**;**\obj\**" />
   </ItemGroup>
 
+  <!-- BUG: File I/O during property evaluation — runs on EVERY evaluation pass,
+       including design-time evaluations in VS/IDE. This can fire hundreds of times
+       during a normal editing session. Should be moved to a target (execution phase). -->
   <PropertyGroup>
     <BuildNotes Condition="Exists('build-notes.txt')">$([System.IO.File]::ReadAllText('build-notes.txt'))</BuildNotes>
   </PropertyGroup>
+
+  <!-- BUG: MSBuild task invoked during evaluation phase via UsingTask+inline.
+       This registers a task factory that gets loaded during evaluation, adding overhead.
+       Combined with the deep import chain, this compounds evaluation cost. -->
+  <UsingTask TaskName="ValidateBuild" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <IsValid ParameterType="System.Boolean" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        IsValid = true;
+      </Code>
+    </Task>
+  </UsingTask>
 </Project>

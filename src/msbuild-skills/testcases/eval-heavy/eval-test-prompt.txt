@@ -1,1 +1,1 @@
-Analyze this project for MSBuild evaluation performance issues. What patterns are causing slow project evaluation?
+Analyze this project for MSBuild evaluation performance issues. What patterns are causing slow project evaluation? Explain the distinction between evaluation phase and execution phase, and suggest specific fixes for each issue found.
