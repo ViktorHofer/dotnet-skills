@@ -109,17 +109,33 @@ function Invoke-EvaluationCopilot {
 
     $completed = $process.WaitForExit($TimeoutSeconds * 1000)
 
+    # Flush async output streams — the parameterless WaitForExit() ensures
+    # all redirected stdout/stderr has been processed by the event handlers
+    if ($completed) {
+        $process.WaitForExit()
+    }
+
     Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
     Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
 
-    Start-Sleep -Milliseconds 500
+    $stdout = $stdoutBuilder.ToString()
+    $stderr = $stderrBuilder.ToString()
 
     if (-not $completed) {
         $process.Kill()
-        throw "Evaluation Copilot timed out after $TimeoutSeconds seconds"
+        Write-Warning "[TIMEOUT] Evaluation Copilot timed out after $TimeoutSeconds seconds"
+        if ($stderr) { Write-Warning "Stderr: $stderr" }
+        return $null
     }
 
-    return $stdoutBuilder.ToString()
+    $exitCode = $process.ExitCode
+    Write-Host "   Exit code: $exitCode"
+    if ($exitCode -ne 0) {
+        Write-Warning "Evaluation Copilot exited with code $exitCode"
+        if ($stderr) { Write-Warning "Stderr: $stderr" }
+    }
+
+    return $stdout
 }
 
 function Parse-EvaluationJson {
@@ -294,6 +310,12 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
                 -WorkingDir $evalDir `
                 -TimeoutSeconds $TimeoutSeconds
 
+            if ($null -eq $evalOutput -or $evalOutput.Trim() -eq '') {
+                Write-Warning "[EVAL] Attempt $attempt: Copilot returned no output (timeout or error)"
+                if ($attempt -lt $maxRetries) { Start-Sleep -Seconds 2 }
+                continue
+            }
+
             # Save raw evaluation output
             $evalRawFile = Join-Path $scenarioResultsDir "${runType}-eval-raw.txt"
             $evalOutput | Out-File -FilePath $evalRawFile -Encoding utf8
@@ -301,17 +323,27 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
             # Parse evaluation
             $evaluation = Parse-EvaluationJson -Output $evalOutput
 
-            # Check if parsing succeeded (score > 0 means we got valid JSON)
-            if ($evaluation.score -gt 0) {
+            # Check if parsing produced a valid result (reasoning field is only set
+            # to the failure message when parsing fails)
+            if ($evaluation.reasoning -ne "Failed to parse evaluation response from Copilot") {
                 Write-Host "[EVAL] Successfully parsed evaluation on attempt $attempt"
                 break
             }
 
-            if ($attempt -lt $maxRetries) {
-                Write-Host "[WARN] Failed to parse evaluation JSON, retrying..."
-                Start-Sleep -Seconds 2
-            } else {
-                Write-Host "[WARN] All $maxRetries evaluation attempts failed to produce valid JSON"
+            Write-Warning "[EVAL] Attempt $attempt: Failed to parse evaluation JSON"
+            $evaluation = $null
+            if ($attempt -lt $maxRetries) { Start-Sleep -Seconds 2 }
+        }
+
+        if ($null -eq $evaluation) {
+            Write-Warning "[EVAL] All $maxRetries attempts failed for $runType"
+            $evaluation = [PSCustomObject]@{
+                score         = $null
+                accuracy      = $null
+                completeness  = $null
+                actionability = $null
+                clarity       = $null
+                reasoning     = "All evaluation attempts failed (timeout or parse error)"
             }
         }
 
