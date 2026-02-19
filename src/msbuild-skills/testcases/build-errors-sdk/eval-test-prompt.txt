@@ -1,0 +1,1 @@
+Build this project and fix all build errors. For each error, explain the root cause and the correct fix. If there are multiple layers of errors, explain how they relate to each other and recommend best practices for SDK version management.
