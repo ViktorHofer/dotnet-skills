@@ -1,0 +1,1 @@
+Build both projects in this directory and fix all build/restore errors. For each error, explain the root cause (not just the symptom), trace through any dependency chains or NuGet configuration that contributes to the failure, and provide specific fixes. Recommend best practices for NuGet package management in multi-project solutions.
