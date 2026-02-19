@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771533649756,
+  "lastUpdate": 1771537304799,
   "entries": {
     "Efficiency": [
       {
@@ -1439,6 +1439,43 @@
             "value": 292900.0
           }
         ]
+      },
+      {
+        "commit": {
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "model": "claude-opus-4.5",
+        "date": 1771537304799,
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "value": 76.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 248500.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "value": 126.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 423800.0,
+            "unit": "tokens"
+          }
+        ],
+        "tool": "customSmallerIsBetter"
       }
     ],
     "Quality": [
@@ -2886,6 +2923,43 @@
             "value": 9.0
           }
         ]
+      },
+      {
+        "commit": {
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "model": "claude-opus-4.5",
+        "date": 1771537304799,
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 7.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 9.0,
+            "unit": "Score (0-10)"
+          }
+        ],
+        "tool": "customBiggerIsBetter"
       }
     ]
   },
