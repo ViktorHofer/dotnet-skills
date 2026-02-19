@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460403284,
+  "lastUpdate": 1771460563489,
   "entries": {
     "Quality": [
       {
@@ -664,6 +664,22 @@
           "timestamp": "",
           "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
         }
+      },
+      {
+        "tool": "customBiggerIsBetter",
+        "commit": {
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "message": "",
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "benches": [],
+        "model": null,
+        "date": 1771460563489
       }
     ],
     "Efficiency": [
@@ -1190,6 +1206,22 @@
           "timestamp": "",
           "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
         }
+      },
+      {
+        "tool": "customSmallerIsBetter",
+        "commit": {
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "message": "",
+          "timestamp": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        },
+        "benches": [],
+        "model": null,
+        "date": 1771460563489
       }
     ]
   }
