@@ -4,19 +4,29 @@
 
 ## Project Scaffolding
 
-This repository uses `dotnet new` templates for project creation. Key commands:
-- Search templates: `dotnet new search <term>`
-- List installed: `dotnet new list`
-- Create project: `dotnet new <template> -n <name> -o <path>`
-- Install template pack: `dotnet new install <package>`
+This repository uses `dotnet new` templates for project creation, powered by the DotnetTemplateMCP MCP server. Prefer MCP tools over raw `dotnet new` CLI commands for validation, smart defaults, and auto-resolution.
 
 ## Template Selection
 
 When creating new projects:
-1. Use `template_search` or `template_list` MCP tools to find the right template
-2. Use `template_inspect` to understand available parameters before creation
-3. Use `template_dry_run` to preview output before committing to creation
-4. Use `template_instantiate` with appropriate parameters for the project type
+1. Use `template_from_intent` to resolve natural-language descriptions (e.g., *"web API with auth"* → webapi + `auth=Individual`)
+2. Use `template_search` or `template_list` to find templates by keyword
+3. Use `template_inspect` to understand available parameters before creation
+4. Use `template_dry_run` to preview output before committing to creation
+5. Use `template_instantiate` with appropriate parameters — it validates, applies smart defaults, adapts to CPM, and resolves latest NuGet versions automatically
+
+## Smart Behaviors
+
+The MCP server handles these automatically during `template_instantiate`:
+- **Auto-resolve**: Template not installed? Searches NuGet, installs, and creates — one call
+- **Smart defaults**: `EnableAot=true` → suggests latest framework; `auth=Individual` → keeps HTTPS; `UseControllers=true` → sets `UseMinimalAPIs=false`
+- **CPM adaptation**: Detects `Directory.Packages.props`, strips versions from `.csproj`, adds `<PackageVersion>` entries to the props file
+- **Latest versions**: Queries NuGet V3 API to replace stale template-hardcoded package versions with latest stable releases
+- **Parameter validation**: Reports invalid values with "did you mean...?" suggestions before files are written
+
+## Multi-Template Workflows
+
+Use `template_compose` for complex project structures (solution + API + tests) in a single orchestrated workflow, or chain `template_instantiate` calls manually.
 
 ## Parameter Conventions
 

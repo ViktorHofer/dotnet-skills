@@ -32,12 +32,13 @@ Classify the user's request and invoke the appropriate skill:
 
 | User Intent | Skill to Invoke |
 |------------|-----------------|
-| "Create a new project/app/service" | `template-discovery` → `template-instantiation` |
+| "Create a new project/app/service" | Use `template_from_intent` → `template-instantiation` |
 | "What templates are available for X?" | `template-discovery` |
 | "Create a template from my project" | `template-authoring` |
 | "Add a parameter to my template" | `template-authoring` |
 | "Show me template details/parameters" | `template-discovery` (inspect) |
 | "Install a template package" | `template-instantiation` (install) |
+| "Create solution + API + tests" | `template_compose` for multi-template orchestration |
 
 ## Workflow: Creating a Project
 
@@ -91,11 +92,14 @@ All template operations go through the template-engine-mcp server:
 | `template_search` | Finding templates by keyword (local + NuGet.org) |
 | `template_list` | Listing installed templates with filters |
 | `template_inspect` | Getting full template metadata |
-| `template_instantiate` | Creating projects from templates |
+| `template_instantiate` | Creating projects with validation, smart defaults, CPM adaptation, and latest NuGet versions |
 | `template_dry_run` | Previewing creation without writing files |
 | `template_install` | Installing template packages |
 | `template_uninstall` | Removing template packages |
 | `template_create_from_existing` | Generating templates from existing projects |
+| `template_from_intent` | Resolving natural-language descriptions to template + parameters (70+ keyword mappings) |
+| `template_compose` | Executing multi-template sequences (project + items) in one workflow |
+| `template_suggest_parameters` | Suggesting parameter values with rationale |
 
 ## Cross-Reference
 

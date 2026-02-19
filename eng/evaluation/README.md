@@ -11,7 +11,7 @@ Each scenario is run **twice** through Copilot CLI:
 | **Vanilla** | None | Baseline — what Copilot produces on its own |
 | **Skilled** | Plugin installed | What Copilot produces with the skills plugin |
 
-Both outputs are then scored by a separate Copilot invocation (acting as an evaluator) against an expected-output rubric, producing per-scenario quality scores (Accuracy, Completeness, Actionability, Clarity — each 1–5) along with token and time metrics.
+Both outputs are then scored by a separate Copilot invocation (acting as an evaluator) against an expected-output rubric, producing per-scenario quality scores (Accuracy, Completeness, Actionability, Clarity — each 0–10) along with token and time metrics.
 
 ## Testcase Structure
 
@@ -45,7 +45,7 @@ Results are written to `artifacts/TestResults/`.
 4. Ensure no hint-comments (e.g., `<!-- BAD: ... -->`, `// CS0246: ...`) remain in project files.
 5. The pipeline will auto-discover any testcase folder containing `expected-output.md`.
 
-> **Note:** Only project files are copied to a temp directory for each run. `README.md`, `expected-output.md`, `eval-test-prompt.txt`, `DEMO.md`, and `.gitignore` are excluded from the temp copy to avoid leaking answers to the AI.
+> **Note:** Only project files are copied to a temp directory for each run. `README.md`, `expected-output.md`, `eval-test-prompt.txt`, and `.gitignore` are excluded from the temp copy to avoid leaking answers to the AI.
 
 ## Pipeline Steps
 
