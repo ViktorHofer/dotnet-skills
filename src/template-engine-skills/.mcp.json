@@ -5,7 +5,7 @@
             "command": "dnx",
             "args": [
                 "-y",
-                "DotnetTemplateMCP@0.1.0-preview.2"
+                "DotnetTemplateMCP@0.1.0-preview.3"
             ],
             "tools": [
                 "*"

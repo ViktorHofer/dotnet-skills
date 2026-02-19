@@ -66,9 +66,23 @@ The MCP server suggests parameter relationships:
 - `--auth Individual` → appropriate identity packages
 - `--use-controllers false` → minimal API pattern
 
+Use `template_suggest_parameters` for parameter suggestions with human-readable rationale.
+
+## Post-Creation Intelligence
+
+The `template_instantiate` tool automatically adapts output to the target environment:
+
+### CPM (Central Package Management)
+If `Directory.Packages.props` exists in any parent directory:
+- Strips `Version` attributes from generated `.csproj` PackageReferences
+- Adds `<PackageVersion>` entries to `Directory.Packages.props` (skips existing entries)
+
+### Latest NuGet Versions
+By default (`resolveLatestVersions: true`), queries the NuGet V3 API for every PackageReference and replaces template-hardcoded versions with the latest stable release. In CPM mode, latest versions go into `Directory.Packages.props`.
+
 ## Multi-Template Workflows
 
-For complex project structures, chain template operations:
+For complex project structures, use `template_compose` for orchestrated multi-step creation, or chain template operations:
 
 ### 1. Solution + Web API + Test Project
 ```

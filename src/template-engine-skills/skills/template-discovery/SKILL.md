@@ -13,6 +13,17 @@ Invoke this skill when:
 - User needs to find the right template for a specific scenario (e.g., "MAUI app", "Blazor WASM", "worker service")
 - User wants to compare template options before choosing
 
+## Step 0: Try Intent Resolution First
+
+For natural-language requests like *"I need a web API with auth and controllers"*, start with `template_from_intent`:
+
+```
+template_from_intent with description: "web API with auth and controllers"
+→ Returns: { template: "webapi", confidence: 0.85, params: { auth: "Individual", UseControllers: "true" } }
+```
+
+This uses 70+ keyword mappings to resolve intent offline (no LLM round-trip). If confidence is high (>0.7), proceed directly to `template-instantiation`. If low or ambiguous, fall through to Step 1.
+
 ## Step 1: Search for Templates
 
 Use `template_search` to find templates matching the user's intent. The tool searches both local installed templates and NuGet.org, returning ranked results.
