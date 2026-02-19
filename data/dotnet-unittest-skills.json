@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771459975588,
+  "lastUpdate": 1771459977362,
   "entries": {
     "Quality": [
       {
@@ -306,26 +306,26 @@
         }
       },
       {
+        "model": null,
         "benches": [
           {
-            "name": "calculator-xunit - Vanilla Quality",
-            "value": 7.0,
-            "unit": "Score (1-5)"
+            "value": 9.0,
+            "unit": "Score (1-5)",
+            "name": "order-service-mstest - Vanilla Quality"
           }
         ],
-        "model": null,
+        "date": 1771459977362,
+        "tool": "customBiggerIsBetter",
         "commit": {
-          "author": {
-            "username": "ViktorHofer",
-            "name": ""
-          },
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "message": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "timestamp": "",
-          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
-        },
-        "date": 1771459975588,
-        "tool": "customBiggerIsBetter"
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          }
+        }
       }
     ],
     "Efficiency": [
@@ -565,20 +565,20 @@
         }
       },
       {
-        "benches": [],
         "model": null,
+        "benches": [],
+        "date": 1771459977362,
+        "tool": "customSmallerIsBetter",
         "commit": {
-          "author": {
-            "username": "ViktorHofer",
-            "name": ""
-          },
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "message": "",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
           "timestamp": "",
-          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
-        },
-        "date": 1771459975588,
-        "tool": "customSmallerIsBetter"
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          }
+        }
       }
     ]
   }
