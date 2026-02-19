@@ -150,130 +150,64 @@ jobs:
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}
         run: |
-          $plugin = "${{ matrix.plugin }}"
-
-          # Ensure plugin is not installed (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall $plugin 2>$null
+          copilot plugin uninstall "${{ matrix.plugin }}" 2>$null
           $ErrorActionPreference = "Stop"
 
-          # Validate plugin state
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "\b$plugin\b") {
-            throw "❌ VALIDATION FAILED: $plugin should NOT be installed for vanilla run"
-          }
-          Write-Host "✅ Validated: No $plugin plugin installed"
-
-          # Run scenarios in parallel
-          $scenarios = $env:SCENARIOS -split ","
-          $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
-          $runId = $env:RUN_ID
-          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
-
-          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
-            $scenario = $_
-            $plugin = $using:plugin
-            $resultsDir = $using:resultsDir
-            $runId = $using:runId
-            Write-Host "`n=== Running vanilla: $scenario ==="
-            pwsh -File ./eng/evaluation/run-scenario.ps1 `
-              -ScenarioName $scenario `
-              -RunType "vanilla" `
-              -ResultsDir $resultsDir `
-              -RunId $runId `
-              -ScenariosBaseDir "src/$plugin/testcases"
+          if ($pluginList -match "\b${{ matrix.plugin }}\b") {
+            throw "❌ VALIDATION FAILED: ${{ matrix.plugin }} should NOT be installed for vanilla run"
           }
 
-          Write-Host "`n✅ All vanilla scenario runs completed"
+          pwsh -File ./eng/evaluation/run-scenarios-parallel.ps1 `
+            -Script "./eng/evaluation/run-scenario.ps1" `
+            -RunType "vanilla" `
+            -Scenarios "$env:SCENARIOS" `
+            -Parallelism $env:PARALLELISM `
+            -Plugin "${{ matrix.plugin }}" `
+            -ResultsDir "$env:RESULTS_DIR" `
+            -RunId "$env:RUN_ID"
         shell: pwsh
 
       - name: Install Plugin and Run Skilled Copilot
         run: |
           $plugin = "${{ matrix.plugin }}"
-
-          # Register the repo checkout as a local plugin marketplace
-          $repoRoot = "${{ github.workspace }}"
-          Write-Host "Registering marketplace from: $repoRoot"
-          Write-Host "Marketplace config exists: $(Test-Path (Join-Path $repoRoot '.github/plugin/marketplace.json'))"
-          copilot plugin marketplace add $repoRoot 2>&1 | Write-Host
-
-          # Browse available plugins
-          Write-Host "`nAvailable plugins in marketplace:"
-          copilot plugin marketplace browse dotnet-skills 2>&1 | Write-Host
-
-          # Install the plugin from the marketplace
-          Write-Host "`nInstalling $plugin plugin..."
+          copilot plugin marketplace add "${{ github.workspace }}" 2>&1 | Write-Host
           copilot plugin install "$plugin@dotnet-skills" 2>&1 | Write-Host
 
-          # Validate plugin is installed
           $pluginList = copilot plugin list 2>&1 | Out-String
           if ($pluginList -notmatch "\b$plugin\b") {
             throw "❌ VALIDATION FAILED: $plugin should be installed for skilled run"
           }
-          Write-Host "✅ Validated: $plugin plugin is installed"
 
-          # Run scenarios in parallel
-          $scenarios = $env:SCENARIOS -split ","
-          $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
-          $runId = $env:RUN_ID
-          Write-Host "`nRunning $($scenarios.Count) scenarios with parallelism level: $parallelism"
-
-          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
-            $scenario = $_
-            $resultsDir = $using:resultsDir
-            $runId = $using:runId
-            $plugin = $using:plugin
-            Write-Host "`n=== Running skilled: $scenario ==="
-            pwsh -File ./eng/evaluation/run-scenario.ps1 `
-              -ScenarioName $scenario `
-              -RunType "skilled" `
-              -ResultsDir $resultsDir `
-              -RunId $runId `
-              -ScenariosBaseDir "src/$plugin/testcases"
-          }
-
-          Write-Host "`n✅ All skilled scenario runs completed"
+          pwsh -File ./eng/evaluation/run-scenarios-parallel.ps1 `
+            -Script "./eng/evaluation/run-scenario.ps1" `
+            -RunType "skilled" `
+            -Scenarios "$env:SCENARIOS" `
+            -Parallelism $env:PARALLELISM `
+            -Plugin "$plugin" `
+            -ResultsDir "$env:RESULTS_DIR" `
+            -RunId "$env:RUN_ID"
         shell: pwsh
 
       - name: Uninstall Plugin and Run Evaluation
         run: |
-          $plugin = "${{ matrix.plugin }}"
-
-          # Uninstall plugin for clean evaluation (ignore error if not installed)
           $ErrorActionPreference = "SilentlyContinue"
-          copilot plugin uninstall $plugin 2>$null
+          copilot plugin uninstall "${{ matrix.plugin }}" 2>$null
           $ErrorActionPreference = "Stop"
 
-          # Validate plugin is removed
           $pluginList = copilot plugin list 2>&1 | Out-String
-          if ($pluginList -match "\b$plugin\b") {
-            throw "❌ VALIDATION FAILED: $plugin should NOT be installed for evaluation"
-          }
-          Write-Host "✅ Validated: No $plugin plugin installed for evaluation"
-
-          # Evaluate scenarios in parallel
-          $scenarios = $env:SCENARIOS -split ","
-          $parallelism = [int]$env:PARALLELISM
-          $resultsDir = $env:RESULTS_DIR
-          $runId = $env:RUN_ID
-          Write-Host "`nEvaluating $($scenarios.Count) scenarios with parallelism level: $parallelism"
-
-          $scenarios | ForEach-Object -ThrottleLimit $parallelism -Parallel {
-            $scenario = $_
-            $resultsDir = $using:resultsDir
-            $runId = $using:runId
-            $plugin = $using:plugin
-            Write-Host "`n=== Evaluating: $scenario ==="
-            pwsh -File ./eng/evaluation/evaluate-response.ps1 `
-              -ScenarioName $scenario `
-              -ResultsDir $resultsDir `
-              -RunId $runId `
-              -ScenariosBaseDir "src/$plugin/testcases"
+          if ($pluginList -match "\b${{ matrix.plugin }}\b") {
+            throw "❌ VALIDATION FAILED: ${{ matrix.plugin }} should NOT be installed for evaluation"
           }
 
-          Write-Host "`n✅ All scenario evaluations completed"
+          pwsh -File ./eng/evaluation/run-scenarios-parallel.ps1 `
+            -Script "./eng/evaluation/evaluate-response.ps1" `
+            -Scenarios "$env:SCENARIOS" `
+            -Parallelism $env:PARALLELISM `
+            -Plugin "${{ matrix.plugin }}" `
+            -ResultsDir "$env:RESULTS_DIR" `
+            -RunId "$env:RUN_ID"
         shell: pwsh
 
       - name: Upload Artifacts
