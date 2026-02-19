@@ -21,12 +21,6 @@
 .PARAMETER TimeoutSeconds
     Maximum time to wait for Copilot CLI to complete (default: 300).
 
-.PARAMETER PluginName
-    Name of the Copilot plugin to install/uninstall.
-
-.PARAMETER MarketplaceName
-    Name of the local plugin marketplace (default: dotnet-skills).
-
 .PARAMETER ScenariosBaseDir
     Path to the testcases directory. Can be relative (resolved against RepoRoot)
     or absolute.
@@ -48,18 +42,19 @@ param(
 
     [int]$TimeoutSeconds = 300,
 
-    [string]$PluginName,
-
-    [string]$MarketplaceName = "dotnet-skills",
+    [Parameter(Mandatory)]
+    [int]$MaxRetries,
 
     [string]$ScenariosBaseDir,
 
     [Parameter(Mandatory)]
     [string]$RunId,
 
+    [Parameter(Mandatory)]
+    [string]$Model,
+
     [string]$RepoRoot
 )
-
 $ErrorActionPreference = "Stop"
 
 # Resolve repo root
@@ -68,28 +63,10 @@ if (-not $RepoRoot) {
 }
 
 # Import helper functions
+. (Join-Path $PSScriptRoot "invoke-copilot.ps1")
 . (Join-Path $PSScriptRoot "parse-copilot-stats.ps1")
 
 #region Helper Functions
-
-function Assert-PluginState {
-    param(
-        [string]$PluginName,
-        [bool]$ShouldBeInstalled
-    )
-
-    $output = & copilot plugin list 2>&1 | Out-String
-    $isInstalled = $output -match $PluginName
-
-    if ($ShouldBeInstalled -and -not $isInstalled) {
-        throw "[FAIL] VALIDATION FAILED: Plugin '$PluginName' should be installed but is NOT. Output: $output"
-    }
-    if (-not $ShouldBeInstalled -and $isInstalled) {
-        throw "[FAIL] VALIDATION FAILED: Plugin '$PluginName' should NOT be installed but IS. Output: $output"
-    }
-
-    Write-Host "[OK] Plugin state validated: '$PluginName' installed=$isInstalled (expected=$ShouldBeInstalled)"
-}
 
 function Get-SkillActivation {
     param(
@@ -177,7 +154,7 @@ function Copy-ScenarioToTemp {
     Copy-Item -Path "$ScenarioSourceDir\*" -Destination $tempDir -Recurse -Force
 
     # Remove evaluation and documentation files from temp copy
-    $excludeFiles = @("expected-output.md", "eval-test-prompt.txt", "README.md", "DEMO.md", ".gitignore")
+    $excludeFiles = @("expected-output.md", "eval-test-prompt.txt", "README.md", ".gitignore")
     foreach ($file in $excludeFiles) {
         $filePath = Join-Path $tempDir $file
         if (Test-Path $filePath) {
@@ -189,124 +166,6 @@ function Copy-ScenarioToTemp {
     Write-Host "[OK] Scenario copied to clean working directory"
 
     return $tempDir
-}
-
-function Invoke-CopilotWithTimeout {
-    param(
-        [string]$Prompt,
-        [string]$WorkingDir,
-        [string]$OutputFile,
-        [int]$TimeoutSeconds = 300,
-        [string]$ConfigDir = ""
-    )
-
-    Write-Host "[RUN] Running Copilot CLI..."
-    Write-Host "   Working directory: $WorkingDir"
-    Write-Host "   Timeout: ${TimeoutSeconds}s"
-    Write-Host "   Prompt: $Prompt"
-
-    $errorFile = "${OutputFile}.err"
-
-    # Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
-    # Use -All to search across all PATH entries, not just the first match
-    $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandType -eq 'Application' } |
-        Select-Object -First 1 -ExpandProperty Source
-
-    $configDirArg = ""
-    if ($ConfigDir -and $ConfigDir -ne "") {
-        $configDirArg = " --config-dir `"$ConfigDir`""
-    }
-
-    if (-not $copilotCmd) {
-        if ($env:OS -match 'Windows') {
-            # Windows: use cmd.exe to run copilot (works with .cmd/.bat shims via PATH)
-            $copilotCmd = "cmd.exe"
-            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
-        } else {
-            # Linux/macOS: use /usr/bin/env to find copilot
-            $copilotCmd = "/usr/bin/env"
-            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
-        }
-    } else {
-        $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
-    }
-
-    Write-Host "   Copilot executable: $copilotCmd"
-
-    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $processInfo.FileName = $copilotCmd
-    $processInfo.Arguments = $copilotArgs
-    $processInfo.WorkingDirectory = $WorkingDir
-    $processInfo.RedirectStandardOutput = $true
-    $processInfo.RedirectStandardError = $true
-    $processInfo.UseShellExecute = $false
-    $processInfo.CreateNoWindow = $true
-
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = $processInfo
-
-    # Capture output asynchronously to avoid deadlocks
-    $stdoutBuilder = New-Object System.Text.StringBuilder
-    $stderrBuilder = New-Object System.Text.StringBuilder
-
-    $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName OutputDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stdoutBuilder
-
-    $stderrEvent = Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stderrBuilder
-
-    $startTime = Get-Date
-    $process.Start() | Out-Null
-    $process.BeginOutputReadLine()
-    $process.BeginErrorReadLine()
-
-    $completed = $process.WaitForExit($TimeoutSeconds * 1000)
-    $elapsed = (Get-Date) - $startTime
-
-    # Flush async output streams — the parameterless WaitForExit() ensures
-    # all redirected stdout/stderr has been processed by the event handlers
-    if ($completed) {
-        $process.WaitForExit()
-    }
-
-    # Unregister events
-    Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
-    Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
-
-    $stdout = $stdoutBuilder.ToString()
-    $stderr = $stderrBuilder.ToString()
-
-    # Save outputs
-    $stdout | Out-File -FilePath $OutputFile -Encoding utf8
-    if ($stderr) {
-        $stderr | Out-File -FilePath $errorFile -Encoding utf8
-    }
-
-    if (-not $completed) {
-        $process.Kill()
-        Write-Warning "[TIMEOUT] Copilot timed out after $TimeoutSeconds seconds for $ScenarioName ($RunType)"
-        return $null
-    }
-
-    $exitCode = $process.ExitCode
-    Write-Host "   Exit code: $exitCode"
-    Write-Host "   Elapsed: $([math]::Round($elapsed.TotalSeconds, 1))s"
-
-    if ($exitCode -ne 0) {
-        Write-Warning "Copilot CLI exited with code $exitCode"
-        Write-Warning "Stderr: $stderr"
-        # Don't throw - we still want to capture and evaluate partial output
-    }
-
-    # Return combined output (stats are written to stderr by Copilot CLI)
-    return ($stdout + "`n" + $stderr)
 }
 
 #endregion
@@ -338,33 +197,7 @@ New-Item -ItemType Directory -Force -Path $scenarioResultsDir | Out-Null
 # Step 1: Copy scenario to a clean temp directory
 $workingDir = Copy-ScenarioToTemp -ScenarioSourceDir $scenarioSourceDir -ScenarioName $ScenarioName -RunType $RunType
 
-# Step 2: Configure plugin state
-$pluginName = $PluginName
-$marketplaceName = $MarketplaceName
-
-if ($RunType -eq "vanilla") {
-    Write-Host ""
-    Write-Host "[PLUGIN] Uninstalling plugin for vanilla run..."
-    $prevPref = $ErrorActionPreference
-    $ErrorActionPreference = "SilentlyContinue"
-    & copilot plugin uninstall $pluginName 2>&1 | Out-Null
-    $ErrorActionPreference = $prevPref
-    # Swallow error if not installed - that's the desired state
-    Assert-PluginState -PluginName $pluginName -ShouldBeInstalled $false
-} elseif ($RunType -eq "skilled") {
-    Write-Host ""
-    Write-Host "[PLUGIN] Installing plugin for skilled run..."
-    # Register the repo as a local marketplace (idempotent - ignore if already added)
-    $prevPref = $ErrorActionPreference
-    $ErrorActionPreference = "SilentlyContinue"
-    & copilot plugin marketplace add $RepoRoot 2>&1 | Write-Host
-    $ErrorActionPreference = $prevPref
-    # Install plugin from the marketplace
-    & copilot plugin install "${pluginName}@${marketplaceName}" 2>&1 | Write-Host
-    Assert-PluginState -PluginName $pluginName -ShouldBeInstalled $true
-}
-
-# Step 3: Build the prompt
+# Step 2: Build the prompt
 # Read eval-test-prompt.txt from the ORIGINAL testcase dir (before exclusion)
 $promptFile = Join-Path $scenarioBaseDir "eval-test-prompt.txt"
 if (Test-Path $promptFile) {
@@ -375,7 +208,7 @@ if (Test-Path $promptFile) {
     Write-Host "[PROMPT] Using default prompt (no eval-test-prompt.txt found)"
 }
 
-# Step 4: Run Copilot CLI
+# Step 3: Run Copilot CLI
 $outputFile = Join-Path $scenarioResultsDir "${RunType}-output.txt"
 
 # Create a per-run config directory for session isolation (must be absolute path)
@@ -383,14 +216,36 @@ $sessionConfigDir = Join-Path (Resolve-Path $scenarioResultsDir).Path "${RunType
 New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
 Write-Host "[SESSION] Config directory: $sessionConfigDir"
 
-$output = Invoke-CopilotWithTimeout `
-    -Prompt $prompt `
-    -WorkingDir $workingDir `
-    -OutputFile $outputFile `
-    -TimeoutSeconds $TimeoutSeconds `
-    -ConfigDir $sessionConfigDir
+$output = $null
+for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
+    if ($attempt -gt 1) {
+        Write-Host "[RETRY] Attempt $attempt of $MaxRetries..."
+        # Clean up previous session config for fresh retry
+        Remove-Item -Recurse -Force $sessionConfigDir -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
+    }
 
-# Step 5: Parse stats
+    $output = Invoke-CopilotCli `
+        -Prompt $prompt `
+        -WorkingDir $workingDir `
+        -OutputFile $outputFile `
+        -TimeoutSeconds $TimeoutSeconds `
+        -ConfigDir $sessionConfigDir `
+        -IncludeStderr `
+        -Model $Model
+
+    if ($null -ne $output) {
+        break
+    }
+    $delay = 60 * $attempt
+    Write-Warning "[RETRY] Attempt $attempt failed (timeout or error), retrying in ${delay}s..."
+    Start-Sleep -Seconds $delay
+}
+if ($null -eq $output) {
+    Write-Warning "[RETRY] All $MaxRetries attempts failed for $ScenarioName ($RunType)"
+}
+
+# Step 4: Parse stats
 Write-Host ""
 Write-Host "[STATS] Parsing stats..."
 $stats = Parse-CopilotStats -Output $output
@@ -410,7 +265,7 @@ Write-Host "   Model: $($stats.Model)"
 Write-Host "   Tokens In: $($stats.TokensIn)"
 Write-Host "   Tokens Out: $($stats.TokensOut)"
 
-# Step 5b: Extract skill activation from session logs
+# Step 4b: Extract skill activation from session logs
 Write-Host ""
 Write-Host "[ACTIVATION] Checking skill activation from session logs..."
 $activation = Get-SkillActivation -ConfigDir $sessionConfigDir
@@ -445,7 +300,7 @@ if ($activation.SessionId) {
     Write-Host "   Session ID: $($activation.SessionId)"
 }
 
-# Step 6: Clean up temp directory
+# Step 5: Clean up temp directory
 Write-Host ""
 Write-Host "[CLEAN] Removing temp working directory: $workingDir"
 Remove-Item -Path $workingDir -Recurse -Force -ErrorAction SilentlyContinue

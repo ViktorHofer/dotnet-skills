@@ -36,7 +36,13 @@ param(
     [int]$TimeoutSeconds = 300,
 
     [Parameter(Mandatory)]
+    [int]$MaxRetries,
+
+    [Parameter(Mandatory)]
     [string]$RunId,
+
+    [Parameter(Mandatory)]
+    [string]$Model,
 
     [string]$RepoRoot
 )
@@ -47,80 +53,10 @@ if (-not $RepoRoot) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\")).Path
 }
 
+# Import helper functions
+. (Join-Path $PSScriptRoot "invoke-copilot.ps1")
+
 #region Helper Functions
-
-function Invoke-EvaluationCopilot {
-    param(
-        [string]$Prompt,
-        [string]$WorkingDir,
-        [int]$TimeoutSeconds = 300
-    )
-
-# Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
-    # Use -All to search across all PATH entries, not just the first match
-    $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandType -eq 'Application' } |
-        Select-Object -First 1 -ExpandProperty Source
-    if (-not $copilotCmd) {
-        if ($env:OS -match 'Windows') {
-            $copilotCmd = "cmd.exe"
-            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-        } else {
-            $copilotCmd = "/usr/bin/env"
-            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-        }
-    } else {
-        $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-    }
-
-    Write-Host "   Copilot executable: $copilotCmd"
-    Write-Host "   Working dir: $WorkingDir"
-
-    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $processInfo.FileName = $copilotCmd
-    $processInfo.Arguments = $copilotArgs
-    $processInfo.WorkingDirectory = $WorkingDir
-    $processInfo.RedirectStandardOutput = $true
-    $processInfo.RedirectStandardError = $true
-    $processInfo.UseShellExecute = $false
-    $processInfo.CreateNoWindow = $true
-
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = $processInfo
-
-    $stdoutBuilder = New-Object System.Text.StringBuilder
-    $stderrBuilder = New-Object System.Text.StringBuilder
-
-    $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName OutputDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stdoutBuilder
-
-    $stderrEvent = Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stderrBuilder
-
-    $process.Start() | Out-Null
-    $process.BeginOutputReadLine()
-    $process.BeginErrorReadLine()
-
-    $completed = $process.WaitForExit($TimeoutSeconds * 1000)
-
-    Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
-    Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
-
-    Start-Sleep -Milliseconds 500
-
-    if (-not $completed) {
-        $process.Kill()
-        throw "Evaluation Copilot timed out after $TimeoutSeconds seconds"
-    }
-
-    return $stdoutBuilder.ToString()
-}
 
 function Parse-EvaluationJson {
     param([string]$Output)
@@ -284,15 +220,25 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
         $evalPrompt = "Read the files in this directory: INSTRUCTIONS.md, expected-output.md, and actual-response.txt. Follow the instructions in INSTRUCTIONS.md to evaluate the actual response against the expected output. Your response must be ONLY a JSON object as specified in the instructions. Do not include any markdown code fences, explanatory text, or anything other than the raw JSON object."
 
         # Run evaluation with Copilot (vanilla - no plugins) with retry logic
-        $maxRetries = 3
         $evaluation = $null
 
-        for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
-            Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$maxRetries)..."
-            $evalOutput = Invoke-EvaluationCopilot `
+        for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
+            Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$MaxRetries)..."
+            $evalOutput = Invoke-CopilotCli `
                 -Prompt $evalPrompt `
                 -WorkingDir $evalDir `
-                -TimeoutSeconds $TimeoutSeconds
+                -TimeoutSeconds $TimeoutSeconds `
+                -Model $Model
+
+            if ($null -eq $evalOutput -or $evalOutput.Trim() -eq '') {
+                Write-Warning "[EVAL] Attempt ${attempt}: Copilot returned no output (timeout or error)"
+                if ($attempt -lt $MaxRetries) {
+                    $delay = 60 * $attempt
+                    Write-Host "[EVAL] Waiting ${delay}s before retry..."
+                    Start-Sleep -Seconds $delay
+                }
+                continue
+            }
 
             # Save raw evaluation output
             $evalRawFile = Join-Path $scenarioResultsDir "${runType}-eval-raw.txt"
@@ -301,17 +247,31 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
             # Parse evaluation
             $evaluation = Parse-EvaluationJson -Output $evalOutput
 
-            # Check if parsing succeeded (score > 0 means we got valid JSON)
-            if ($evaluation.score -gt 0) {
+            # Check if parsing produced a valid result (reasoning field is only set
+            # to the failure message when parsing fails)
+            if ($evaluation.reasoning -ne "Failed to parse evaluation response from Copilot") {
                 Write-Host "[EVAL] Successfully parsed evaluation on attempt $attempt"
                 break
             }
 
-            if ($attempt -lt $maxRetries) {
-                Write-Host "[WARN] Failed to parse evaluation JSON, retrying..."
-                Start-Sleep -Seconds 2
-            } else {
-                Write-Host "[WARN] All $maxRetries evaluation attempts failed to produce valid JSON"
+            Write-Warning "[EVAL] Attempt ${attempt}: Failed to parse evaluation JSON"
+            $evaluation = $null
+            if ($attempt -lt $MaxRetries) {
+                $delay = 60 * $attempt
+                Write-Host "[EVAL] Waiting ${delay}s before retry..."
+                Start-Sleep -Seconds $delay
+            }
+        }
+
+        if ($null -eq $evaluation) {
+            Write-Warning "[EVAL] All $MaxRetries attempts failed for $runType"
+            $evaluation = [PSCustomObject]@{
+                score         = $null
+                accuracy      = $null
+                completeness  = $null
+                actionability = $null
+                clarity       = $null
+                reasoning     = "All evaluation attempts failed (timeout or parse error)"
             }
         }
 
