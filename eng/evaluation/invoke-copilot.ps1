@@ -109,18 +109,27 @@ function Invoke-CopilotCli {
     $process.BeginOutputReadLine()
     $process.BeginErrorReadLine()
 
-    $completed = $process.WaitForExit($TimeoutSeconds * 1000)
-    $elapsed = (Get-Date) - $startTime
+    try {
+        $completed = $process.WaitForExit($TimeoutSeconds * 1000)
+        $elapsed = (Get-Date) - $startTime
 
-    # Flush async output streams — the parameterless WaitForExit() ensures
-    # all redirected stdout/stderr has been processed by the event handlers
-    if ($completed) {
-        $process.WaitForExit()
+        # Flush async output streams — the parameterless WaitForExit() ensures
+        # all redirected stdout/stderr has been processed by the event handlers
+        if ($completed) {
+            $process.WaitForExit()
+            $exitCode = $process.ExitCode
+        }
     }
+    finally {
+        Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
+        Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
 
-    # Unregister events
-    Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
-    Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
+        if (-not $process.HasExited) {
+            $process.Kill()
+            $process.WaitForExit()
+        }
+        $process.Dispose()
+    }
 
     $stdout = $stdoutBuilder.ToString()
     $stderr = $stderrBuilder.ToString()
@@ -134,13 +143,11 @@ function Invoke-CopilotCli {
     }
 
     if (-not $completed) {
-        $process.Kill()
         Write-Warning "[TIMEOUT] Copilot timed out after $TimeoutSeconds seconds"
         if ($stderr) { Write-Warning "Stderr: $stderr" }
         return $null
     }
 
-    $exitCode = $process.ExitCode
     Write-Host "   Exit code: $exitCode"
     Write-Host "   Elapsed: $([math]::Round($elapsed.TotalSeconds, 1))s"
 
