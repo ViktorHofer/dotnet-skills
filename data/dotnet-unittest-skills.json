@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771520241844,
+  "lastUpdate": 1771520259208,
   "entries": {
     "Efficiency": [
       {
@@ -1254,6 +1254,43 @@
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/509c430469ab0e7024727e0a6aa1dc13240f523c"
         },
         "model": "claude-opus-4.5"
+      },
+      {
+        "date": 1771520259208,
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5",
+        "commit": {
+          "message": "Improve evaluation performance: higher parallelism and concurrent eval",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/509c430469ab0e7024727e0a6aa1dc13240f523c",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-19T16:21:58+00:00",
+          "id": "509c430469ab0e7024727e0a6aa1dc13240f523c"
+        },
+        "benches": [
+          {
+            "value": 128.0,
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 417400.0,
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 106.0,
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 317700.0,
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens"
+          }
+        ]
       }
     ],
     "Quality": [
@@ -2516,6 +2553,43 @@
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/509c430469ab0e7024727e0a6aa1dc13240f523c"
         },
         "model": "claude-opus-4.5"
+      },
+      {
+        "date": 1771520259208,
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5",
+        "commit": {
+          "message": "Improve evaluation performance: higher parallelism and concurrent eval",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/509c430469ab0e7024727e0a6aa1dc13240f523c",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-19T16:21:58+00:00",
+          "id": "509c430469ab0e7024727e0a6aa1dc13240f523c"
+        },
+        "benches": [
+          {
+            "value": 8.0,
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 9.0,
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 9.0,
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)"
+          }
+        ]
       }
     ]
   },
