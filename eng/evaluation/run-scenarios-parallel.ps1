@@ -54,7 +54,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$scenarioList = $Scenarios -split ","
+$scenarioList = ($Scenarios -split ",") | Where-Object { $_.Trim() -ne "" }
+if ($scenarioList.Count -eq 0) {
+    throw "No scenarios provided. The scenarios list is empty."
+}
 $label = if ($RunType) { $RunType } else { "evaluation" }
 $resolvedScript = (Resolve-Path $Script).Path
 $scenariosBaseDir = "src/$Plugin/testcases"

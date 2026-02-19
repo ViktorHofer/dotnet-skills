@@ -35,6 +35,8 @@ param(
 
     [int]$TimeoutSeconds = 300,
 
+    [int]$MaxRetries = 3,
+
     [Parameter(Mandatory)]
     [string]$RunId,
 
@@ -214,11 +216,10 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
         $evalPrompt = "Read the files in this directory: INSTRUCTIONS.md, expected-output.md, and actual-response.txt. Follow the instructions in INSTRUCTIONS.md to evaluate the actual response against the expected output. Your response must be ONLY a JSON object as specified in the instructions. Do not include any markdown code fences, explanatory text, or anything other than the raw JSON object."
 
         # Run evaluation with Copilot (vanilla - no plugins) with retry logic
-        $maxRetries = 3
         $evaluation = $null
 
-        for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
-            Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$maxRetries)..."
+        for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
+            Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$MaxRetries)..."
             $evalOutput = Invoke-CopilotCli `
                 -Prompt $evalPrompt `
                 -WorkingDir $evalDir `
@@ -226,8 +227,11 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
 
             if ($null -eq $evalOutput -or $evalOutput.Trim() -eq '') {
                 Write-Warning "[EVAL] Attempt ${attempt}: Copilot returned no output (timeout or error)"
-                # Wait before retry to avoid hitting API quota limits
-                if ($attempt -lt $maxRetries) { Start-Sleep -Seconds 60 }
+                if ($attempt -lt $MaxRetries) {
+                    $delay = 60 * $attempt
+                    Write-Host "[EVAL] Waiting ${delay}s before retry..."
+                    Start-Sleep -Seconds $delay
+                }
                 continue
             }
 
@@ -247,12 +251,15 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
 
             Write-Warning "[EVAL] Attempt ${attempt}: Failed to parse evaluation JSON"
             $evaluation = $null
-            # Wait before retry to avoid hitting API quota limits
-            if ($attempt -lt $maxRetries) { Start-Sleep -Seconds 60 }
+            if ($attempt -lt $MaxRetries) {
+                $delay = 60 * $attempt
+                Write-Host "[EVAL] Waiting ${delay}s before retry..."
+                Start-Sleep -Seconds $delay
+            }
         }
 
         if ($null -eq $evaluation) {
-            Write-Warning "[EVAL] All $maxRetries attempts failed for $runType"
+            Write-Warning "[EVAL] All $MaxRetries attempts failed for $runType"
             $evaluation = [PSCustomObject]@{
                 score         = $null
                 accuracy      = $null

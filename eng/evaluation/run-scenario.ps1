@@ -42,6 +42,8 @@ param(
 
     [int]$TimeoutSeconds = 300,
 
+    [int]$MaxRetries = 3,
+
     [string]$ScenariosBaseDir,
 
     [Parameter(Mandatory)]
@@ -211,11 +213,10 @@ $sessionConfigDir = Join-Path (Resolve-Path $scenarioResultsDir).Path "${RunType
 New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
 Write-Host "[SESSION] Config directory: $sessionConfigDir"
 
-$maxRetries = 3
 $output = $null
-for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
+for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
     if ($attempt -gt 1) {
-        Write-Host "[RETRY] Attempt $attempt of $maxRetries..."
+        Write-Host "[RETRY] Attempt $attempt of $MaxRetries..."
         # Clean up previous session config for fresh retry
         Remove-Item -Recurse -Force $sessionConfigDir -ErrorAction SilentlyContinue
         New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
@@ -232,12 +233,12 @@ for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
     if ($null -ne $output) {
         break
     }
-    Write-Warning "[RETRY] Attempt $attempt failed (timeout or error), retrying in 60s..."
-    # Wait before retry to avoid hitting API quota limits
-    Start-Sleep -Seconds 60
+    $delay = 60 * $attempt
+    Write-Warning "[RETRY] Attempt $attempt failed (timeout or error), retrying in ${delay}s..."
+    Start-Sleep -Seconds $delay
 }
 if ($null -eq $output) {
-    Write-Warning "[RETRY] All $maxRetries attempts failed for $ScenarioName ($RunType)"
+    Write-Warning "[RETRY] All $MaxRetries attempts failed for $ScenarioName ($RunType)"
 }
 
 # Step 4: Parse stats
