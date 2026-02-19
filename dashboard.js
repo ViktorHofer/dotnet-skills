@@ -120,11 +120,13 @@
     // Quality charts
     const qualityChartsDiv = document.getElementById(`quality-${plugin}`);
     if (qualityEntries.length > 0) {
+      // Discover scenarios from all entries (not just latest, which may have partial data)
       const scenarios = new Set();
-      const latest = qualityEntries[qualityEntries.length - 1];
-      latest.benches.forEach(b => {
-        const match = b.name.match(/^(.+) - (Skilled|Vanilla) Quality$/);
-        if (match) scenarios.add(match[1]);
+      qualityEntries.forEach(entry => {
+        entry.benches.forEach(b => {
+          const match = b.name.match(/^(.+) - (Skilled|Vanilla) Quality$/);
+          if (match) scenarios.add(match[1]);
+        });
       });
 
       scenarios.forEach(scenario => {
@@ -139,11 +141,13 @@
     // Efficiency charts
     const efficiencyChartsDiv = document.getElementById(`efficiency-${plugin}`);
     if (efficiencyEntries.length > 0) {
-      const latestEff = efficiencyEntries[efficiencyEntries.length - 1];
+      // Discover scenarios from all entries (not just latest, which may have partial data)
       const effScenarios = new Set();
-      latestEff.benches.forEach(b => {
-        const match = b.name.match(/^(.+) - Skilled Time$/);
-        if (match) effScenarios.add(match[1]);
+      efficiencyEntries.forEach(entry => {
+        entry.benches.forEach(b => {
+          const match = b.name.match(/^(.+) - Skilled Time$/);
+          if (match) effScenarios.add(match[1]);
+        });
       });
 
       effScenarios.forEach(scenario => {
