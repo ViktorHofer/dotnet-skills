@@ -4,8 +4,8 @@
 
 .DESCRIPTION
     Shared helper that runs Copilot CLI as a subprocess with configurable
-    timeout, captures stdout/stderr asynchronously (avoiding deadlocks),
-    and returns the output. Optionally saves output to files.
+    timeout, captures stdout asynchronously for the return value, and
+    tees stderr to the console so errors are always visible in CI logs.
 
     Returns $null on timeout or failure. Returns stdout (or stdout+stderr
     when IncludeStderr is set) on success.
@@ -105,7 +105,8 @@ function Invoke-CopilotCli {
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $processInfo
 
-    # Capture output asynchronously to avoid deadlocks
+    # Capture stdout asynchronously for return value.
+    # Capture stderr asynchronously and tee to console so errors are visible in CI.
     $stdoutBuilder = New-Object System.Text.StringBuilder
     $stderrBuilder = New-Object System.Text.StringBuilder
 
@@ -118,6 +119,8 @@ function Invoke-CopilotCli {
     $stderrEvent = Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -Action {
         if ($null -ne $EventArgs.Data) {
             $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
+            # Tee stderr to console so it's visible in CI logs
+            [Console]::Error.WriteLine($EventArgs.Data)
         }
     } -MessageData $stderrBuilder
 
@@ -161,7 +164,6 @@ function Invoke-CopilotCli {
 
     if (-not $completed) {
         Write-Warning "[TIMEOUT] Copilot timed out after $TimeoutSeconds seconds"
-        if ($stderr) { Write-Warning "Stderr: $stderr" }
         return $null
     }
 
@@ -170,13 +172,9 @@ function Invoke-CopilotCli {
 
     if ($exitCode -ne 0) {
         Write-Warning "Copilot CLI exited with code $exitCode"
-        if ($stderr) {
-            Write-Warning "Stderr output:"
-            foreach ($line in ($stderr -split "`n")) {
-                if ($line.Trim()) { Write-Warning "  $line" }
-            }
-        } else {
-            Write-Warning "No stderr output captured"
+        if ($stdout) {
+            Write-Host "Stdout output:"
+            Write-Host $stdout
         }
         return $null
     }
