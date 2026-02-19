@@ -49,9 +49,11 @@ param(
     [Parameter(Mandatory)]
     [string]$RunId,
 
+    [Parameter(Mandatory)]
+    [string]$Model,
+
     [string]$RepoRoot
 )
-
 $ErrorActionPreference = "Stop"
 
 # Resolve repo root
@@ -228,7 +230,8 @@ for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
         -OutputFile $outputFile `
         -TimeoutSeconds $TimeoutSeconds `
         -ConfigDir $sessionConfigDir `
-        -IncludeStderr
+        -IncludeStderr `
+        -Model $Model
 
     if ($null -ne $output) {
         break

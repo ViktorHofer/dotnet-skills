@@ -40,6 +40,9 @@ param(
     [Parameter(Mandatory)]
     [string]$RunId,
 
+    [Parameter(Mandatory)]
+    [string]$Model,
+
     [string]$RepoRoot
 )
 
@@ -223,7 +226,8 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
             $evalOutput = Invoke-CopilotCli `
                 -Prompt $evalPrompt `
                 -WorkingDir $evalDir `
-                -TimeoutSeconds $TimeoutSeconds
+                -TimeoutSeconds $TimeoutSeconds `
+                -Model $Model
 
             if ($null -eq $evalOutput -or $evalOutput.Trim() -eq '') {
                 Write-Warning "[EVAL] Attempt ${attempt}: Copilot returned no output (timeout or error)"

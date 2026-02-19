@@ -149,6 +149,42 @@ if (-not $scenarioDirs) {
     $scenarioDirs = @()
 }
 
+# Load all scenario data in a single pass
+$scenarioData = @{}
+foreach ($scenarioDir in $scenarioDirs) {
+    $scenarioName = $scenarioDir.Name
+    $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
+    $vanillaStatsFile = Join-Path $scenarioDir.FullName $RunId "vanilla-stats.json"
+    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
+    $activationsFile = Join-Path $scenarioDir.FullName $RunId "skilled-activations.json"
+
+    $data = @{
+        Name = $scenarioName
+        VanillaEval = $null
+        SkilledEval = $null
+        VanillaStats = $null
+        SkilledStats = $null
+        Activations = $null
+    }
+
+    if (Test-Path $evalFile) {
+        $evalData = Get-Content $evalFile -Raw | ConvertFrom-Json
+        $data.VanillaEval = $evalData.evaluations.vanilla
+        $data.SkilledEval = $evalData.evaluations.skilled
+    }
+    if (Test-Path $vanillaStatsFile) {
+        $data.VanillaStats = Get-Content $vanillaStatsFile -Raw | ConvertFrom-Json
+    }
+    if (Test-Path $skilledStatsFile) {
+        $data.SkilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
+    }
+    if (Test-Path $activationsFile) {
+        $data.Activations = Get-Content $activationsFile -Raw | ConvertFrom-Json
+    }
+
+    $scenarioData[$scenarioName] = $data
+}
+
 $summaryLines = New-Object System.Collections.Generic.List[string]
 
 # Header
@@ -170,88 +206,55 @@ $overallSkilled = 0.0
 $scenarioCount = 0
 
 foreach ($scenarioDir in $scenarioDirs) {
-    $scenarioName = $scenarioDir.Name
-    $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
-    $vanillaStatsFile = Join-Path $scenarioDir.FullName $RunId "vanilla-stats.json"
-    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
+    $d = $scenarioData[$scenarioDir.Name]
+    $vanillaEval = $d.VanillaEval
+    $skilledEval = $d.SkilledEval
+    $vanillaStats = $d.VanillaStats
+    $skilledStats = $d.SkilledStats
 
-    # Load evaluation
-    $vanillaScore = "N/A"
-    $skilledScore = "N/A"
+    # Quality delta
     $qualityDelta = "N/A"
-    $winner = "N/A"
+    if ($vanillaEval -and $vanillaEval.score) {
+        $overallVanilla += [float]$vanillaEval.score
+    }
+    if ($skilledEval -and $skilledEval.score) {
+        $overallSkilled += [float]$skilledEval.score
+    }
+    if ($vanillaEval -and $vanillaEval.score -and $skilledEval -and $skilledEval.score) {
+        $delta = [float]$skilledEval.score - [float]$vanillaEval.score
+        $deltaEmoji = Get-QualityDeltaEmoji -Delta $delta
+        $qualityDelta = "$deltaEmoji $delta"
+        $scenarioCount++
+    }
 
-    # Checklist scores
+    # Checklist delta
     $checklistDelta = "N/A"
-
-    if (Test-Path $evalFile) {
-        $evalData = Get-Content $evalFile -Raw | ConvertFrom-Json
-
-        $vanillaEval = $evalData.evaluations.vanilla
-        $skilledEval = $evalData.evaluations.skilled
-
-        if ($vanillaEval -and $vanillaEval.score) {
-            $vanillaScore = "$($vanillaEval.score)/10"
-            $overallVanilla += [float]$vanillaEval.score
-        }
-        if ($skilledEval -and $skilledEval.score) {
-            $skilledScore = "$($skilledEval.score)/10"
-            $overallSkilled += [float]$skilledEval.score
-        }
-
-        # Calculate checklist delta
-        $vCheck = if ($vanillaEval -and $null -ne $vanillaEval.checklist_score -and $null -ne $vanillaEval.checklist_max) { "$($vanillaEval.checklist_score)/$($vanillaEval.checklist_max)" } else { $null }
-        $sCheck = if ($skilledEval -and $null -ne $skilledEval.checklist_score -and $null -ne $skilledEval.checklist_max) { "$($skilledEval.checklist_score)/$($skilledEval.checklist_max)" } else { $null }
-        if ($vCheck -and $sCheck) {
-            $clDelta = [float]$skilledEval.checklist_score - [float]$vanillaEval.checklist_score
-            $clEmoji = Get-QualityDeltaEmoji -Delta $clDelta
-            $checklistDelta = "$clEmoji $clDelta ($vCheck vs $sCheck)"
-        } elseif ($sCheck) {
-            $checklistDelta = "$sCheck (skilled only)"
-        } elseif ($vCheck) {
-            $checklistDelta = "$vCheck (vanilla only)"
-        }
-
-        if ($vanillaEval.score -and $skilledEval.score) {
-            $delta = [float]$skilledEval.score - [float]$vanillaEval.score
-            $deltaEmoji = Get-QualityDeltaEmoji -Delta $delta
-            $qualityDelta = "$deltaEmoji $delta"
-            $scenarioCount++
-        }
+    $vCheck = if ($vanillaEval -and $null -ne $vanillaEval.checklist_score -and $null -ne $vanillaEval.checklist_max) { "$($vanillaEval.checklist_score)/$($vanillaEval.checklist_max)" } else { $null }
+    $sCheck = if ($skilledEval -and $null -ne $skilledEval.checklist_score -and $null -ne $skilledEval.checklist_max) { "$($skilledEval.checklist_score)/$($skilledEval.checklist_max)" } else { $null }
+    if ($vCheck -and $sCheck) {
+        $clDelta = [float]$skilledEval.checklist_score - [float]$vanillaEval.checklist_score
+        $clEmoji = Get-QualityDeltaEmoji -Delta $clDelta
+        $checklistDelta = "$clEmoji $clDelta ($vCheck vs $sCheck)"
+    } elseif ($sCheck) {
+        $checklistDelta = "$sCheck (skilled only)"
+    } elseif ($vCheck) {
+        $checklistDelta = "$vCheck (vanilla only)"
     }
 
-    # Load timing stats
-    $vanillaTime = "N/A"
-    $skilledTime = "N/A"
+    # Time delta
     $timeDelta = "N/A"
-    $vanillaStats = $null
-    $skilledStats = $null
-
-    if (Test-Path $vanillaStatsFile) {
-        $vanillaStats = Get-Content $vanillaStatsFile -Raw | ConvertFrom-Json
-        if ($vanillaStats.TotalTimeSeconds) {
-            $vanillaTime = "$($vanillaStats.TotalTimeSeconds)s"
-        }
-    }
-    if (Test-Path $skilledStatsFile) {
-        $skilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
-        if ($skilledStats.TotalTimeSeconds) {
-            $skilledTime = "$($skilledStats.TotalTimeSeconds)s"
-        }
-    }
-
     if ($vanillaStats -and $vanillaStats.TotalTimeSeconds -and $skilledStats -and $skilledStats.TotalTimeSeconds) {
         $timeDelta = Get-TimeDelta -Vanilla ([int]$vanillaStats.TotalTimeSeconds) -Skilled ([int]$skilledStats.TotalTimeSeconds)
     }
 
-    # Delta stats for summary table
+    # Token delta
     $tokenDelta = "N/A"
-
     if ($vanillaStats -and $skilledStats -and $vanillaStats.TokensIn -and $skilledStats.TokensIn) {
         $tokenDelta = Get-TokenDelta -Vanilla ([int]$vanillaStats.TokensIn) -Skilled ([int]$skilledStats.TokensIn)
     }
 
-    # Determine winner: quality first, then time + tokens as tiebreakers
+    # Winner
+    $winner = "N/A"
     if ($vanillaEval -and $skilledEval -and $vanillaEval.score -and $skilledEval.score) {
         $winnerParams = @{
             VanillaScore = [float]$vanillaEval.score
@@ -270,18 +273,16 @@ foreach ($scenarioDir in $scenarioDirs) {
         $winner = Get-Winner @winnerParams
     }
 
-    # Load skill activation for summary table
+    # Skills activation
     $skillsSummary = "-"
-    $skilledActivationsFileSummary = Join-Path $scenarioDir.FullName $RunId "skilled-activations.json"
-    if (Test-Path $skilledActivationsFileSummary) {
-        $actData = Get-Content $skilledActivationsFileSummary -Raw | ConvertFrom-Json
-        if ($actData.Activated) {
+    if ($d.Activations) {
+        if ($d.Activations.Activated) {
             $parts = @()
-            if ($actData.Skills -and $actData.Skills.Count -gt 0) {
-                $parts += $actData.Skills
+            if ($d.Activations.Skills -and $d.Activations.Skills.Count -gt 0) {
+                $parts += $d.Activations.Skills
             }
-            if ($actData.Agents -and $actData.Agents.Count -gt 0) {
-                $parts += $actData.Agents
+            if ($d.Activations.Agents -and $d.Activations.Agents.Count -gt 0) {
+                $parts += $d.Activations.Agents
             }
             $skillsSummary = $parts -join ', '
         } else {
@@ -289,7 +290,7 @@ foreach ($scenarioDir in $scenarioDirs) {
         }
     }
 
-    $summaryLines.Add("| $scenarioName | $qualityDelta | $checklistDelta | $timeDelta | $tokenDelta | $skillsSummary | $winner |")
+    $summaryLines.Add("| $($d.Name) | $qualityDelta | $checklistDelta | $timeDelta | $tokenDelta | $skillsSummary | $winner |")
 }
 
 $summaryLines.Add("")
@@ -319,29 +320,13 @@ $summaryLines.Add("### Scenario Details")
 $summaryLines.Add("")
 
 foreach ($scenarioDir in $scenarioDirs) {
-    $scenarioName = $scenarioDir.Name
-    $evalFile = Join-Path $scenarioDir.FullName $RunId "evaluation.json"
-    $vanillaStatsFile = Join-Path $scenarioDir.FullName $RunId "vanilla-stats.json"
-    $skilledStatsFile = Join-Path $scenarioDir.FullName $RunId "skilled-stats.json"
+    $d = $scenarioData[$scenarioDir.Name]
+    $vanillaEval = $d.VanillaEval
+    $skilledEval = $d.SkilledEval
+    $vanillaStats = $d.VanillaStats
+    $skilledStats = $d.SkilledStats
 
-    $vanillaStats = $null
-    $skilledStats = $null
-    $vanillaEval = $null
-    $skilledEval = $null
-
-    if (Test-Path $evalFile) {
-        $evalData = Get-Content $evalFile -Raw | ConvertFrom-Json
-        $vanillaEval = $evalData.evaluations.vanilla
-        $skilledEval = $evalData.evaluations.skilled
-    }
-    if (Test-Path $vanillaStatsFile) {
-        $vanillaStats = Get-Content $vanillaStatsFile -Raw | ConvertFrom-Json
-    }
-    if (Test-Path $skilledStatsFile) {
-        $skilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
-    }
-
-    $summaryLines.Add("#### $scenarioName")
+    $summaryLines.Add("#### $($d.Name)")
     $summaryLines.Add("")
     $summaryLines.Add("| Metric | Vanilla | Skilled | Delta |")
     $summaryLines.Add("|--------|---------|---------|-------|")
@@ -351,9 +336,9 @@ foreach ($scenarioDir in $scenarioDirs) {
     $sScore = if ($skilledEval -and $skilledEval.score) { "$($skilledEval.score)/10" } else { "N/A" }
     $qDelta = "N/A"
     if ($vanillaEval -and $vanillaEval.score -and $skilledEval -and $skilledEval.score) {
-        $d = [float]$skilledEval.score - [float]$vanillaEval.score
-        $emoji = Get-QualityDeltaEmoji -Delta $d
-        $qDelta = "$emoji $d"
+        $dd = [float]$skilledEval.score - [float]$vanillaEval.score
+        $emoji = Get-QualityDeltaEmoji -Delta $dd
+        $qDelta = "$emoji $dd"
     }
     $summaryLines.Add("| Quality | $vScore | $sScore | $qDelta |")
 
@@ -398,16 +383,14 @@ foreach ($scenarioDir in $scenarioDirs) {
     }
 
     # Skill activation info
-    $skilledActivationsFile = Join-Path $scenarioDir.FullName $RunId "skilled-activations.json"
-    if (Test-Path $skilledActivationsFile) {
-        $activationData = Get-Content $skilledActivationsFile -Raw | ConvertFrom-Json
-        if ($activationData.Activated) {
+    if ($d.Activations) {
+        if ($d.Activations.Activated) {
             $activationParts = @()
-            if ($activationData.Skills -and $activationData.Skills.Count -gt 0) {
-                $activationParts += "Skills: $($activationData.Skills -join ', ')"
+            if ($d.Activations.Skills -and $d.Activations.Skills.Count -gt 0) {
+                $activationParts += "Skills: $($d.Activations.Skills -join ', ')"
             }
-            if ($activationData.Agents -and $activationData.Agents.Count -gt 0) {
-                $activationParts += "Agents: $($activationData.Agents -join ', ')"
+            if ($d.Activations.Agents -and $d.Activations.Agents.Count -gt 0) {
+                $activationParts += "Agents: $($d.Activations.Agents -join ', ')"
             }
             $summaryLines.Add("**Skills Activated**: $($activationParts -join ' | ')")
         } else {

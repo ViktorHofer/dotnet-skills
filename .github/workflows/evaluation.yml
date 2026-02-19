@@ -30,6 +30,10 @@ on:
         required: false
         type: number
         default: 4
+      model:
+        description: 'Copilot model to use (e.g. claude-opus-4.5, claude-sonnet-4.5)'
+        required: false
+        default: 'claude-opus-4.5'
 
 
 concurrency:
@@ -42,6 +46,8 @@ concurrency:
 env:
   GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
   RESULTS_BASE: artifacts/TestResults
+  DOTNET_VERSION: '10.0.x'
+  DEFAULT_MODEL: 'claude-opus-4.5'
 
 permissions:
   contents: write
@@ -140,12 +146,20 @@ jobs:
           }
           Write-Host "Parallelism level: $parallelism"
           echo "PARALLELISM=$parallelism" >> $env:GITHUB_ENV
+
+          # Set model
+          $model = "${{ github.event.inputs.model }}"
+          if (-not $model -or $model -eq '') {
+            $model = "$env:DEFAULT_MODEL"
+          }
+          Write-Host "Model: $model"
+          echo "COPILOT_MODEL=$model" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run Vanilla Copilot (no plugins)
         if: ${{ github.event.inputs.skip_vanilla != 'true' }}
@@ -166,7 +180,8 @@ jobs:
             -Parallelism $env:PARALLELISM `
             -Plugin "${{ matrix.plugin }}" `
             -ResultsDir "$env:RESULTS_DIR" `
-            -RunId "$env:RUN_ID"
+            -RunId "$env:RUN_ID" `
+            -Model "$env:COPILOT_MODEL"
         shell: pwsh
 
       - name: Install Plugin and Run Skilled Copilot
@@ -187,7 +202,8 @@ jobs:
             -Parallelism $env:PARALLELISM `
             -Plugin "$plugin" `
             -ResultsDir "$env:RESULTS_DIR" `
-            -RunId "$env:RUN_ID"
+            -RunId "$env:RUN_ID" `
+            -Model "$env:COPILOT_MODEL"
         shell: pwsh
 
       - name: Uninstall Plugin and Run Evaluation
@@ -207,7 +223,8 @@ jobs:
             -Parallelism $env:PARALLELISM `
             -Plugin "${{ matrix.plugin }}" `
             -ResultsDir "$env:RESULTS_DIR" `
-            -RunId "$env:RUN_ID"
+            -RunId "$env:RUN_ID" `
+            -Model "$env:COPILOT_MODEL"
         shell: pwsh
 
       - name: Upload Artifacts
@@ -263,10 +280,7 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages 2>/dev/null || true
           mkdir -p /tmp/gh-pages/data
-          # Copy all existing per-plugin JSON files and manifest
-          for f in $(git ls-tree --name-only gh-pages:data 2>/dev/null); do
-            git show "gh-pages:data/$f" > "/tmp/gh-pages/data/$f" 2>/dev/null || true
-          done
+          git checkout gh-pages -- data/ 2>/dev/null && cp -r data/* /tmp/gh-pages/data/ && git checkout HEAD -- . || true
 
       - name: Generate Benchmark Data
         run: |

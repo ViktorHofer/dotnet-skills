@@ -29,7 +29,7 @@
     If set, return stdout + stderr combined (for stats parsing).
 
 .PARAMETER Model
-    Copilot model to use (default: claude-opus-4.5).
+    Copilot model to use.
 #>
 function Invoke-CopilotCli {
     [CmdletBinding()]
@@ -48,7 +48,8 @@ function Invoke-CopilotCli {
 
         [switch]$IncludeStderr,
 
-        [string]$Model = "claude-opus-4.5"
+        [Parameter(Mandatory)]
+        [string]$Model
     )
 
     Write-Host "[RUN] Running Copilot CLI..."
