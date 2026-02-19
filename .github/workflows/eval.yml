@@ -194,6 +194,10 @@ jobs:
         shell: pwsh
 
       - name: Install Plugin and Run Skilled Copilot
+        # Allow timeouts to continue without failing the workflow.
+        # Individual scenario timeouts are logged as warnings and tracked in stats,
+        # allowing other scenarios to complete and results to be collected.
+        continue-on-error: true
         run: |
           $plugin = "${{ matrix.plugin }}"
 

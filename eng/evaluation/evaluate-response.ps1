@@ -211,6 +211,28 @@ $evaluations = @{}
 
 foreach ($runType in $runTypes) {
     $outputFile = Join-Path $scenarioResultsDir "${runType}-output.txt"
+    $statsFile = Join-Path $scenarioResultsDir "${runType}-stats.json"
+
+    # Check if run timed out by looking at stats file
+    $timedOut = $false
+    if (Test-Path $statsFile) {
+        $statsContent = Get-Content $statsFile -Raw | ConvertFrom-Json
+        $timedOut = $statsContent.TimedOut -eq $true
+    }
+
+    if ($timedOut) {
+        Write-Warning "[TIMEOUT] Scenario $ScenarioName ($runType) timed out - skipping evaluation"
+        $evaluations[$runType] = [PSCustomObject]@{
+            score         = 0
+            accuracy      = 0
+            completeness  = 0
+            actionability = 0
+            clarity       = 0
+            reasoning     = "Run timed out - evaluation skipped"
+            timedOut      = $true
+        }
+        continue
+    }
 
     if (-not (Test-Path $outputFile)) {
         Write-Warning "[WARN] Output file not found for $runType run: $outputFile"
@@ -226,6 +248,21 @@ foreach ($runType in $runTypes) {
     }
 
     $actualOutput = Get-Content $outputFile -Raw
+    
+    # Check if output is empty or too short (likely timeout or error)
+    if ([string]::IsNullOrWhiteSpace($actualOutput) -or $actualOutput.Length -lt 50) {
+        Write-Warning "[WARN] Output file is empty or too short for $runType run"
+        $evaluations[$runType] = [PSCustomObject]@{
+            score         = 0
+            accuracy      = 0
+            completeness  = 0
+            actionability = 0
+            clarity       = 0
+            reasoning     = "Output file is empty or too short - run may have failed"
+        }
+        continue
+    }
+
     Write-Host ""
     Write-Host "[EVAL] Evaluating $runType response ($($actualOutput.Length) chars)..."
 

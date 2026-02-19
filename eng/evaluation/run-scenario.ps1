@@ -393,7 +393,26 @@ $output = Invoke-CopilotWithTimeout `
 # Step 5: Parse stats
 Write-Host ""
 Write-Host "[STATS] Parsing stats..."
-$stats = Parse-CopilotStats -Output $output
+
+# Handle timeout case where output is null
+if ($null -eq $output) {
+    Write-Host "   TIMEOUT: Creating default stats for timed-out run"
+    $stats = @{
+        PremiumRequests  = $null
+        ApiTimeSeconds   = $null
+        TotalTimeSeconds = $TimeoutSeconds
+        LinesAdded       = $null
+        LinesRemoved     = $null
+        Model            = $null
+        TokensIn         = $null
+        TokensOut        = $null
+        TokensCached     = $null
+        TimedOut         = $true
+    }
+} else {
+    $stats = Parse-CopilotStats -Output $output
+    $stats.TimedOut = $false
+}
 
 # Add metadata
 $stats.RunType = $RunType
@@ -403,36 +422,58 @@ $stats.Timestamp = (Get-Date -Format "o")
 $statsFile = Join-Path $scenarioResultsDir "${RunType}-stats.json"
 $stats | ConvertTo-Json -Depth 5 | Out-File -FilePath $statsFile -Encoding utf8
 
-Write-Host "   Premium Requests: $($stats.PremiumRequests)"
-Write-Host "   API Time: $($stats.ApiTimeSeconds)s"
-Write-Host "   Total Time: $($stats.TotalTimeSeconds)s"
-Write-Host "   Model: $($stats.Model)"
-Write-Host "   Tokens In: $($stats.TokensIn)"
-Write-Host "   Tokens Out: $($stats.TokensOut)"
+if ($stats.TimedOut) {
+    Write-Host "   TIMED OUT after ${TimeoutSeconds}s"
+    # Emit GitHub Actions warning annotation for visibility
+    Write-Host "::warning::Scenario $ScenarioName ($RunType) timed out after ${TimeoutSeconds}s"
+} else {
+    Write-Host "   Premium Requests: $($stats.PremiumRequests)"
+    Write-Host "   API Time: $($stats.ApiTimeSeconds)s"
+    Write-Host "   Total Time: $($stats.TotalTimeSeconds)s"
+    Write-Host "   Model: $($stats.Model)"
+    Write-Host "   Tokens In: $($stats.TokensIn)"
+    Write-Host "   Tokens Out: $($stats.TokensOut)"
+}
 
 # Step 5b: Extract skill activation from session logs
 Write-Host ""
 Write-Host "[ACTIVATION] Checking skill activation from session logs..."
-$activation = Get-SkillActivation -ConfigDir $sessionConfigDir
+
+# Skip activation check if timed out
+if ($stats.TimedOut) {
+    Write-Host "   SKIPPED: Timeout occurred, no activation data available"
+    $activation = @{
+        SessionId = $null
+        Skills    = @()
+        Agents    = @()
+        Activated = $false
+        TimedOut  = $true
+    }
+} else {
+    $activation = Get-SkillActivation -ConfigDir $sessionConfigDir
+    $activation.TimedOut = $false
+}
 
 $activationFile = Join-Path $scenarioResultsDir "${RunType}-activations.json"
 $activation | ConvertTo-Json -Depth 5 | Out-File -FilePath $activationFile -Encoding utf8
 
-if ($activation.Activated) {
-    Write-Host "   Skills activated: $($activation.Skills -join ', ')"
-    if ($activation.Agents.Count -gt 0) {
-        Write-Host "   Agents delegated: $($activation.Agents -join ', ')"
-    }
-} else {
-    if ($RunType -eq "skilled") {
-        Write-Host "   WARNING: No skills or agents were activated in skilled run"
+if (-not $stats.TimedOut) {
+    if ($activation.Activated) {
+        Write-Host "   Skills activated: $($activation.Skills -join ', ')"
+        if ($activation.Agents.Count -gt 0) {
+            Write-Host "   Agents delegated: $($activation.Agents -join ', ')"
+        }
     } else {
-        Write-Host "   (vanilla run - no skills expected)"
+        if ($RunType -eq "skilled") {
+            Write-Host "   WARNING: No skills or agents were activated in skilled run"
+        } else {
+            Write-Host "   (vanilla run - no skills expected)"
+        }
     }
 }
 
 # Save session ID for reproducibility
-if ($activation.SessionId) {
+if ($activation.SessionId -and -not $stats.TimedOut) {
     $sessionInfo = @{
         SessionId = $activation.SessionId
         ConfigDir = $sessionConfigDir
@@ -451,8 +492,15 @@ Write-Host "[CLEAN] Removing temp working directory: $workingDir"
 Remove-Item -Path $workingDir -Recurse -Force -ErrorAction SilentlyContinue
 
 Write-Host ""
-Write-Host "[OK] Scenario $ScenarioName ($RunType) completed"
-Write-Host "   Output: $outputFile"
-Write-Host "   Stats: $statsFile"
+if ($stats.TimedOut) {
+    Write-Host "[TIMEOUT] Scenario $ScenarioName ($RunType) timed out after ${TimeoutSeconds}s"
+    Write-Host "   Partial results saved to: $scenarioResultsDir"
+    Write-Host "   Output: $outputFile"
+    Write-Host "   Stats: $statsFile"
+} else {
+    Write-Host "[OK] Scenario $ScenarioName ($RunType) completed"
+    Write-Host "   Output: $outputFile"
+    Write-Host "   Stats: $statsFile"
+}
 
 #endregion

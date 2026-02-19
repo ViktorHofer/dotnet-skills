@@ -226,22 +226,32 @@ foreach ($scenarioDir in $scenarioDirs) {
     $timeDelta = "N/A"
     $vanillaStats = $null
     $skilledStats = $null
+    $vanillaTimedOut = $false
+    $skilledTimedOut = $false
 
     if (Test-Path $vanillaStatsFile) {
         $vanillaStats = Get-Content $vanillaStatsFile -Raw | ConvertFrom-Json
-        if ($vanillaStats.TotalTimeSeconds) {
+        $vanillaTimedOut = $vanillaStats.TimedOut -eq $true
+        if ($vanillaTimedOut) {
+            $vanillaTime = ":warning: TIMEOUT"
+        } elseif ($vanillaStats.TotalTimeSeconds) {
             $vanillaTime = "$($vanillaStats.TotalTimeSeconds)s"
         }
     }
     if (Test-Path $skilledStatsFile) {
         $skilledStats = Get-Content $skilledStatsFile -Raw | ConvertFrom-Json
-        if ($skilledStats.TotalTimeSeconds) {
+        $skilledTimedOut = $skilledStats.TimedOut -eq $true
+        if ($skilledTimedOut) {
+            $skilledTime = ":warning: TIMEOUT"
+        } elseif ($skilledStats.TotalTimeSeconds) {
             $skilledTime = "$($skilledStats.TotalTimeSeconds)s"
         }
     }
 
-    if ($vanillaStats -and $vanillaStats.TotalTimeSeconds -and $skilledStats -and $skilledStats.TotalTimeSeconds) {
+    if ($vanillaStats -and $vanillaStats.TotalTimeSeconds -and $skilledStats -and $skilledStats.TotalTimeSeconds -and -not $vanillaTimedOut -and -not $skilledTimedOut) {
         $timeDelta = Get-TimeDelta -Vanilla ([int]$vanillaStats.TotalTimeSeconds) -Skilled ([int]$skilledStats.TotalTimeSeconds)
+    } elseif ($vanillaTimedOut -or $skilledTimedOut) {
+        $timeDelta = "N/A (timeout)"
     }
 
     # Delta stats for summary table
@@ -343,6 +353,25 @@ foreach ($scenarioDir in $scenarioDirs) {
 
     $summaryLines.Add("#### $scenarioName")
     $summaryLines.Add("")
+    
+    # Check for timeout in either run
+    $vanillaTimedOut = $false
+    $skilledTimedOut = $false
+    if ($vanillaStats) {
+        $vanillaTimedOut = $vanillaStats.TimedOut -eq $true
+    }
+    if ($skilledStats) {
+        $skilledTimedOut = $skilledStats.TimedOut -eq $true
+    }
+    
+    if ($vanillaTimedOut -or $skilledTimedOut) {
+        $timeoutNote = if ($vanillaTimedOut -and $skilledTimedOut) { "both vanilla and skilled runs" } 
+                       elseif ($vanillaTimedOut) { "vanilla run" } 
+                       else { "skilled run" }
+        $summaryLines.Add(":warning: **Timeout occurred during $timeoutNote**")
+        $summaryLines.Add("")
+    }
+    
     $summaryLines.Add("| Metric | Vanilla | Skilled | Delta |")
     $summaryLines.Add("|--------|---------|---------|-------|")
 
@@ -358,11 +387,17 @@ foreach ($scenarioDir in $scenarioDirs) {
     $summaryLines.Add("| Quality | $vScore | $sScore | $qDelta |")
 
     # Time row
-    $vTime = if ($vanillaStats -and $vanillaStats.TotalTimeSeconds) { "$($vanillaStats.TotalTimeSeconds)s" } else { "N/A" }
-    $sTime = if ($skilledStats -and $skilledStats.TotalTimeSeconds) { "$($skilledStats.TotalTimeSeconds)s" } else { "N/A" }
+    $vTime = if ($vanillaStats -and ($vanillaStats.TimedOut -eq $true)) { ":warning: TIMEOUT" }
+             elseif ($vanillaStats -and $vanillaStats.TotalTimeSeconds) { "$($vanillaStats.TotalTimeSeconds)s" } 
+             else { "N/A" }
+    $sTime = if ($skilledStats -and ($skilledStats.TimedOut -eq $true)) { ":warning: TIMEOUT" }
+             elseif ($skilledStats -and $skilledStats.TotalTimeSeconds) { "$($skilledStats.TotalTimeSeconds)s" } 
+             else { "N/A" }
     $tDelta = "N/A"
-    if ($vanillaStats -and $skilledStats -and $vanillaStats.TotalTimeSeconds -and $skilledStats.TotalTimeSeconds) {
+    if ($vanillaStats -and $skilledStats -and $vanillaStats.TotalTimeSeconds -and $skilledStats.TotalTimeSeconds -and -not ($vanillaStats.TimedOut -eq $true) -and -not ($skilledStats.TimedOut -eq $true)) {
         $tDelta = Get-TimeDelta -Vanilla ([int]$vanillaStats.TotalTimeSeconds) -Skilled ([int]$skilledStats.TotalTimeSeconds)
+    } elseif (($vanillaStats -and ($vanillaStats.TimedOut -eq $true)) -or ($skilledStats -and ($skilledStats.TimedOut -eq $true))) {
+        $tDelta = "N/A (timeout)"
     }
     $summaryLines.Add("| Time | $vTime | $sTime | $tDelta |")
 
