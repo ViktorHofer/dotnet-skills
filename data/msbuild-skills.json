@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771499141895,
+  "lastUpdate": 1771499419522,
   "entries": {
     "Efficiency": [
       {
@@ -2224,6 +2224,98 @@
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/719ff0d561e967ef4d96f5aab9c5e51d331aac9b"
         },
         "tool": "customSmallerIsBetter"
+      },
+      {
+        "date": 1771499419522,
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "build-errors-cs - Skilled Time",
+            "value": 52.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "build-errors-cs - Skilled Tokens In",
+            "value": 216800.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "build-errors-sdk - Skilled Time",
+            "value": 50.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "build-errors-sdk - Skilled Tokens In",
+            "value": 236800.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "eval-heavy - Skilled Time",
+            "value": 29.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "eval-heavy - Skilled Tokens In",
+            "value": 111100.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "generated-files - Skilled Time",
+            "value": 146.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "generated-files - Skilled Tokens In",
+            "value": 959100.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "incremental-broken - Skilled Time",
+            "value": 23.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "incremental-broken - Skilled Tokens In",
+            "value": 82500.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "multitarget - Skilled Time",
+            "value": 74.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "multitarget - Skilled Tokens In",
+            "value": 282700.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "parallel-bottleneck - Skilled Time",
+            "value": 135.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "perf-analyzers - Skilled Time",
+            "value": 179.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "perf-analyzers - Skilled Tokens In",
+            "value": 27200.0,
+            "unit": "tokens"
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/719ff0d561e967ef4d96f5aab9c5e51d331aac9b",
+          "timestamp": "",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "id": "719ff0d561e967ef4d96f5aab9c5e51d331aac9b",
+          "message": ""
+        }
       }
     ],
     "Quality": [
@@ -4299,6 +4391,43 @@
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/719ff0d561e967ef4d96f5aab9c5e51d331aac9b"
         },
         "tool": "customBiggerIsBetter"
+      },
+      {
+        "date": 1771499419522,
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "name": "build-errors-nuget - Vanilla Quality",
+            "value": 8.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "eval-heavy - Vanilla Quality",
+            "value": 8.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "generated-files - Vanilla Quality",
+            "value": 6.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "incremental-broken - Skilled Quality",
+            "value": 6.0,
+            "unit": "Score (0-10)"
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/719ff0d561e967ef4d96f5aab9c5e51d331aac9b",
+          "timestamp": "",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "id": "719ff0d561e967ef4d96f5aab9c5e51d331aac9b",
+          "message": ""
+        }
       }
     ]
   },
