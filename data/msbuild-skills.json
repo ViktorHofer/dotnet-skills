@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771459988991,
+  "lastUpdate": 1771459994114,
   "entries": {
     "Quality": [
       {
@@ -746,76 +746,61 @@
         }
       },
       {
-        "benches": [
-          {
-            "unit": "Score (1-5)",
-            "value": 7.0,
-            "name": "build-errors-cs - Vanilla Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 7.0,
-            "name": "build-errors-sdk - Skilled Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 8.0,
-            "name": "eval-heavy - Skilled Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 8.0,
-            "name": "eval-heavy - Vanilla Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 6.0,
-            "name": "generated-files - Vanilla Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 8.0,
-            "name": "legacy-project - Skilled Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 7.0,
-            "name": "parallel-bottleneck - Skilled Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 8.0,
-            "name": "perf-analyzers - Skilled Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 7.0,
-            "name": "style-issues - Vanilla Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 7.6,
-            "name": "Overall - Skilled Avg Quality"
-          },
-          {
-            "unit": "Score (1-5)",
-            "value": 5.6,
-            "name": "Overall - Vanilla Avg Quality"
-          }
-        ],
-        "tool": "customBiggerIsBetter",
-        "model": "claude-opus-4.5",
         "commit": {
+          "message": "",
+          "timestamp": "",
           "author": {
             "name": "",
             "username": "ViktorHofer"
           },
-          "message": "",
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "timestamp": "",
-          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
         },
-        "date": 1771459988991
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "bin-obj-clash - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "build-errors-nuget - Skilled Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "eval-heavy - Skilled Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "generated-files - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "legacy-project - Vanilla Quality",
+            "value": 8.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "style-issues - Vanilla Quality",
+            "value": 7.0,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "value": 8.5,
+            "unit": "Score (1-5)"
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "value": 3.75,
+            "unit": "Score (1-5)"
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "date": 1771459994114
       }
     ],
     "Efficiency": [
@@ -1567,81 +1552,81 @@
         }
       },
       {
-        "benches": [
-          {
-            "unit": "seconds",
-            "value": 104.0,
-            "name": "bin-obj-clash - Skilled Time"
-          },
-          {
-            "unit": "tokens",
-            "value": 375500.0,
-            "name": "bin-obj-clash - Skilled Tokens In"
-          },
-          {
-            "unit": "seconds",
-            "value": 52.0,
-            "name": "build-errors-sdk - Skilled Time"
-          },
-          {
-            "unit": "tokens",
-            "value": 110100.0,
-            "name": "build-errors-sdk - Skilled Tokens In"
-          },
-          {
-            "unit": "seconds",
-            "value": 33.0,
-            "name": "eval-heavy - Skilled Time"
-          },
-          {
-            "unit": "tokens",
-            "value": 116600.0,
-            "name": "eval-heavy - Skilled Tokens In"
-          },
-          {
-            "unit": "seconds",
-            "value": 51.0,
-            "name": "legacy-project - Skilled Time"
-          },
-          {
-            "unit": "tokens",
-            "value": 201000.0,
-            "name": "legacy-project - Skilled Tokens In"
-          },
-          {
-            "unit": "seconds",
-            "value": 100.0,
-            "name": "parallel-bottleneck - Skilled Time"
-          },
-          {
-            "unit": "tokens",
-            "value": 546100.0,
-            "name": "parallel-bottleneck - Skilled Tokens In"
-          },
-          {
-            "unit": "seconds",
-            "value": 216.0,
-            "name": "perf-analyzers - Skilled Time"
-          },
-          {
-            "unit": "tokens",
-            "value": 1200000.0,
-            "name": "perf-analyzers - Skilled Tokens In"
-          }
-        ],
-        "tool": "customSmallerIsBetter",
-        "model": "claude-opus-4.5",
         "commit": {
+          "message": "",
+          "timestamp": "",
           "author": {
             "name": "",
             "username": "ViktorHofer"
           },
-          "message": "",
-          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587",
-          "timestamp": "",
-          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587"
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
         },
-        "date": 1771459988991
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bin-obj-clash - Skilled Time",
+            "value": 89.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "bin-obj-clash - Skilled Tokens In",
+            "value": 272500.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "build-errors-cs - Skilled Time",
+            "value": 75.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "build-errors-cs - Skilled Tokens In",
+            "value": 182200.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "build-errors-nuget - Skilled Time",
+            "value": 44.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "build-errors-nuget - Skilled Tokens In",
+            "value": 110000.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "eval-heavy - Skilled Time",
+            "value": 36.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "eval-heavy - Skilled Tokens In",
+            "value": 118300.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "generated-files - Skilled Time",
+            "value": 107.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "generated-files - Skilled Tokens In",
+            "value": 614700.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "style-issues - Skilled Time",
+            "value": 80.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "style-issues - Skilled Tokens In",
+            "value": 47700.0,
+            "unit": "tokens"
+          }
+        ],
+        "model": "claude-opus-4.5",
+        "date": 1771459994114
       }
     ]
   }
