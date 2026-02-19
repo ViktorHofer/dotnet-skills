@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771503031177,
+  "lastUpdate": 1771511100368,
   "entries": {
     "Efficiency": [
       {
@@ -734,6 +734,43 @@
             "unit": "tokens",
             "value": 253600.0,
             "name": "order-service-mstest - Skilled Tokens In"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "id": "fd88c1d7f3df32f4b47ccdd31fa45b603df4aed3",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/fd88c1d7f3df32f4b47ccdd31fa45b603df4aed3",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "message": "Use ArgumentList for Copilot CLI process args to fix escaping",
+          "timestamp": "2026-02-19T14:12:41+00:00"
+        },
+        "date": 1771511100368,
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time",
+            "value": 72.0
+          },
+          {
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 215000.0
+          },
+          {
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time",
+            "value": 101.0
+          },
+          {
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 294100.0
           }
         ]
       }
@@ -1478,6 +1515,43 @@
             "unit": "Score (0-10)",
             "value": 9.0,
             "name": "order-service-mstest - Vanilla Quality"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "id": "fd88c1d7f3df32f4b47ccdd31fa45b603df4aed3",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/fd88c1d7f3df32f4b47ccdd31fa45b603df4aed3",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "message": "Use ArgumentList for Copilot CLI process args to fix escaping",
+          "timestamp": "2026-02-19T14:12:41+00:00"
+        },
+        "date": 1771511100368,
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 8.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 8.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 9.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 8.0
           }
         ]
       }

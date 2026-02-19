@@ -75,14 +75,25 @@
       <div class="charts-grid" id="efficiency-${plugin}"></div>
     `;
 
-    // Summary cards — compute averages client-side from per-scenario data
+    // Summary cards — compute averages across the last 50 entries
     const summaryDiv = document.getElementById(`summary-${plugin}`);
-    const latestQuality = qualityEntries[qualityEntries.length - 1];
-    if (latestQuality) {
-      const skilledScores = latestQuality.benches.filter(b => b.name.endsWith('- Skilled Quality'));
-      const vanillaScores = latestQuality.benches.filter(b => b.name.endsWith('- Vanilla Quality'));
-      const skilledAvg = skilledScores.length > 0 ? skilledScores.reduce((s, b) => s + b.value, 0) / skilledScores.length : null;
-      const vanillaAvg = vanillaScores.length > 0 ? vanillaScores.reduce((s, b) => s + b.value, 0) / vanillaScores.length : null;
+    const SUMMARY_WINDOW = 50;
+    if (qualityEntries.length > 0) {
+      // Use only the most recent entries for summary cards
+      const recentEntries = qualityEntries.slice(-SUMMARY_WINDOW);
+      let skilledTotal = 0, skilledCount = 0, vanillaTotal = 0, vanillaCount = 0;
+      recentEntries.forEach(entry => {
+        entry.benches.forEach(b => {
+          if (b.name.endsWith('- Skilled Quality')) { skilledTotal += b.value; skilledCount++; }
+          if (b.name.endsWith('- Vanilla Quality')) { vanillaTotal += b.value; vanillaCount++; }
+        });
+      });
+      const skilledAvg = skilledCount > 0 ? skilledTotal / skilledCount : null;
+      const vanillaAvg = vanillaCount > 0 ? vanillaTotal / vanillaCount : null;
+      const latestModel = qualityEntries[qualityEntries.length - 1].model;
+      const windowLabel = qualityEntries.length > SUMMARY_WINDOW
+        ? `last ${SUMMARY_WINDOW} of ${qualityEntries.length} runs`
+        : `${qualityEntries.length} runs`;
       if (skilledAvg !== null && vanillaAvg !== null) {
         const delta = (skilledAvg - vanillaAvg).toFixed(2);
         const deltaClass = delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
@@ -91,12 +102,12 @@
           <div class="card">
             <div class="card-label">Skilled Avg</div>
             <div class="card-value" style="color: var(--skilled)">${skilledAvg.toFixed(2)}</div>
-            <div class="card-delta">out of 10.0</div>
+            <div class="card-delta">${windowLabel}</div>
           </div>
           <div class="card">
             <div class="card-label">Vanilla Avg</div>
             <div class="card-value" style="color: var(--vanilla)">${vanillaAvg.toFixed(2)}</div>
-            <div class="card-delta">out of 10.0</div>
+            <div class="card-delta">${windowLabel}</div>
           </div>
           <div class="card">
             <div class="card-label">Delta</div>
@@ -106,11 +117,11 @@
           <div class="card">
             <div class="card-label">Data Points</div>
             <div class="card-value">${qualityEntries.length}</div>
-            <div class="card-delta">evaluation runs</div>
+            <div class="card-delta">total evaluation runs</div>
           </div>
           <div class="card">
             <div class="card-label">Model</div>
-            <div class="card-value" style="font-size: 18px">${latestQuality.model || 'N/A'}</div>
+            <div class="card-value" style="font-size: 18px">${latestModel || 'N/A'}</div>
             <div class="card-delta">latest run</div>
           </div>
         `;
@@ -159,7 +170,7 @@
 
         const labels = efficiencyEntries.map(e => {
           const d = new Date(e.date);
-          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         });
 
         const timeData = efficiencyEntries.map(e => {
@@ -237,7 +248,7 @@
 
     const labels = entries.map(e => {
       const d = new Date(e.date);
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     });
 
     const dataA = entries.map(e => {
@@ -306,8 +317,8 @@
           y: {
             ticks: { color: '#8b949e' },
             grid: { color: '#30363d' },
-            suggestedMin: title.includes('Quality') ? 0 : undefined,
-            suggestedMax: title.includes('Quality') ? 10 : undefined
+            suggestedMin: 0,
+            suggestedMax: 10
           }
         }
       }
