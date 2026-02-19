@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771516509936,
+  "lastUpdate": 1771516559844,
   "entries": {
     "Efficiency": [
       {
@@ -1143,6 +1143,43 @@
           },
           "id": "08efdf506d1b0f608f041caf7038213a151898a4"
         }
+      },
+      {
+        "benches": [
+          {
+            "value": 108.0,
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "value": 352900.0,
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In"
+          },
+          {
+            "value": 97.0,
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time"
+          },
+          {
+            "value": 188200.0,
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In"
+          }
+        ],
+        "commit": {
+          "message": "Fix evaluation failure handling and stderr visibility",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/08efdf506d1b0f608f041caf7038213a151898a4",
+          "id": "08efdf506d1b0f608f041caf7038213a151898a4",
+          "timestamp": "2026-02-19T15:25:08+00:00"
+        },
+        "model": "claude-opus-4.5",
+        "date": 1771516559844,
+        "tool": "customSmallerIsBetter"
       }
     ],
     "Quality": [
@@ -2294,6 +2331,43 @@
           },
           "id": "08efdf506d1b0f608f041caf7038213a151898a4"
         }
+      },
+      {
+        "benches": [
+          {
+            "value": 7.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality"
+          }
+        ],
+        "commit": {
+          "message": "Fix evaluation failure handling and stderr visibility",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/08efdf506d1b0f608f041caf7038213a151898a4",
+          "id": "08efdf506d1b0f608f041caf7038213a151898a4",
+          "timestamp": "2026-02-19T15:25:08+00:00"
+        },
+        "model": "claude-opus-4.5",
+        "date": 1771516559844,
+        "tool": "customBiggerIsBetter"
       }
     ]
   },
