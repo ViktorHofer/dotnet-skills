@@ -311,7 +311,7 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
                 -TimeoutSeconds $TimeoutSeconds
 
             if ($null -eq $evalOutput -or $evalOutput.Trim() -eq '') {
-                Write-Warning "[EVAL] Attempt $attempt: Copilot returned no output (timeout or error)"
+                Write-Warning "[EVAL] Attempt ${attempt}: Copilot returned no output (timeout or error)"
                 # Wait before retry to avoid hitting API quota limits
                 if ($attempt -lt $maxRetries) { Start-Sleep -Seconds 60 }
                 continue
@@ -331,7 +331,7 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
                 break
             }
 
-            Write-Warning "[EVAL] Attempt $attempt: Failed to parse evaluation JSON"
+            Write-Warning "[EVAL] Attempt ${attempt}: Failed to parse evaluation JSON"
             $evaluation = $null
             # Wait before retry to avoid hitting API quota limits
             if ($attempt -lt $maxRetries) { Start-Sleep -Seconds 60 }
