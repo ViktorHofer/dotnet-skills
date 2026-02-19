@@ -154,7 +154,7 @@ function Copy-ScenarioToTemp {
     Copy-Item -Path "$ScenarioSourceDir\*" -Destination $tempDir -Recurse -Force
 
     # Remove evaluation and documentation files from temp copy
-    $excludeFiles = @("expected-output.md", "eval-test-prompt.txt", "README.md", "DEMO.md", ".gitignore")
+    $excludeFiles = @("expected-output.md", "eval-test-prompt.txt", "README.md", ".gitignore")
     foreach ($file in $excludeFiles) {
         $filePath = Join-Path $tempDir $file
         if (Test-Path $filePath) {
