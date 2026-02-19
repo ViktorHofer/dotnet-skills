@@ -34,6 +34,11 @@ on:
         description: 'Copilot model to use (e.g. claude-opus-4.5, claude-sonnet-4.5)'
         required: false
         default: 'claude-opus-4.5'
+      max_retries:
+        description: 'Maximum number of retries per scenario on failure'
+        required: false
+        type: number
+        default: 3
 
 
 concurrency:
@@ -48,6 +53,7 @@ env:
   RESULTS_BASE: artifacts/TestResults
   DOTNET_VERSION: '10.0.x'
   DEFAULT_MODEL: 'claude-opus-4.5'
+  DEFAULT_MAX_RETRIES: 3
 
 permissions:
   contents: write
@@ -154,6 +160,25 @@ jobs:
           }
           Write-Host "Model: $model"
           echo "COPILOT_MODEL=$model" >> $env:GITHUB_ENV
+
+          # Set max retries
+          $maxRetries = "${{ github.event.inputs.max_retries }}"
+          if (-not $maxRetries -or $maxRetries -eq '') {
+            $maxRetries = $env:DEFAULT_MAX_RETRIES
+          } else {
+            try {
+              $maxRetries = [int]$maxRetries
+              if ($maxRetries -lt 1) {
+                Write-Warning "Max retries must be at least 1, using default of $env:DEFAULT_MAX_RETRIES"
+                $maxRetries = $env:DEFAULT_MAX_RETRIES
+              }
+            } catch {
+              Write-Warning "Invalid max retries value, using default of $env:DEFAULT_MAX_RETRIES"
+              $maxRetries = $env:DEFAULT_MAX_RETRIES
+            }
+          }
+          Write-Host "Max retries: $maxRetries"
+          echo "MAX_RETRIES=$maxRetries" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Setup .NET SDK
@@ -181,7 +206,8 @@ jobs:
             -Plugin "${{ matrix.plugin }}" `
             -ResultsDir "$env:RESULTS_DIR" `
             -RunId "$env:RUN_ID" `
-            -Model "$env:COPILOT_MODEL"
+            -Model "$env:COPILOT_MODEL" `
+            -MaxRetries $env:MAX_RETRIES
         shell: pwsh
 
       - name: Install Plugin and Run Skilled Copilot
@@ -203,7 +229,8 @@ jobs:
             -Plugin "$plugin" `
             -ResultsDir "$env:RESULTS_DIR" `
             -RunId "$env:RUN_ID" `
-            -Model "$env:COPILOT_MODEL"
+            -Model "$env:COPILOT_MODEL" `
+            -MaxRetries $env:MAX_RETRIES
         shell: pwsh
 
       - name: Uninstall Plugin and Run Evaluation
@@ -224,7 +251,8 @@ jobs:
             -Plugin "${{ matrix.plugin }}" `
             -ResultsDir "$env:RESULTS_DIR" `
             -RunId "$env:RUN_ID" `
-            -Model "$env:COPILOT_MODEL"
+            -Model "$env:COPILOT_MODEL" `
+            -MaxRetries $env:MAX_RETRIES
         shell: pwsh
 
       - name: Upload Artifacts

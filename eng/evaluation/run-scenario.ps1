@@ -42,7 +42,8 @@ param(
 
     [int]$TimeoutSeconds = 300,
 
-    [int]$MaxRetries = 3,
+    [Parameter(Mandatory)]
+    [int]$MaxRetries,
 
     [string]$ScenariosBaseDir,
 

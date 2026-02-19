@@ -52,7 +52,10 @@ param(
     [string]$RunId,
 
     [Parameter(Mandatory)]
-    [string]$Model
+    [string]$Model,
+
+    [Parameter(Mandatory)]
+    [int]$MaxRetries
 )
 
 $ErrorActionPreference = "Stop"
@@ -79,6 +82,7 @@ $scenarioList | ForEach-Object -ThrottleLimit $Parallelism -Parallel {
     $failures = $using:failures
     $label = $using:label
     $model = $using:Model
+    $maxRetries = $using:MaxRetries
 
     Write-Host "`n=== ${label}: $scenario ==="
 
@@ -87,7 +91,8 @@ $scenarioList | ForEach-Object -ThrottleLimit $Parallelism -Parallel {
         "-ResultsDir", $resultsDir,
         "-RunId", $runId,
         "-ScenariosBaseDir", $scenariosBaseDir,
-        "-Model", $model
+        "-Model", $model,
+        "-MaxRetries", $maxRetries
     )
     if ($runType) {
         $scriptArgs += @("-RunType", $runType)
