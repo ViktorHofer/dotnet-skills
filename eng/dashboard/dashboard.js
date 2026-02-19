@@ -75,12 +75,14 @@
       <div class="charts-grid" id="efficiency-${plugin}"></div>
     `;
 
-    // Summary cards — compute averages across all entries
+    // Summary cards — compute averages across the last 50 entries
     const summaryDiv = document.getElementById(`summary-${plugin}`);
+    const SUMMARY_WINDOW = 50;
     if (qualityEntries.length > 0) {
-      // Collect all skilled/vanilla scores across all entries
+      // Use only the most recent entries for summary cards
+      const recentEntries = qualityEntries.slice(-SUMMARY_WINDOW);
       let skilledTotal = 0, skilledCount = 0, vanillaTotal = 0, vanillaCount = 0;
-      qualityEntries.forEach(entry => {
+      recentEntries.forEach(entry => {
         entry.benches.forEach(b => {
           if (b.name.endsWith('- Skilled Quality')) { skilledTotal += b.value; skilledCount++; }
           if (b.name.endsWith('- Vanilla Quality')) { vanillaTotal += b.value; vanillaCount++; }
@@ -89,6 +91,9 @@
       const skilledAvg = skilledCount > 0 ? skilledTotal / skilledCount : null;
       const vanillaAvg = vanillaCount > 0 ? vanillaTotal / vanillaCount : null;
       const latestModel = qualityEntries[qualityEntries.length - 1].model;
+      const windowLabel = qualityEntries.length > SUMMARY_WINDOW
+        ? `last ${SUMMARY_WINDOW} of ${qualityEntries.length} runs`
+        : `${qualityEntries.length} runs`;
       if (skilledAvg !== null && vanillaAvg !== null) {
         const delta = (skilledAvg - vanillaAvg).toFixed(2);
         const deltaClass = delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral';
@@ -97,12 +102,12 @@
           <div class="card">
             <div class="card-label">Skilled Avg</div>
             <div class="card-value" style="color: var(--skilled)">${skilledAvg.toFixed(2)}</div>
-            <div class="card-delta">out of 10.0</div>
+            <div class="card-delta">${windowLabel}</div>
           </div>
           <div class="card">
             <div class="card-label">Vanilla Avg</div>
             <div class="card-value" style="color: var(--vanilla)">${vanillaAvg.toFixed(2)}</div>
-            <div class="card-delta">out of 10.0</div>
+            <div class="card-delta">${windowLabel}</div>
           </div>
           <div class="card">
             <div class="card-label">Delta</div>
@@ -112,7 +117,7 @@
           <div class="card">
             <div class="card-label">Data Points</div>
             <div class="card-value">${qualityEntries.length}</div>
-            <div class="card-delta">evaluation runs</div>
+            <div class="card-delta">total evaluation runs</div>
           </div>
           <div class="card">
             <div class="card-label">Model</div>

@@ -105,6 +105,13 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Cache Copilot CLI
+        id: cache-copilot
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-copilot-${{ runner.os }}-${{ hashFiles('.github/workflows/evaluation.yml') }}
+
       - name: Install Copilot CLI
         run: |
           npm install -g @github/copilot

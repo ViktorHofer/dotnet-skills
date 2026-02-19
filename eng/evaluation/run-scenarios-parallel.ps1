@@ -98,11 +98,15 @@ $scenarioList | ForEach-Object -ThrottleLimit $Parallelism -Parallel {
         $scriptArgs += @("-RunType", $runType)
     }
 
-    pwsh -File $script @scriptArgs
+    # Capture output and prefix each line with the scenario name for readable logs
+    $output = pwsh -File $script @scriptArgs 2>&1
+    $exitCode = $LASTEXITCODE
 
-    if ($LASTEXITCODE -ne 0) {
+    $output | ForEach-Object { Write-Host "[$scenario] $_" }
+
+    if ($exitCode -ne 0) {
         $failures.Add($scenario)
-        Write-Error "Scenario $scenario ($label) failed with exit code $LASTEXITCODE"
+        Write-Error "[$scenario] Scenario $scenario ($label) failed with exit code $exitCode"
     }
 }
 
