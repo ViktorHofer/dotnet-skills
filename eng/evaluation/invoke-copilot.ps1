@@ -27,6 +27,9 @@
 
 .PARAMETER IncludeStderr
     If set, return stdout + stderr combined (for stats parsing).
+
+.PARAMETER Model
+    Copilot model to use (default: claude-opus-4.5).
 #>
 function Invoke-CopilotCli {
     [CmdletBinding()]
@@ -43,7 +46,9 @@ function Invoke-CopilotCli {
 
         [string]$OutputFile,
 
-        [switch]$IncludeStderr
+        [switch]$IncludeStderr,
+
+        [string]$Model = "claude-opus-4.5"
     )
 
     Write-Host "[RUN] Running Copilot CLI..."
@@ -65,13 +70,13 @@ function Invoke-CopilotCli {
     if (-not $copilotCmd) {
         if ($env:OS -match 'Windows') {
             $copilotCmd = "cmd.exe"
-            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
+            $copilotArgs = "/c copilot -p `"$Prompt`" --model $Model --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
         } else {
             $copilotCmd = "/usr/bin/env"
-            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
+            $copilotArgs = "copilot -p `"$Prompt`" --model $Model --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
         }
     } else {
-        $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
+        $copilotArgs = "-p `"$Prompt`" --model $Model --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
     }
 
     Write-Host "   Copilot executable: $copilotCmd"
