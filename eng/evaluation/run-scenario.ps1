@@ -383,12 +383,31 @@ $sessionConfigDir = Join-Path (Resolve-Path $scenarioResultsDir).Path "${RunType
 New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
 Write-Host "[SESSION] Config directory: $sessionConfigDir"
 
-$output = Invoke-CopilotWithTimeout `
-    -Prompt $prompt `
-    -WorkingDir $workingDir `
-    -OutputFile $outputFile `
-    -TimeoutSeconds $TimeoutSeconds `
-    -ConfigDir $sessionConfigDir
+$maxRetries = 3
+$output = $null
+for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
+    if ($attempt -gt 1) {
+        Write-Host "[RETRY] Attempt $attempt of $maxRetries..."
+        # Clean up previous session config for fresh retry
+        Remove-Item -Recurse -Force $sessionConfigDir -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
+    }
+
+    $output = Invoke-CopilotWithTimeout `
+        -Prompt $prompt `
+        -WorkingDir $workingDir `
+        -OutputFile $outputFile `
+        -TimeoutSeconds $TimeoutSeconds `
+        -ConfigDir $sessionConfigDir
+
+    if ($null -ne $output) {
+        break
+    }
+    Write-Warning "[RETRY] Attempt $attempt failed (timeout or error), retrying..."
+}
+if ($null -eq $output) {
+    Write-Warning "[RETRY] All $maxRetries attempts failed for $ScenarioName ($RunType)"
+}
 
 # Step 5: Parse stats
 Write-Host ""
