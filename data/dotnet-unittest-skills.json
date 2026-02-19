@@ -1,6 +1,6 @@
 {
   "repoUrl": "",
-  "lastUpdate": 1771460278946,
+  "lastUpdate": 1771460403284,
   "entries": {
     "Quality": [
       {
@@ -627,6 +627,43 @@
         },
         "tool": "customBiggerIsBetter",
         "date": 1771460278946
+      },
+      {
+        "date": 1771460403284,
+        "model": "claude-opus-4.5",
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (1-5)",
+            "value": 9.0
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (1-5)",
+            "value": 8.0
+          },
+          {
+            "name": "Overall - Skilled Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 9.0
+          },
+          {
+            "name": "Overall - Vanilla Avg Quality",
+            "unit": "Score (1-5)",
+            "value": 8.0
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        }
       }
     ],
     "Efficiency": [
@@ -1126,6 +1163,33 @@
         },
         "tool": "customSmallerIsBetter",
         "date": 1771460278946
+      },
+      {
+        "date": 1771460403284,
+        "model": "claude-opus-4.5",
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 136.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 417600.0
+          }
+        ],
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/5cf30c27ee7d119f7911ae8a2144d84f66714587",
+          "author": {
+            "name": "",
+            "username": "ViktorHofer"
+          },
+          "message": "",
+          "timestamp": "",
+          "id": "5cf30c27ee7d119f7911ae8a2144d84f66714587"
+        }
       }
     ]
   }
