@@ -336,12 +336,18 @@ jobs:
 
       - name: Generate Benchmark Data
         run: |
+          # Use git log instead of github.event.head_commit (which is null for schedule/dispatch)
+          $sha = "${{ github.sha }}"
+          $commitMsg = git log -1 --format='%s' $sha
+          $commitTimestamp = git log -1 --format='%aI' $sha
+          $commitAuthor = git log -1 --format='%an' $sha
+
           $commitJson = @{
-            id        = "${{ github.sha }}"
-            message   = $env:COMMIT_MSG
-            timestamp = "${{ github.event.head_commit.timestamp }}"
-            url       = "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-            author    = @{ name = "${{ github.event.head_commit.author.name }}"; username = "${{ github.actor }}" }
+            id        = $sha
+            message   = $commitMsg
+            timestamp = $commitTimestamp
+            url       = "https://github.com/${{ github.repository }}/commit/$sha"
+            author    = @{ name = $commitAuthor; username = "${{ github.actor }}" }
           } | ConvertTo-Json -Compress
 
           # Generate benchmark data for each plugin
@@ -385,8 +391,6 @@ jobs:
           @($plugins) | ConvertTo-Json | Out-File -FilePath "/tmp/gh-pages/data/plugins.json" -Encoding utf8
           Write-Host "`n=== plugins.json: $($plugins -join ', ') ==="
         shell: pwsh
-        env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
 
       - name: Deploy to GitHub Pages
         run: |
