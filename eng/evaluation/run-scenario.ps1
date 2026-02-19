@@ -288,7 +288,8 @@ function Invoke-CopilotWithTimeout {
 
     if (-not $completed) {
         $process.Kill()
-        throw "[TIMEOUT] Copilot timed out after $TimeoutSeconds seconds"
+        Write-Warning "[TIMEOUT] Copilot timed out after $TimeoutSeconds seconds for $ScenarioName ($RunType)"
+        return $null
     }
 
     $exitCode = $process.ExitCode
