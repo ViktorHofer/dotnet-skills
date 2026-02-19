@@ -11,7 +11,7 @@ Each scenario is run **twice** through Copilot CLI:
 | **Vanilla** | None | Baseline — what Copilot produces on its own |
 | **Skilled** | Plugin installed | What Copilot produces with the skills plugin |
 
-Both outputs are then scored by a separate Copilot invocation (acting as an evaluator) against an expected-output rubric, producing per-scenario quality scores (Accuracy, Completeness, Actionability, Clarity — each 1–5) along with token and time metrics.
+Both outputs are then scored by a separate Copilot invocation (acting as an evaluator) against an expected-output rubric, producing per-scenario quality scores (Accuracy, Completeness, Actionability, Clarity — each 0–10) along with token and time metrics.
 
 ## Testcase Structure
 
