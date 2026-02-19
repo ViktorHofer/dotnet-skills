@@ -165,7 +165,7 @@
 
         const labels = efficiencyEntries.map(e => {
           const d = new Date(e.date);
-          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         });
 
         const timeData = efficiencyEntries.map(e => {
@@ -243,7 +243,7 @@
 
     const labels = entries.map(e => {
       const d = new Date(e.date);
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     });
 
     const dataA = entries.map(e => {
