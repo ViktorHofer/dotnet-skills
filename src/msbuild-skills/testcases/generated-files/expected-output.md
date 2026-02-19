@@ -1,13 +1,13 @@
 # Expected Findings: generated-file-include Scenario
 
 ## Problem Summary
-This project generates a C# source file during the build (via an MSBuild inline task), but fails to include it in compilation. The build fails because `Program.cs` references `TestProject.Generated.BuildInfo` which exists in the generated file.
+This project generates a C# source file during the build (via an MSBuild inline task) and attempts to include it via a project-level glob, but the build fails with CS0103 because the glob is evaluated before the file exists.
 
 ## Root Cause
-The `GenerateSampleCode` target writes a `.cs` file to `$(IntermediateOutputPath)Generated\GeneratedInfo.cs` using the `WriteCodeFile` inline task, but the target does **not** add the generated file to the `Compile` item group. Since the file is generated during the build (execution phase), it wasn't present during MSBuild's evaluation phase when default globs are expanded, so it is never compiled.
+The project has `<Compile Include="$(IntermediateOutputPath)Generated\**\*.cs" />` at the project level (outside of any target). This glob is expanded during MSBuild's **evaluation phase**, before any targets execute. Since the `GenerateSampleCode` target creates the file during the **execution phase**, the glob finds nothing — the directory and file don't exist yet.
 
 ## Expected Fix
-The fix should add an `<ItemGroup>` inside the `GenerateSampleCode` target (after the file is written) that includes the generated file in compilation and registers it for cleanup:
+Move the `<Compile Include>` from the project level into the `GenerateSampleCode` target (after the file is written), and add `FileWrites` for clean support:
 
 ```xml
 <ItemGroup>
@@ -16,28 +16,21 @@ The fix should add an `<ItemGroup>` inside the `GenerateSampleCode` target (afte
 </ItemGroup>
 ```
 
-## Key Concepts That Should Be Mentioned
-- MSBuild evaluation phase vs execution phase
-- Files generated during build are not captured by default glob patterns
-- `Compile` item group for source files that need to be compiled
-- `FileWrites` item group for proper cleanup during `dotnet clean`
-- `$(IntermediateOutputPath)` as the correct base directory for generated files
-- `BeforeTargets="CoreCompile;BeforeCompile"` as the correct target timing for generated source files
-- The generated file must be added to `Compile` **inside the target** (not at the project level) because it doesn't exist at evaluation time
+The project-level `<Compile Include="$(IntermediateOutputPath)Generated\**\*.cs" />` should be removed — it has no effect and is misleading.
 
 ## Evaluation Checklist
 Award 1 point for each item correctly identified and addressed:
 
-- [ ] Identified that the generated file is not included in compilation
-- [ ] Explained evaluation phase vs execution phase timing
-- [ ] Explained that default globs don't capture files generated during build
-- [ ] Suggested adding generated file to Compile item group inside the target
-- [ ] Suggested adding generated file to FileWrites item group
-- [ ] Provided correct XML for the fix (Compile Include inside target)
-- [ ] Mentioned IntermediateOutputPath as correct base directory
-- [ ] Mentioned correct target timing (BeforeTargets="CoreCompile")
-- [ ] Explained that the include must be inside the target, not at project level
-- [ ] Solution would actually fix the build error
+1. [ ] Identified that the project-level Compile glob doesn't capture the generated file
+2. [ ] Explained WHY: globs outside targets are expanded during evaluation phase, before the file exists
+3. [ ] Explained evaluation phase vs execution phase distinction clearly
+4. [ ] Recommended moving the Compile Include INSIDE the GenerateSampleCode target (after file generation)
+5. [ ] Recommended adding FileWrites for proper `dotnet clean` support
+6. [ ] Provided correct XML fix with both Compile and FileWrites inside the target
+7. [ ] Mentioned or used `$(IntermediateOutputPath)` as the correct base directory for generated files (not hardcoded `obj\`)
+8. [ ] Explained that `BeforeTargets="CoreCompile;BeforeCompile"` is the correct target timing for generated source files (both targets, not just one)
+9. [ ] Explained that project-level includes (outside targets) cannot work for files that don't exist at evaluation time — the include must be inside a target
+10. [ ] Solution would actually fix the CS0103 build error
 
 Total: __/10
 

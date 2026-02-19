@@ -1,30 +1,32 @@
 # Generated Files — Inclusion Issues
 
-A project that generates a .cs file during build but fails to include it in compilation.
+A project that generates a .cs file during build and attempts to include it via a project-level glob, but fails.
 
-## Issue
+## Issues (Surface Level)
 
-The `GenerateVersionFile` target creates `Version.g.cs` in the intermediate output,
-but doesn't add it to `<Compile>` items or register it in `<FileWrites>`.
+### 1. Build Fails with CS0103
+- `GenerateSampleCode` target creates `GeneratedInfo.cs` in the intermediate output
+- Program.cs references `TestProject.Generated.BuildInfo` which doesn't compile
 
-Result: `CS0103: The name 'VersionInfo' does not exist in the current context`
+## Issues (Subtle / Skill-Specific)
+
+### 2. Project-Level Glob Red Herring
+- There IS a `<Compile Include="$(IntermediateOutputPath)Generated\**\*.cs" />` at the project level
+- It looks like it should capture the generated file, but it doesn't — globs outside targets are expanded during evaluation phase before the file exists
+- The skilled response should explain WHY the existing include doesn't work
+
+### 3. Missing FileWrites
+- Generated file is not registered in `FileWrites` for proper `dotnet clean` support
+
+### 4. Target Timing Knowledge
+- Skill teaches `BeforeTargets="CoreCompile;BeforeCompile"` (both targets) for robust ordering
 
 ## Skills Tested
 
-- `including-generated-files` — How to properly include build-generated files
+- `including-generated-files` — Evaluation vs execution phase, proper include patterns
 
 ## How to Test
 
 ```bash
-dotnet build GeneratedFiles.csproj   # Fails with CS0103
-```
-
-## Expected Fix
-
-Add to the target:
-```xml
-<ItemGroup>
-  <Compile Include="$(VersionFile)" />
-  <FileWrites Include="$(VersionFile)" />
-</ItemGroup>
+dotnet build TestProject.csproj   # Fails with CS0103
 ```

@@ -7,6 +7,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Attempt to include generated files - this should capture them, right? -->
+  <ItemGroup>
+    <Compile Include="$(IntermediateOutputPath)Generated\**\*.cs" />
+  </ItemGroup>
+
   <!-- Inline task to write text file with proper content -->
   <UsingTask TaskName="WriteCodeFile" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
