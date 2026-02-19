@@ -1,0 +1,1 @@
+I want to create a new Worker Service project. Before creating it, tell me all the available configuration options (parameters) for this template, what their types are, what values are valid, and what the defaults are. Also tell me if there are any constraints or requirements (like SDK version or OS) I should know about.

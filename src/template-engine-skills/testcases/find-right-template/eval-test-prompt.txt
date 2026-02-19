@@ -1,0 +1,1 @@
+I need to create a new project but I'm not sure which template to use. I want to build a real-time web application where the server can push updates to connected browsers. It should support .NET and use C#. What are my options and which one would you recommend?

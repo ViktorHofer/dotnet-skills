@@ -1,0 +1,1 @@
+Create a new ASP.NET Web API project called "OrderService" in the current directory. It should use controllers (not minimal APIs), have Individual authentication, and target the latest .NET framework. Make sure HTTPS is enabled.
