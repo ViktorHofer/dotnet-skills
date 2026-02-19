@@ -30,11 +30,7 @@ on:
         required: false
         type: number
         default: 4
-      publish_benchmark:
-        description: 'Publish results to benchmark dashboard'
-        required: false
-        type: boolean
-        default: false
+
 
 concurrency:
   # PRs: cancel previous runs on same branch. Schedule/dispatch: unique group per run (never cancel).
@@ -317,7 +313,7 @@ jobs:
 
   publish-benchmark:
     needs: evaluate
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_benchmark == 'true')
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
