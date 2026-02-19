@@ -58,6 +58,7 @@ if (-not $RepoRoot) {
 }
 
 # Import helper functions
+. (Join-Path $PSScriptRoot "invoke-copilot.ps1")
 . (Join-Path $PSScriptRoot "parse-copilot-stats.ps1")
 
 #region Helper Functions
@@ -162,124 +163,6 @@ function Copy-ScenarioToTemp {
     return $tempDir
 }
 
-function Invoke-CopilotWithTimeout {
-    param(
-        [string]$Prompt,
-        [string]$WorkingDir,
-        [string]$OutputFile,
-        [int]$TimeoutSeconds = 300,
-        [string]$ConfigDir = ""
-    )
-
-    Write-Host "[RUN] Running Copilot CLI..."
-    Write-Host "   Working directory: $WorkingDir"
-    Write-Host "   Timeout: ${TimeoutSeconds}s"
-    Write-Host "   Prompt: $Prompt"
-
-    $errorFile = "${OutputFile}.err"
-
-    # Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
-    # Use -All to search across all PATH entries, not just the first match
-    $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandType -eq 'Application' } |
-        Select-Object -First 1 -ExpandProperty Source
-
-    $configDirArg = ""
-    if ($ConfigDir -and $ConfigDir -ne "") {
-        $configDirArg = " --config-dir `"$ConfigDir`""
-    }
-
-    if (-not $copilotCmd) {
-        if ($env:OS -match 'Windows') {
-            # Windows: use cmd.exe to run copilot (works with .cmd/.bat shims via PATH)
-            $copilotCmd = "cmd.exe"
-            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
-        } else {
-            # Linux/macOS: use /usr/bin/env to find copilot
-            $copilotCmd = "/usr/bin/env"
-            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
-        }
-    } else {
-        $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --allow-all-tools --allow-all-paths --no-ask-user$configDirArg"
-    }
-
-    Write-Host "   Copilot executable: $copilotCmd"
-
-    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $processInfo.FileName = $copilotCmd
-    $processInfo.Arguments = $copilotArgs
-    $processInfo.WorkingDirectory = $WorkingDir
-    $processInfo.RedirectStandardOutput = $true
-    $processInfo.RedirectStandardError = $true
-    $processInfo.UseShellExecute = $false
-    $processInfo.CreateNoWindow = $true
-
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = $processInfo
-
-    # Capture output asynchronously to avoid deadlocks
-    $stdoutBuilder = New-Object System.Text.StringBuilder
-    $stderrBuilder = New-Object System.Text.StringBuilder
-
-    $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName OutputDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stdoutBuilder
-
-    $stderrEvent = Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stderrBuilder
-
-    $startTime = Get-Date
-    $process.Start() | Out-Null
-    $process.BeginOutputReadLine()
-    $process.BeginErrorReadLine()
-
-    $completed = $process.WaitForExit($TimeoutSeconds * 1000)
-    $elapsed = (Get-Date) - $startTime
-
-    # Flush async output streams — the parameterless WaitForExit() ensures
-    # all redirected stdout/stderr has been processed by the event handlers
-    if ($completed) {
-        $process.WaitForExit()
-    }
-
-    # Unregister events
-    Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
-    Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
-
-    $stdout = $stdoutBuilder.ToString()
-    $stderr = $stderrBuilder.ToString()
-
-    # Save outputs
-    $stdout | Out-File -FilePath $OutputFile -Encoding utf8
-    if ($stderr) {
-        $stderr | Out-File -FilePath $errorFile -Encoding utf8
-    }
-
-    if (-not $completed) {
-        $process.Kill()
-        Write-Warning "[TIMEOUT] Copilot timed out after $TimeoutSeconds seconds for $ScenarioName ($RunType)"
-        return $null
-    }
-
-    $exitCode = $process.ExitCode
-    Write-Host "   Exit code: $exitCode"
-    Write-Host "   Elapsed: $([math]::Round($elapsed.TotalSeconds, 1))s"
-
-    if ($exitCode -ne 0) {
-        Write-Warning "Copilot CLI exited with code $exitCode"
-        Write-Warning "Stderr: $stderr"
-        # Don't throw - we still want to capture and evaluate partial output
-    }
-
-    # Return combined output (stats are written to stderr by Copilot CLI)
-    return ($stdout + "`n" + $stderr)
-}
-
 #endregion
 
 #region Main Logic
@@ -338,12 +221,13 @@ for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
         New-Item -ItemType Directory -Force -Path $sessionConfigDir | Out-Null
     }
 
-    $output = Invoke-CopilotWithTimeout `
+    $output = Invoke-CopilotCli `
         -Prompt $prompt `
         -WorkingDir $workingDir `
         -OutputFile $outputFile `
         -TimeoutSeconds $TimeoutSeconds `
-        -ConfigDir $sessionConfigDir
+        -ConfigDir $sessionConfigDir `
+        -IncludeStderr
 
     if ($null -ne $output) {
         break

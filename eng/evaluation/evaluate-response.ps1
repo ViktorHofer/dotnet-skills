@@ -47,96 +47,10 @@ if (-not $RepoRoot) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\")).Path
 }
 
+# Import helper functions
+. (Join-Path $PSScriptRoot "invoke-copilot.ps1")
+
 #region Helper Functions
-
-function Invoke-EvaluationCopilot {
-    param(
-        [string]$Prompt,
-        [string]$WorkingDir,
-        [int]$TimeoutSeconds = 300
-    )
-
-    # Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
-    # Use -All to search across all PATH entries, not just the first match
-    $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandType -eq 'Application' } |
-        Select-Object -First 1 -ExpandProperty Source
-    if (-not $copilotCmd) {
-        if ($env:OS -match 'Windows') {
-            $copilotCmd = "cmd.exe"
-            $copilotArgs = "/c copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-        } else {
-            $copilotCmd = "/usr/bin/env"
-            $copilotArgs = "copilot -p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-        }
-    } else {
-        $copilotArgs = "-p `"$Prompt`" --model claude-opus-4.5 --no-ask-user --allow-all-tools --allow-all-paths"
-    }
-
-    Write-Host "   Copilot executable: $copilotCmd"
-    Write-Host "   Working dir: $WorkingDir"
-
-    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $processInfo.FileName = $copilotCmd
-    $processInfo.Arguments = $copilotArgs
-    $processInfo.WorkingDirectory = $WorkingDir
-    $processInfo.RedirectStandardOutput = $true
-    $processInfo.RedirectStandardError = $true
-    $processInfo.UseShellExecute = $false
-    $processInfo.CreateNoWindow = $true
-
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = $processInfo
-
-    $stdoutBuilder = New-Object System.Text.StringBuilder
-    $stderrBuilder = New-Object System.Text.StringBuilder
-
-    $stdoutEvent = Register-ObjectEvent -InputObject $process -EventName OutputDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stdoutBuilder
-
-    $stderrEvent = Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -Action {
-        if ($null -ne $EventArgs.Data) {
-            $Event.MessageData.AppendLine($EventArgs.Data) | Out-Null
-        }
-    } -MessageData $stderrBuilder
-
-    $process.Start() | Out-Null
-    $process.BeginOutputReadLine()
-    $process.BeginErrorReadLine()
-
-    $completed = $process.WaitForExit($TimeoutSeconds * 1000)
-
-    # Flush async output streams — the parameterless WaitForExit() ensures
-    # all redirected stdout/stderr has been processed by the event handlers
-    if ($completed) {
-        $process.WaitForExit()
-    }
-
-    Unregister-Event -SourceIdentifier $stdoutEvent.Name -ErrorAction SilentlyContinue
-    Unregister-Event -SourceIdentifier $stderrEvent.Name -ErrorAction SilentlyContinue
-
-    $stdout = $stdoutBuilder.ToString()
-    $stderr = $stderrBuilder.ToString()
-
-    if (-not $completed) {
-        $process.Kill()
-        Write-Warning "[TIMEOUT] Evaluation Copilot timed out after $TimeoutSeconds seconds"
-        if ($stderr) { Write-Warning "Stderr: $stderr" }
-        return $null
-    }
-
-    $exitCode = $process.ExitCode
-    Write-Host "   Exit code: $exitCode"
-    if ($exitCode -ne 0) {
-        Write-Warning "Evaluation Copilot exited with code $exitCode"
-        if ($stderr) { Write-Warning "Stderr: $stderr" }
-    }
-
-    return $stdout
-}
 
 function Parse-EvaluationJson {
     param([string]$Output)
@@ -305,7 +219,7 @@ Your response must be ONLY a JSON object. Do not include any other text, markdow
 
         for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
             Write-Host "[EVAL] Running Copilot evaluator for $runType (attempt $attempt/$maxRetries)..."
-            $evalOutput = Invoke-EvaluationCopilot `
+            $evalOutput = Invoke-CopilotCli `
                 -Prompt $evalPrompt `
                 -WorkingDir $evalDir `
                 -TimeoutSeconds $TimeoutSeconds
