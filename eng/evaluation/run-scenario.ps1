@@ -403,7 +403,9 @@ for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
     if ($null -ne $output) {
         break
     }
-    Write-Warning "[RETRY] Attempt $attempt failed (timeout or error), retrying..."
+    Write-Warning "[RETRY] Attempt $attempt failed (timeout or error), retrying in 60s..."
+    # Wait before retry to avoid hitting API quota limits
+    Start-Sleep -Seconds 60
 }
 if ($null -eq $output) {
     Write-Warning "[RETRY] All $maxRetries attempts failed for $ScenarioName ($RunType)"
