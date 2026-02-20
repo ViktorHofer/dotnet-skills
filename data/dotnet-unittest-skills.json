@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771574297363,
+  "lastUpdate": 1771577372367,
   "entries": {
     "Efficiency": [
       {
@@ -1770,6 +1770,43 @@
             "unit": "tokens",
             "name": "order-service-mstest - Skilled Tokens In",
             "value": 371300.0
+          }
+        ]
+      },
+      {
+        "model": "claude-opus-4.5",
+        "commit": {
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "date": 1771577372367,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 84.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 302700.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 116.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 426300.0
           }
         ]
       }
@@ -3550,6 +3587,43 @@
             "unit": "Score (0-10)",
             "name": "order-service-mstest - Vanilla Quality",
             "value": 7.0
+          }
+        ]
+      },
+      {
+        "model": "claude-opus-4.5",
+        "commit": {
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "date": 1771577372367,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
           }
         ]
       }
