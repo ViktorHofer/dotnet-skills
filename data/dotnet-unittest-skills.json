@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771571117219,
+  "lastUpdate": 1771574297363,
   "entries": {
     "Efficiency": [
       {
@@ -1735,6 +1735,43 @@
           "timestamp": "2026-02-19T18:15:51+00:00"
         },
         "model": "claude-opus-4.5"
+      },
+      {
+        "tool": "customSmallerIsBetter",
+        "date": 1771574297363,
+        "commit": {
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time",
+            "value": 84.0
+          },
+          {
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 336900.0
+          },
+          {
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time",
+            "value": 110.0
+          },
+          {
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 371300.0
+          }
+        ]
       }
     ],
     "Quality": [
@@ -3478,6 +3515,43 @@
           "timestamp": "2026-02-19T18:15:51+00:00"
         },
         "model": "claude-opus-4.5"
+      },
+      {
+        "tool": "customBiggerIsBetter",
+        "date": 1771574297363,
+        "commit": {
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 9.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 8.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 9.0
+          },
+          {
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 7.0
+          }
+        ]
       }
     ]
   },
