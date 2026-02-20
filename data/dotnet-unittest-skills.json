@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771592770840,
+  "lastUpdate": 1771596765010,
   "entries": {
     "Efficiency": [
       {
@@ -1955,6 +1955,43 @@
             "unit": "tokens",
             "name": "order-service-mstest - Skilled Tokens In",
             "value": 411900.0
+          }
+        ]
+      },
+      {
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "timestamp": "2026-02-20T10:21:56+00:00"
+        },
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5",
+        "date": 1771596765010,
+        "benches": [
+          {
+            "value": 82.0,
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "value": 240600.0,
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In"
+          },
+          {
+            "value": 114.0,
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time"
+          },
+          {
+            "value": 428000.0,
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In"
           }
         ]
       }
@@ -3920,6 +3957,43 @@
             "unit": "Score (0-10)",
             "name": "order-service-mstest - Vanilla Quality",
             "value": 8.0
+          }
+        ]
+      },
+      {
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "timestamp": "2026-02-20T10:21:56+00:00"
+        },
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5",
+        "date": 1771596765010,
+        "benches": [
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "value": 7.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality"
           }
         ]
       }
