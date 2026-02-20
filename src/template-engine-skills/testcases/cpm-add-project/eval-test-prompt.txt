@@ -1,0 +1,1 @@
+Add a new class library project called "SharedModels" to this solution. It should be in a "src" subdirectory.

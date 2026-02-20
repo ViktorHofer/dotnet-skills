@@ -1,0 +1,6 @@
+Create a complete solution structure for a new microservice called "InventoryService" with the following:
+1. A Web API project (with controllers)
+2. A class library for shared domain models
+3. An xUnit test project for the API
+
+All projects should be organized in a clean folder structure (src/ and test/ directories). Add project references so the test project references the API project, and the API project references the class library.
