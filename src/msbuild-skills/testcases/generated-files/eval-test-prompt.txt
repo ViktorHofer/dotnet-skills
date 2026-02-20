@@ -1,0 +1,1 @@
+This project fails to build with error CS0103. There is already a Compile include for the generated files directory, but the build still fails. Diagnose why the generated source file is not being compiled and provide the correct fix.

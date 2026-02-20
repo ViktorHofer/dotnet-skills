@@ -1,28 +1,27 @@
 # Build Errors: SDK/Workload (NETSDK) Errors
 
-Sample projects demonstrating SDK resolution failures.
+Sample projects demonstrating SDK resolution failures with a two-layer error pattern.
 
-## Projects
+## Issues (Surface Level)
 
-| Project | Errors Demonstrated | Skills Tested |
-|---------|-------------------|---------------|
-| `SdkMismatch` | NETSDK1045 (SDK too old for TFM) | `common-build-errors`, `sdk-workload-resolution` |
-| `global.json` | NETSDK1141 (SDK version not found) | `sdk-workload-resolution` |
+### 1. NETSDK1141 — SDK Version Not Found
+- `global.json` pins to nonexistent SDK `99.0.100` with `rollForward: "disable"`
+- Build can't even start
 
-## How to Test
+### 2. NETSDK1045 — Invalid Target Framework
+- Project targets `net99.0` which no installed SDK supports
+- Only visible after fixing global.json
 
-```bash
-# Build with the restrictive global.json — should fail with NETSDK1141
-dotnet build SdkMismatch.csproj
+## Issues (Subtle / Skill-Specific)
 
-# Delete global.json, then build — should fail with NETSDK1045 (net99.0 doesn't exist)
-# Remove global.json
-dotnet build SdkMismatch.csproj
-```
+### 3. rollForward Policy Knowledge
+- The skill provides a complete table of 9 rollForward policies
+- `latestFeature` recommended for dev, `latestPatch` for CI locked environments
 
-## Expected Behavior
+### 4. Feature Band Understanding
+- SDK versioning: `8.0.100` vs `8.0.200` vs `8.0.300` are different feature bands
+- `rollForward: "patch"` stays within a feature band; `"feature"` crosses them
 
-The AI should:
-1. Recognize NETSDK error codes
-2. Check global.json for SDK pinning
-3. Suggest rollForward policy adjustment or SDK installation
+## Skills Tested
+
+- `sdk-workload-resolution` — rollForward policies, feature bands, SDK resolution algorithm

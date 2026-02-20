@@ -1,41 +1,30 @@
 # ClashTest - BinClash Sample Repository
 
-This repository contains sample projects demonstrating different types of MSBuild binclash scenarios.
+This repository contains sample projects demonstrating different types of MSBuild output path clash scenarios.
 
 ## What is BinClash?
 
-BinClash occurs when multiple build targets attempt to write to the same output location, causing file conflicts during parallel builds.
+BinClash occurs when multiple MSBuild project evaluations write to the same output or intermediate directories, causing file conflicts during parallel builds.
 
-## Sample Projects
+## Issues (Surface Level)
 
-### 1. MultiTargetLib - Output Path BinClash
+### 1. MultiTargetLib - Multi-targeting Clash
+- Multi-targets `net8.0` and `net9.0` with `AppendTargetFrameworkToOutputPath=false` and `AppendTargetFrameworkToIntermediateOutputPath=false`
+- Both TFMs write to the same directories
 
-**Location:** `MultiTargetLib/`
+### 2. LibraryA & LibraryB - Shared Output Path
+- Both projects set `BaseOutputPath=..\SharedOutput\`
+- Build artifacts overwrite each other
 
-This project demonstrates a binclash in the **output path** caused by multi-targeting with disabled target framework path appending.
+### 3. LibraryA & LibraryB - Shared Intermediate Path
+- Both projects set `BaseIntermediateOutputPath=..\SharedObj\`
+- `project.assets.json` conflicts during restore
 
-**Configuration:**
-- Multi-targets `net8.0` and `net9.0`
-- Sets `AppendTargetFrameworkToOutputPath` to `false`
+## Issues (Subtle / Skill-Specific)
 
-**Problem:** When building for multiple target frameworks, both `net8.0` and `net9.0` outputs are written to the same output directory, causing file conflicts.
+### 4. AppendTargetFramework Cannot Fix Shared BaseIntermediateOutputPath
+- Even re-enabling `AppendTargetFrameworkToIntermediateOutputPath=true` won't fix LibraryA/B — NuGet writes `project.assets.json` directly to `BaseIntermediateOutputPath` without the TFM subfolder
+- Only fix is unique `BaseIntermediateOutputPath` per project
 
-### 2. LibraryA & LibraryB - Output Path and Intermediate Output Path BinClash
-
-**Location:** `LibraryA/` and `LibraryB/`
-
-These projects demonstrate a binclash in the **output path** and **intermediate output path** caused by sharing common directories.
-
-**Configuration:**
-- Both projects use a shared intermediate path: `..\SharedObj\`
-- Both projects use a shared output path: `..\SharedOutput\`
-- Both disable `AppendTargetFrameworkToOutputPath` and `AppendTargetFrameworkToIntermediateOutputPath`
-
-**Problem:** When building both projects in parallel, they write final output files and intermediate files (like `project.assets.json` files, generated sources, etc.) to the same `SharedObj` directory, causing file conflicts.
-
-## Reproducing the Issues
-
-Build the solution (with has parallel builds enabled by default):
-```bash
-dotnet build ClashTest.slnx
-```
+### 5. Binlog-Based Detection
+- Systematic clash detection via binlog: load binlog → list evaluations → compare OutputPath/IntermediateOutputPath — more reliable than manual csproj inspection

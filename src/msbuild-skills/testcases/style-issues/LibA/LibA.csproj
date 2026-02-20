@@ -7,17 +7,10 @@
     <OutputPath>C:\builds\output\LibA</OutputPath>
   </PropertyGroup>
 
-  <!-- BUG: DefineConstants OVERWRITES instead of appending.
-       This kills all existing constants (TRACE, DEBUG from SDK defaults).
-       Should be: <DefineConstants>$(DefineConstants);ENABLE_LOGGING</DefineConstants> -->
   <PropertyGroup Condition="$(Configuration) == Debug">
     <DefineConstants>ENABLE_LOGGING</DefineConstants>
   </PropertyGroup>
 
-  <!-- BUG: Mixing Include and Update for the same item in one ItemGroup.
-       The Include is redundant (SDK auto-includes *.cs) and the Update in the same
-       ItemGroup can have subtle evaluation-order issues. Split into separate ItemGroups
-       or remove the redundant Include entirely. -->
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Update="Class1.cs" AutoGen="true" />

@@ -12,4 +12,15 @@
   <PropertyGroup>
     <BuildNotes Condition="Exists('build-notes.txt')">$([System.IO.File]::ReadAllText('build-notes.txt'))</BuildNotes>
   </PropertyGroup>
+
+  <UsingTask TaskName="ValidateBuild" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <IsValid ParameterType="System.Boolean" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        IsValid = true;
+      </Code>
+    </Task>
+  </UsingTask>
 </Project>
