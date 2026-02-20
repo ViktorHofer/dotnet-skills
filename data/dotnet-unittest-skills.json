@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771577372367,
+  "lastUpdate": 1771580971462,
   "entries": {
     "Efficiency": [
       {
@@ -1809,6 +1809,43 @@
             "value": 426300.0
           }
         ]
+      },
+      {
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 79.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 241300.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 94.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 284200.0
+          }
+        ],
+        "tool": "customSmallerIsBetter",
+        "commit": {
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "model": "claude-opus-4.5",
+        "date": 1771580971462
       }
     ],
     "Quality": [
@@ -3626,6 +3663,43 @@
             "value": 9.0
           }
         ]
+      },
+      {
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 7.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          }
+        ],
+        "tool": "customBiggerIsBetter",
+        "commit": {
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "message": "Fail the plugin scenario tests if some tests failed",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7"
+        },
+        "model": "claude-opus-4.5",
+        "date": 1771580971462
       }
     ]
   },
