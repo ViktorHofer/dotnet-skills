@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771546022612,
+  "lastUpdate": 1771553877227,
   "entries": {
     "Efficiency": [
       {
@@ -5604,6 +5604,143 @@
         "model": "claude-opus-4.5",
         "tool": "customSmallerIsBetter",
         "date": 1771546022612
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 113.0,
+            "name": "bin-obj-clash - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 641100.0,
+            "name": "bin-obj-clash - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 52.0,
+            "name": "build-errors-cs - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 203700.0,
+            "name": "build-errors-cs - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 47.0,
+            "name": "build-errors-nuget - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 147500.0,
+            "name": "build-errors-nuget - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 46.0,
+            "name": "build-errors-sdk - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 144800.0,
+            "name": "build-errors-sdk - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 35.0,
+            "name": "eval-heavy - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 124100.0,
+            "name": "eval-heavy - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 77.0,
+            "name": "generated-files - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 489900.0,
+            "name": "generated-files - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 24.0,
+            "name": "incremental-broken - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 71000.0,
+            "name": "incremental-broken - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 55.0,
+            "name": "legacy-project - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 193400.0,
+            "name": "legacy-project - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 45.0,
+            "name": "multitarget - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 243100.0,
+            "name": "multitarget - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 128.0,
+            "name": "parallel-bottleneck - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 856600.0,
+            "name": "parallel-bottleneck - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 146.0,
+            "name": "perf-analyzers - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 1100000.0,
+            "name": "perf-analyzers - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 112.0,
+            "name": "style-issues - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 61700.0,
+            "name": "style-issues - Skilled Tokens In",
+            "unit": "tokens"
+          }
+        ],
+        "tool": "customSmallerIsBetter",
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "message": "Fail the plugin scenario tests if some tests failed"
+        },
+        "date": 1771553877227
       }
     ],
     "Quality": [
@@ -10954,6 +11091,138 @@
         "model": "claude-opus-4.5",
         "tool": "customBiggerIsBetter",
         "date": 1771546022612
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 9.0,
+            "name": "bin-obj-clash - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 5.0,
+            "name": "bin-obj-clash - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "build-errors-cs - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "build-errors-cs - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "build-errors-nuget - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "build-errors-nuget - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "build-errors-sdk - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 5.0,
+            "name": "build-errors-sdk - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 9.0,
+            "name": "eval-heavy - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "eval-heavy - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "generated-files - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 5.0,
+            "name": "incremental-broken - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 6.0,
+            "name": "incremental-broken - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 9.0,
+            "name": "legacy-project - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "legacy-project - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "multitarget - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "multitarget - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "parallel-bottleneck - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 7.0,
+            "name": "parallel-bottleneck - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "perf-analyzers - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "perf-analyzers - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "style-issues - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 8.0,
+            "name": "style-issues - Vanilla Quality",
+            "unit": "Score (0-10)"
+          }
+        ],
+        "tool": "customBiggerIsBetter",
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "message": "Fail the plugin scenario tests if some tests failed"
+        },
+        "date": 1771553877227
       }
     ]
   },

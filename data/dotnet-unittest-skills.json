@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771546022552,
+  "lastUpdate": 1771553877162,
   "entries": {
     "Efficiency": [
       {
@@ -1587,6 +1587,43 @@
         "model": "claude-opus-4.5",
         "tool": "customSmallerIsBetter",
         "date": 1771546022552
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 114.0,
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 341900.0,
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens"
+          },
+          {
+            "value": 109.0,
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds"
+          },
+          {
+            "value": 400600.0,
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens"
+          }
+        ],
+        "tool": "customSmallerIsBetter",
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "message": "Fail the plugin scenario tests if some tests failed"
+        },
+        "date": 1771553877162
       }
     ],
     "Quality": [
@@ -3182,6 +3219,43 @@
         "model": "claude-opus-4.5",
         "tool": "customBiggerIsBetter",
         "date": 1771546022552
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 8.0,
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 9.0,
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 9.0,
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)"
+          },
+          {
+            "value": 9.0,
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)"
+          }
+        ],
+        "tool": "customBiggerIsBetter",
+        "commit": {
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "id": "6fdad090e9b74f35c4bfabab9c319415906410f7",
+          "timestamp": "2026-02-19T18:15:51+00:00",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "message": "Fail the plugin scenario tests if some tests failed"
+        },
+        "date": 1771553877162
       }
     ]
   },
