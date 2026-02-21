@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771714868613,
+  "lastUpdate": 1771716778396,
   "entries": {
     "Efficiency": [
       {
@@ -3659,6 +3659,43 @@
             "unit": "tokens"
           }
         ]
+      },
+      {
+        "date": 1771716778396,
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472"
+        },
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "unit": "seconds",
+            "value": 93.0,
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 325200.0,
+            "name": "calculator-xunit - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 106.0,
+            "name": "order-service-mstest - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 321800.0,
+            "name": "order-service-mstest - Skilled Tokens In"
+          }
+        ],
+        "model": "claude-opus-4.5"
       }
     ],
     "Quality": [
@@ -7326,6 +7363,43 @@
             "unit": "Score (0-10)"
           }
         ]
+      },
+      {
+        "date": 1771716778396,
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472"
+        },
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "order-service-mstest - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "order-service-mstest - Vanilla Quality"
+          }
+        ],
+        "model": "claude-opus-4.5"
       }
     ]
   },

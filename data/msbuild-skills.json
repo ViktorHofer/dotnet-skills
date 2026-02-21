@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771714868694,
+  "lastUpdate": 1771716778487,
   "entries": {
     "Efficiency": [
       {
@@ -13276,6 +13276,143 @@
             "unit": "tokens"
           }
         ]
+      },
+      {
+        "date": 1771716778487,
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472"
+        },
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "unit": "seconds",
+            "value": 71.0,
+            "name": "bin-obj-clash - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 283200.0,
+            "name": "bin-obj-clash - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 52.0,
+            "name": "build-errors-cs - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 204200.0,
+            "name": "build-errors-cs - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 49.0,
+            "name": "build-errors-nuget - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 246200.0,
+            "name": "build-errors-nuget - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 46.0,
+            "name": "build-errors-sdk - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 237100.0,
+            "name": "build-errors-sdk - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 32.0,
+            "name": "eval-heavy - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 124200.0,
+            "name": "eval-heavy - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 57.0,
+            "name": "generated-files - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 285500.0,
+            "name": "generated-files - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 27.0,
+            "name": "incremental-broken - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 86600.0,
+            "name": "incremental-broken - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 45.0,
+            "name": "legacy-project - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 151100.0,
+            "name": "legacy-project - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 44.0,
+            "name": "multitarget - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 214500.0,
+            "name": "multitarget - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 88.0,
+            "name": "parallel-bottleneck - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 468900.0,
+            "name": "parallel-bottleneck - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 126.0,
+            "name": "perf-analyzers - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 967800.0,
+            "name": "perf-analyzers - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 96.0,
+            "name": "style-issues - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 61100.0,
+            "name": "style-issues - Skilled Tokens In"
+          }
+        ],
+        "model": "claude-opus-4.5"
       }
     ],
     "Quality": [
@@ -26103,6 +26240,143 @@
             "unit": "Score (0-10)"
           }
         ]
+      },
+      {
+        "date": 1771716778487,
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472"
+        },
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "bin-obj-clash - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 6.0,
+            "name": "bin-obj-clash - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "build-errors-cs - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 7.0,
+            "name": "build-errors-cs - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "build-errors-nuget - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "build-errors-nuget - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 7.0,
+            "name": "build-errors-sdk - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 6.0,
+            "name": "build-errors-sdk - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "eval-heavy - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "eval-heavy - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "generated-files - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 6.0,
+            "name": "generated-files - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 7.0,
+            "name": "incremental-broken - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 5.0,
+            "name": "incremental-broken - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "legacy-project - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "legacy-project - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "multitarget - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "multitarget - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 5.0,
+            "name": "parallel-bottleneck - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 7.0,
+            "name": "parallel-bottleneck - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 7.0,
+            "name": "perf-analyzers - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "perf-analyzers - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 7.0,
+            "name": "style-issues - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "style-issues - Vanilla Quality"
+          }
+        ],
+        "model": "claude-opus-4.5"
       }
     ]
   },
