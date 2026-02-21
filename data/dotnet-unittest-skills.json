@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771684575050,
+  "lastUpdate": 1771686269983,
   "entries": {
     "Efficiency": [
       {
@@ -3067,6 +3067,43 @@
             "username": "ViktorHofer"
           }
         }
+      },
+      {
+        "model": "claude-opus-4.5",
+        "date": 1771686269983,
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "message": "Add MIT License to the project (#52)"
+        },
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "unit": "seconds",
+            "value": 128.0
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 519400.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "unit": "seconds",
+            "value": 102.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "unit": "tokens",
+            "value": 317400.0
+          }
+        ]
       }
     ],
     "Quality": [
@@ -6142,6 +6179,43 @@
             "username": "ViktorHofer"
           }
         }
+      },
+      {
+        "model": "claude-opus-4.5",
+        "date": 1771686269983,
+        "commit": {
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "message": "Add MIT License to the project (#52)"
+        },
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 9.0
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "unit": "Score (0-10)",
+            "value": 8.0
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "unit": "Score (0-10)",
+            "value": 7.0
+          }
+        ]
       }
     ]
   },
