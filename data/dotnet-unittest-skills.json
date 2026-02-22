@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771780078624,
+  "lastUpdate": 1771782062273,
   "entries": {
     "Efficiency": [
       {
@@ -4473,6 +4473,43 @@
             "value": 451300.0
           }
         ]
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 87.0,
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "value": 286100.0,
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In"
+          },
+          {
+            "value": 102.0,
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time"
+          },
+          {
+            "value": 379200.0,
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In"
+          }
+        ],
+        "commit": {
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "message": "Add MIT License to the project (#52)",
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "date": 1771782062273,
+        "tool": "customSmallerIsBetter"
       }
     ],
     "Quality": [
@@ -8954,6 +8991,43 @@
             "value": 9.0
           }
         ]
+      },
+      {
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality"
+          }
+        ],
+        "commit": {
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "message": "Add MIT License to the project (#52)",
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "date": 1771782062273,
+        "tool": "customBiggerIsBetter"
       }
     ]
   },
