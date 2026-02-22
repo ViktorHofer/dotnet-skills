@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1771726460693,
+  "lastUpdate": 1771735159133,
   "entries": {
     "Efficiency": [
       {
@@ -3770,6 +3770,43 @@
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
           "message": "Add MIT License to the project (#52)"
         }
+      },
+      {
+        "model": "claude-opus-4.5",
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472"
+        },
+        "date": 1771735159133,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "value": 79.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 284500.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "value": 102.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 342800.0,
+            "unit": "tokens"
+          }
+        ]
       }
     ],
     "Quality": [
@@ -7548,6 +7585,43 @@
           "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472",
           "message": "Add MIT License to the project (#52)"
         }
+      },
+      {
+        "model": "claude-opus-4.5",
+        "commit": {
+          "message": "Add MIT License to the project (#52)",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "timestamp": "2026-02-20T10:21:56+00:00",
+          "id": "78af43c631201ad6ebea360bc1d32e8adeac9472",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/78af43c631201ad6ebea360bc1d32e8adeac9472"
+        },
+        "date": 1771735159133,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 7.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 9.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 9.0,
+            "unit": "Score (0-10)"
+          }
+        ]
       }
     ]
   },
