@@ -18,6 +18,12 @@ error handling patterns, and code quality guidance.
 |-------|-------------|
 | [`rust-error-handling`](skills/rust-error-handling/) | Error design patterns: canonical structs, thiserror, anyhow, Result vs panic |
 
+### Tooling & IDE Integration
+
+| Skill | Description |
+|-------|-------------|
+| [`rust-analyzer-setup`](skills/rust-analyzer-setup/) | rust-analyzer installation, Copilot CLI LSP integration, workspace configuration |
+
 ### Shared
 
 | Skill | Description |
@@ -38,3 +44,5 @@ error handling patterns, and code quality guidance.
 | [`type-errors`](testcases/type-errors/) | common-rust-errors | Type mismatches and trait bound failures |
 | [`import-resolution`](testcases/import-resolution/) | common-rust-errors | Unresolved imports and missing dependencies |
 | [`poor-error-handling`](testcases/poor-error-handling/) | rust-error-handling | Anti-pattern error handling that builds but is fragile |
+| [`rust-analyzer-config`](testcases/rust-analyzer-config/) | rust-analyzer-setup | Misconfigured Copilot CLI LSP integration and rust-analyzer settings |
+| [`rust-lsp-usage`](testcases/rust-lsp-usage/) | rust-analyzer-setup | Uses LSP capabilities (find impls, references, go-to-def) to answer code intelligence questions |

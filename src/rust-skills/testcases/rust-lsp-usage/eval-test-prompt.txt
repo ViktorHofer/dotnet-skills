@@ -1,0 +1,8 @@
+I'm working on this Rust project and need help understanding the codebase using code intelligence features. Please use LSP capabilities (find implementations, find references, go to definition) to answer these questions:
+
+1. What types implement the `StorageBackend` trait? List each implementation and which file it's in.
+2. What types implement the `DataProcessor` trait? List each one.
+3. The `Pipeline::process_key` method calls several other methods. Trace the call chain: what does it call, and where are those methods defined?
+4. Find all references to `PipelineError` across the codebase. Which files use it and how?
+5. If I wanted to add a new storage backend (e.g., a Redis-backed one), what methods would I need to implement? Show me the trait definition.
+6. The `ProcessorChain` struct has a method `processors()` — find all places that call it (or could call it) in the codebase.

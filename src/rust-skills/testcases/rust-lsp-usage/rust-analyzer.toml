@@ -1,0 +1,8 @@
+[cargo]
+features = "all"
+
+[procMacro]
+enable = true
+
+[check]
+command = "clippy"

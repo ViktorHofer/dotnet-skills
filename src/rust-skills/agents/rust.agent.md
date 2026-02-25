@@ -46,6 +46,7 @@ If **any** of these are true → proceed with Rust skills.
 | Build failed with E0308, E0277, E0425, E0432, E0433, E0004, E0384, E0596, E0599, E0658 | This agent + **common-rust-errors** skill |
 | Any other `E0xxx` error | This agent + **common-rust-errors** skill (best-effort) |
 | Error handling design, `.unwrap()` issues, error type review | This agent + **rust-error-handling** skill |
+| rust-analyzer setup, Copilot CLI LSP, IDE config | This agent + **rust-analyzer-setup** skill |
 | Cargo dependency issues, feature conflicts | This agent (built-in knowledge) |
 | Clippy warnings | This agent (built-in knowledge; clippy-diagnostics skill planned for V2) |
 | Performance issues | This agent (built-in knowledge; rust-performance skill planned for V2) |
@@ -82,6 +83,10 @@ If **any** of these are true → proceed with Rust skills.
   trait errors with step-by-step fixes
 - **borrow-checker-errors** — Deep ownership/borrowing/lifetime error resolution
   with refactoring strategies
+
+### Tooling & IDE Integration
+- **rust-analyzer-setup** — rust-analyzer installation, Copilot CLI LSP integration,
+  workspace configuration, troubleshooting
 
 ### Error Handling Design
 - **rust-error-handling** — Result vs panic, thiserror, anyhow, canonical error

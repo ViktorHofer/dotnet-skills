@@ -1,6 +1,6 @@
 {
   "name": "rust-skills",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "Rust development skills: compiler error diagnosis, borrow checker resolution, error handling patterns, and code quality guidance.",
   "skills": "./skills/",
   "agents": "./agents/"
