@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1772116640362,
+  "lastUpdate": 1772119972601,
   "entries": {
     "Efficiency": [
       {
@@ -7431,6 +7431,43 @@
             "unit": "tokens",
             "name": "order-service-mstest - Skilled Tokens In",
             "value": 393000.0
+          }
+        ]
+      },
+      {
+        "tool": "customSmallerIsBetter",
+        "date": 1772119972601,
+        "commit": {
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf"
+        },
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 80.0,
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "value": 275200.0,
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In"
+          },
+          {
+            "value": 108.0,
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time"
+          },
+          {
+            "value": 326800.0,
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In"
           }
         ]
       }
@@ -14872,6 +14909,43 @@
             "unit": "Score (0-10)",
             "name": "order-service-mstest - Vanilla Quality",
             "value": 7.0
+          }
+        ]
+      },
+      {
+        "tool": "customBiggerIsBetter",
+        "date": 1772119972601,
+        "commit": {
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          },
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf"
+        },
+        "model": "claude-opus-4.5",
+        "benches": [
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality"
           }
         ]
       }
