@@ -90,6 +90,8 @@ jobs:
 
   evaluate:
     needs: discover
+    # Skip evaluation for fork PRs where the Copilot auth token is not available
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -98,6 +100,14 @@ jobs:
         plugin: ${{ fromJson(needs.discover.outputs.plugins) }}
 
     steps:
+      - name: Verify Copilot auth token
+        run: |
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "::error::Copilot authentication token (COPILOT_GITHUB_TOKEN) is not available. This is expected for fork PRs where repository secrets are not shared. Skipping evaluation."
+            exit 1
+          fi
+          echo "✅ Copilot auth token is available"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 

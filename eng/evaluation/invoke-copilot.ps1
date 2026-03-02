@@ -57,6 +57,13 @@ function Invoke-CopilotCli {
     Write-Host "   Timeout: ${TimeoutSeconds}s"
     Write-Host "   Prompt: $Prompt"
 
+    # Pre-flight: check for authentication token
+    if (-not $env:GH_TOKEN -and -not $env:GITHUB_TOKEN -and -not $env:COPILOT_GITHUB_TOKEN) {
+        Write-Warning "[AUTH] No authentication token found. Set GH_TOKEN, GITHUB_TOKEN, or COPILOT_GITHUB_TOKEN environment variable."
+        Write-Warning "[AUTH] For fork PRs, repository secrets are not available — this is expected."
+        return $null
+    }
+
     # Resolve copilot executable - prefer .cmd/.bat/.exe for Process.Start compatibility
     # Use -All to search across all PATH entries, not just the first match
     $copilotCmd = Get-Command copilot -All -ErrorAction SilentlyContinue |
