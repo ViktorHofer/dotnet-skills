@@ -32,7 +32,7 @@ Classify the user's request and invoke the appropriate skill:
 
 | User Intent | Skill to Invoke |
 |------------|-----------------|
-| "Create a new project/app/service" | Use `template_from_intent` → `template-instantiation` |
+| "Create a new project/app/service" | Use `solution_analyze` → `template_from_intent` → `template-instantiation` |
 | "What templates are available for X?" | `template-discovery` |
 | "Create a template from my project" | `template-authoring` |
 | "Add a parameter to my template" | `template-authoring` |
@@ -89,10 +89,11 @@ All template operations go through the template-engine-mcp server:
 
 | Tool | Use For |
 |------|---------|
+| `solution_analyze` | Understanding workspace context (frameworks, CPM, existing projects) |
 | `template_search` | Finding templates by keyword (local + NuGet.org) |
 | `template_list` | Listing installed templates with filters |
 | `template_inspect` | Getting full template metadata |
-| `template_instantiate` | Creating projects with validation, smart defaults, CPM adaptation, and latest NuGet versions |
+| `template_instantiate` | Creating projects with validation, smart defaults, CPM adaptation, latest NuGet versions, and interactive elicitation |
 | `template_dry_run` | Previewing creation without writing files |
 | `template_install` | Installing template packages |
 | `template_uninstall` | Removing template packages |

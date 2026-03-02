@@ -9,17 +9,19 @@ This repository uses `dotnet new` templates for project creation, powered by the
 ## Template Selection
 
 When creating new projects:
-1. Use `template_from_intent` to resolve natural-language descriptions (e.g., *"web API with auth"* → webapi + `auth=Individual`)
-2. Use `template_search` or `template_list` to find templates by keyword
-3. Use `template_inspect` to understand available parameters before creation
-4. Use `template_dry_run` to preview output before committing to creation
-5. Use `template_instantiate` with appropriate parameters — it validates, applies smart defaults, adapts to CPM, and resolves latest NuGet versions automatically
+1. Use `solution_analyze` to understand the workspace context (frameworks, CPM, existing projects)
+2. Use `template_from_intent` to resolve natural-language descriptions (e.g., *"web API with auth"* → webapi + `auth=Individual`)
+3. Use `template_search` or `template_list` to find templates by keyword
+4. Use `template_inspect` to understand available parameters before creation
+5. Use `template_dry_run` to preview output before committing to creation
+6. Use `template_instantiate` with appropriate parameters — it validates, applies smart defaults, adapts to CPM, resolves latest NuGet versions, and interactively asks for missing required parameters via elicitation
 
 ## Smart Behaviors
 
 The MCP server handles these automatically during `template_instantiate`:
 - **Auto-resolve**: Template not installed? Searches NuGet, installs, and creates — one call
 - **Smart defaults**: `EnableAot=true` → suggests latest framework; `auth=Individual` → keeps HTTPS; `UseControllers=true` → sets `UseMinimalAPIs=false`
+- **Interactive elicitation**: When required parameters are missing, asks the user interactively via MCP elicitation forms (string, bool, number, and choice fields)
 - **CPM adaptation**: Detects `Directory.Packages.props`, strips versions from `.csproj`, adds `<PackageVersion>` entries to the props file
 - **Latest versions**: Queries NuGet V3 API to replace stale template-hardcoded package versions with latest stable releases
 - **Parameter validation**: Reports invalid values with "did you mean...?" suggestions before files are written

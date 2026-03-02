@@ -25,14 +25,14 @@
 
 ## 🔌 MCP Server
 
-This plugin uses the **DotnetTemplateMCP** MCP server (v0.1.0-preview.3), which exposes the following tools:
+This plugin uses the **DotnetTemplateMCP** MCP server (v1.0.0), which exposes the following tools:
 
 | Tool | Description |
 |------|-------------|
 | `template_search` | Search templates locally and on NuGet.org (ranked results) |
 | `template_list` | List installed templates with language/type/classification filters |
 | `template_inspect` | Full metadata: parameters, constraints, post-actions |
-| `template_instantiate` | Create projects with auto-resolve, validation, smart defaults, CPM adaptation, and latest NuGet versions |
+| `template_instantiate` | Create projects with auto-resolve, validation, smart defaults, CPM adaptation, latest NuGet versions, and interactive elicitation of missing parameters |
 | `template_dry_run` | Preview what instantiation would produce without writing files |
 | `template_install` | Install template packages (idempotent, supports upgrade) |
 | `template_uninstall` | Remove installed template packages |
@@ -40,16 +40,19 @@ This plugin uses the **DotnetTemplateMCP** MCP server (v0.1.0-preview.3), which 
 | `template_from_intent` | Natural-language intent resolution: *"web API with auth"* → webapi + `auth=Individual` (70+ keyword mappings, offline) |
 | `template_compose` | Execute a sequence of template operations (project + items) in one orchestrated workflow |
 | `template_suggest_parameters` | Suggest parameter values with rationale based on cross-parameter relationships |
+| `solution_analyze` | Analyze workspace: .sln structure, target frameworks, CPM status, global.json |
 
-### Smart Behaviors (v0.1.0-preview.3)
+### Smart Behaviors (v1.0.0)
 
 | Feature | Description |
 |---------|-------------|
 | **Intent Resolution** | 70+ keyword mappings resolve natural-language descriptions to template + parameters. No LLM needed. |
+| **Interactive Elicitation** | Missing required parameters are collected from the user via MCP elicitation forms — string, bool, number, and choice fields |
 | **CPM Adaptation** | Detects `Directory.Packages.props` in parent directories, strips versions from `.csproj`, adds entries to props file |
 | **Latest NuGet Versions** | Queries NuGet V3 API at creation time to replace template-hardcoded versions with latest stable releases |
 | **Multi-Template Composition** | `template_compose` chains project + item templates in a single orchestrated workflow |
 | **Parameter Suggestions** | `template_suggest_parameters` returns values with human-readable rationale (e.g., "AOT works best with net9.0+") |
+| **HTTP Transport** | Run as a remote server with `--transport http` for team-shared or CI/CD deployment |
 
 ### Resources & Prompts
 
@@ -64,7 +67,7 @@ The MCP server is installed automatically via `dnx` when the plugin is loaded. R
 
 Manual installation:
 ```bash
-dotnet tool install -g DotnetTemplateMCP --version 0.1.0-preview.3
+dotnet tool install -g DotnetTemplateMCP
 ```
 
 ## 📄 Distribution Templates
