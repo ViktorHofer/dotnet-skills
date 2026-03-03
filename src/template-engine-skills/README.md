@@ -25,7 +25,7 @@
 
 ## 🔌 MCP Server
 
-This plugin uses the **DotnetTemplateMCP** MCP server (v0.1.0-preview.3), which exposes the following tools:
+This plugin uses the **DotnetTemplateMCP** MCP server (v1.1.0), which exposes the following tools:
 
 | Tool | Description |
 |------|-------------|
@@ -40,8 +40,11 @@ This plugin uses the **DotnetTemplateMCP** MCP server (v0.1.0-preview.3), which 
 | `template_from_intent` | Natural-language intent resolution: *"web API with auth"* → webapi + `auth=Individual` (70+ keyword mappings, offline) |
 | `template_compose` | Execute a sequence of template operations (project + items) in one orchestrated workflow |
 | `template_suggest_parameters` | Suggest parameter values with rationale based on cross-parameter relationships |
+| `template_validate` | Validate local template.json for authoring issues before publishing |
+| `solution_analyze` | Analyze solution/workspace — project structure, frameworks, CPM status |
+| `templates_installed` | Inventory of all currently installed templates |
 
-### Smart Behaviors (v0.1.0-preview.3)
+### Smart Behaviors (v1.1.0)
 
 | Feature | Description |
 |---------|-------------|
@@ -50,6 +53,9 @@ This plugin uses the **DotnetTemplateMCP** MCP server (v0.1.0-preview.3), which 
 | **Latest NuGet Versions** | Queries NuGet V3 API at creation time to replace template-hardcoded versions with latest stable releases |
 | **Multi-Template Composition** | `template_compose` chains project + item templates in a single orchestrated workflow |
 | **Parameter Suggestions** | `template_suggest_parameters` returns values with human-readable rationale (e.g., "AOT works best with net9.0+") |
+| **Template Validation** | `template_validate` checks template.json for schema compliance, parameter issues, prefix collisions, and post-action gaps |
+| **Tool Profiles** | Set `MCP_TEMPLATE_TOOL_PROFILE=lite` to expose only 5 core tools for simpler agents |
+| **Solution Awareness** | `solution_analyze` inspects .sln/.csproj structure, detects CPM and global.json before scaffolding |
 
 ### Resources & Prompts
 
@@ -64,7 +70,7 @@ The MCP server is installed automatically via `dnx` when the plugin is loaded. R
 
 Manual installation:
 ```bash
-dotnet tool install -g DotnetTemplateMCP --version 0.1.0-preview.3
+dotnet tool install -g DotnetTemplateMCP --version 1.1.0
 ```
 
 ## 📄 Distribution Templates

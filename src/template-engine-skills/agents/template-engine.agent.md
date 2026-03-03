@@ -39,6 +39,8 @@ Classify the user's request and invoke the appropriate skill:
 | "Show me template details/parameters" | `template-discovery` (inspect) |
 | "Install a template package" | `template-instantiation` (install) |
 | "Create solution + API + tests" | `template_compose` for multi-template orchestration |
+| "Validate my custom template" | `template_validate` to check template.json for issues |
+| "Show me the solution structure" | `solution_analyze` to inspect projects, frameworks, CPM |
 
 ## Workflow: Creating a Project
 
@@ -100,6 +102,8 @@ All template operations go through the template-engine-mcp server:
 | `template_from_intent` | Resolving natural-language descriptions to template + parameters (70+ keyword mappings) |
 | `template_compose` | Executing multi-template sequences (project + items) in one workflow |
 | `template_suggest_parameters` | Suggesting parameter values with rationale |
+| `template_validate` | Validating template.json for authoring issues before publishing |
+| `solution_analyze` | Analyzing solution/workspace structure, frameworks, CPM |
 
 ## Cross-Reference
 

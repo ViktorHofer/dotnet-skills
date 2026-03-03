@@ -44,3 +44,4 @@ When creating custom templates:
 - Add `defaultValue` for optional parameters
 - Set appropriate `classifications` and `tags` for discoverability
 - Use `template_create_from_existing` to bootstrap templates from existing projects
+- Use `template_validate` to check template.json for schema issues, parameter problems, and best-practice violations before publishing
