@@ -1,0 +1,1 @@
+Review the error handling in this Rust project. Identify anti-patterns and suggest improvements following Rust best practices for error handling.
