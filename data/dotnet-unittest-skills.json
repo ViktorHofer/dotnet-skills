@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1772912873549,
+  "lastUpdate": 1772915359607,
   "entries": {
     "Efficiency": [
       {
@@ -16311,6 +16311,43 @@
             "name": "order-service-mstest - Skilled Tokens In"
           }
         ],
+        "model": "claude-opus-4.5",
+        "tool": "customSmallerIsBetter"
+      },
+      {
+        "date": 1772915359607,
+        "benches": [
+          {
+            "value": 70.0,
+            "unit": "seconds",
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "value": 265900.0,
+            "unit": "tokens",
+            "name": "calculator-xunit - Skilled Tokens In"
+          },
+          {
+            "value": 106.0,
+            "unit": "seconds",
+            "name": "order-service-mstest - Skilled Time"
+          },
+          {
+            "value": 394200.0,
+            "unit": "tokens",
+            "name": "order-service-mstest - Skilled Tokens In"
+          }
+        ],
+        "commit": {
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf"
+        },
         "model": "claude-opus-4.5",
         "tool": "customSmallerIsBetter"
       }
@@ -32632,6 +32669,43 @@
             "name": "order-service-mstest - Vanilla Quality"
           }
         ],
+        "model": "claude-opus-4.5",
+        "tool": "customBiggerIsBetter"
+      },
+      {
+        "date": 1772915359607,
+        "benches": [
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "value": 9.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Skilled Quality"
+          },
+          {
+            "value": 8.0,
+            "unit": "Score (0-10)",
+            "name": "order-service-mstest - Vanilla Quality"
+          }
+        ],
+        "commit": {
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf"
+        },
         "model": "claude-opus-4.5",
         "tool": "customBiggerIsBetter"
       }
