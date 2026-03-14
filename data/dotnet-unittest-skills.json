@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1773498793229,
+  "lastUpdate": 1773500370244,
   "entries": {
     "Efficiency": [
       {
@@ -22455,6 +22455,43 @@
           }
         ],
         "date": 1773498793229
+      },
+      {
+        "commit": {
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "benches": [
+          {
+            "unit": "seconds",
+            "value": 74.0,
+            "name": "calculator-xunit - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 270600.0,
+            "name": "calculator-xunit - Skilled Tokens In"
+          },
+          {
+            "unit": "seconds",
+            "value": 91.0,
+            "name": "order-service-mstest - Skilled Time"
+          },
+          {
+            "unit": "tokens",
+            "value": 314100.0,
+            "name": "order-service-mstest - Skilled Tokens In"
+          }
+        ],
+        "date": 1773500370244,
+        "tool": "customSmallerIsBetter",
+        "model": "claude-opus-4.5"
       }
     ],
     "Quality": [
@@ -44918,6 +44955,43 @@
           }
         ],
         "date": 1773498793229
+      },
+      {
+        "commit": {
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "username": "ViktorHofer",
+            "name": "Viktor Hofer"
+          }
+        },
+        "benches": [
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "calculator-xunit - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 9.0,
+            "name": "calculator-xunit - Vanilla Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "order-service-mstest - Skilled Quality"
+          },
+          {
+            "unit": "Score (0-10)",
+            "value": 8.0,
+            "name": "order-service-mstest - Vanilla Quality"
+          }
+        ],
+        "date": 1773500370244,
+        "tool": "customBiggerIsBetter",
+        "model": "claude-opus-4.5"
       }
     ]
   },
