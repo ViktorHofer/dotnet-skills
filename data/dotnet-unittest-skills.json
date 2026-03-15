@@ -1,5 +1,5 @@
 {
-  "lastUpdate": 1773532570183,
+  "lastUpdate": 1773541156877,
   "entries": {
     "Efficiency": [
       {
@@ -23084,6 +23084,43 @@
             "value": 319200.0
           }
         ]
+      },
+      {
+        "model": "claude-opus-4.5",
+        "commit": {
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf"
+        },
+        "date": 1773541156877,
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Time",
+            "value": 63.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "calculator-xunit - Skilled Tokens In",
+            "value": 212100.0,
+            "unit": "tokens"
+          },
+          {
+            "name": "order-service-mstest - Skilled Time",
+            "value": 88.0,
+            "unit": "seconds"
+          },
+          {
+            "name": "order-service-mstest - Skilled Tokens In",
+            "value": 268100.0,
+            "unit": "tokens"
+          }
+        ],
+        "tool": "customSmallerIsBetter"
       }
     ],
     "Quality": [
@@ -46176,6 +46213,43 @@
             "value": 8.0
           }
         ]
+      },
+      {
+        "model": "claude-opus-4.5",
+        "commit": {
+          "timestamp": "2026-02-25T16:50:01+00:00",
+          "message": "Fix formatting in README.md table",
+          "author": {
+            "name": "Viktor Hofer",
+            "username": "ViktorHofer"
+          },
+          "url": "https://github.com/ViktorHofer/dotnet-skills/commit/f626679c2e88c2aa06cc0bf6a26d840d20d33bcf",
+          "id": "f626679c2e88c2aa06cc0bf6a26d840d20d33bcf"
+        },
+        "date": 1773541156877,
+        "benches": [
+          {
+            "name": "calculator-xunit - Skilled Quality",
+            "value": 8.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "calculator-xunit - Vanilla Quality",
+            "value": 8.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "order-service-mstest - Skilled Quality",
+            "value": 7.0,
+            "unit": "Score (0-10)"
+          },
+          {
+            "name": "order-service-mstest - Vanilla Quality",
+            "value": 9.0,
+            "unit": "Score (0-10)"
+          }
+        ],
+        "tool": "customBiggerIsBetter"
       }
     ]
   },
